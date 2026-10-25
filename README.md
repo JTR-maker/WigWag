@@ -1,5 +1,4 @@
-# Hello-world
-I hope this helps. 
+Application
 📲 Install Commo Fundamentals on your phone
 
 This is a web app — there's no app store, no account, and no download of a file. You open one link, save it to your home screen, and from then on it launches and behaves exactly like a normal app, including working with no signal.
