@@ -4,7 +4,7 @@ A free, offline-first field reference and toolkit for communications work — re
 
 No app store. No account. No data leaves your phone.
 
-▶️ Open the app: https://YOUR-USERNAME.github.io/YOUR-REPO/
+▶️ Open the app: https://jtr-maker.github.io/WigWag/
 
 ⚠️ Read first
 Unclassified reference only. This app contains general, publicly available communications and land-navigation fundamentals. It is not a technical manual, contains no system-specific or controlled information, and is not a substitute for official doctrine, orders, or current publications.
