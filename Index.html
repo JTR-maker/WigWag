@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+<title>Commo Fundamentals</title>
+<meta name="description" content="Offline field-radio reference & tools: antenna math, coordinates, RF, report formats, Zulu clock, notes. Unclassified.">
+<meta name="theme-color" content="#12202c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Commo">
+<link id="appicon" rel="apple-touch-icon" href="">
+<style>
+  :root{
+    --bg:#15131f; --panel:#1d1a2e; --panel2:#262138; --ink:#e9e6f4; --muted:#9b95b6;
+    --line:#332e49; --accent:#4fd6cb; --accent2:#ecb457; --red:#ff6f8b; --amber:#ecb457;
+    --green:#5fd7a6; --chip:#241f38; --shadow:0 6px 24px rgba(0,0,0,.45);
+    --grad1:#221d38; --grad2:#15131f; --tab1:#100d1b; --tab2:#1b1730; --inset:#141121;
+    --note-bg:#1d1a33; --warn-bg:#2c1b28;
+    --zbar-bg:rgba(22,19,38,.9); --on-accent:#12101c; --logo1:#4fd6cb; --logo2:#7a5cff;
+    --glow:rgba(79,214,203,.55);
+    --safe-b:env(safe-area-inset-bottom,0px); --safe-t:env(safe-area-inset-top,0px);
+  }
+  [data-theme="light"]{
+    --bg:#ecebf3; --panel:#ffffff; --panel2:#f4f2fb; --ink:#221f33; --muted:#5d5876;
+    --line:#dcd8ec; --accent:#0f8f86; --accent2:#a9761c; --red:#c94b66; --amber:#a9761c;
+    --green:#1f9d6e; --chip:#eceaf6; --shadow:0 6px 20px rgba(70,60,110,.15);
+    --grad1:#e9e6f6; --grad2:#ecebf3; --tab1:#e7e3f2; --tab2:#f3f1f9; --inset:#eeecf7;
+    --note-bg:#edeffb; --warn-bg:#fbecef;
+    --zbar-bg:rgba(255,255,255,.92); --on-accent:#ffffff; --logo1:#0f8f86; --logo2:#7a5cff;
+    --glow:rgba(15,143,134,.4);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.55;font-size:16px;-webkit-text-size-adjust:100%;padding-bottom:calc(var(--safe-b) + 20px)}
+  a{color:var(--accent)}
+  header.top{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--grad1),var(--grad2));border-bottom:1px solid var(--line);padding:calc(14px + var(--safe-t)) 20px 12px}
+  .brandrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding-right:150px}
+  .logo{width:40px;height:40px;border-radius:11px;background:linear-gradient(135deg,var(--logo1),var(--logo2));display:flex;align-items:center;justify-content:center;color:#12101c;box-shadow:0 4px 14px rgba(0,0,0,.35),0 0 0 1px rgba(255,255,255,.08) inset;line-height:1}
+  .logo svg{width:23px;height:23px}
+  h1.title{font-size:19px;margin:0;letter-spacing:.3px}
+  .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
+  .searchwrap{margin-top:12px;position:relative;max-width:780px}
+  #q{width:100%;padding:14px 44px 14px 44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;outline:none}
+  #q:focus{border-color:var(--accent)}
+  .sicon{position:absolute;left:14px;top:14px;color:var(--muted)}
+  .clearbtn{position:absolute;right:10px;top:9px;background:var(--chip);border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 9px;cursor:pointer;font-size:12px}
+  .hint{color:var(--muted);font-size:12px;margin-top:8px}
+  .chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .chip{background:var(--chip);border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:12.5px;cursor:pointer;transition:.15s;user-select:none}
+  .chip:hover{border-color:var(--accent);color:var(--ink)}
+  .chip.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:600}
+  main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
+  .meta{color:var(--muted);font-size:13px;margin:6px 2px 14px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:150px;position:relative}
+  .card h3{margin:0 0 3px;font-size:16.5px;padding-right:34px}
+  .cat{display:inline-block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:8px}
+  .card .body{font-size:14.6px}
+  .card .body ul,.card .body ol{margin:8px 0 8px;padding-left:22px}
+  .card .body li{margin:3px 0}
+  .card .body p{margin:7px 0}
+  .tagline{margin-top:10px;display:flex;flex-wrap:wrap;gap:6px}
+  .tag{font-size:11px;background:var(--chip);border:1px solid var(--line);color:var(--muted);padding:2px 8px;border-radius:6px;cursor:pointer}
+  .tag:hover{color:var(--ink);border-color:var(--accent)}
+  .fav{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;padding:2px 4px;border-radius:8px}
+  .fav:hover,.fav.on{color:var(--accent2)}
+  mark{background:var(--accent2);color:var(--on-accent);padding:0 2px;border-radius:3px}
+  .note{background:var(--note-bg);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 8px 8px 0;margin:9px 0;font-size:13.8px}
+  .warn{background:var(--warn-bg);border-left:3px solid var(--red);padding:8px 12px;border-radius:0 8px 8px 0;margin:9px 0;font-size:13.8px}
+  .steps{counter-reset:s;list-style:none;padding-left:0}
+  .steps li{counter-increment:s;position:relative;padding-left:34px;margin:6px 0}
+  .steps li::before{content:counter(s);position:absolute;left:0;top:0;width:23px;height:23px;background:var(--accent);color:var(--on-accent);border-radius:50%;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+  table.led{width:100%;border-collapse:collapse;margin:8px 0;font-size:13.4px}
+  table.led th,table.led td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top}
+  table.led th{background:var(--panel2);color:var(--accent2)}
+  .noresult{text-align:center;color:var(--muted);padding:50px 20px}
+  .kbd{background:var(--chip);border:1px solid var(--line);border-radius:5px;padding:1px 7px;font-family:monospace;font-size:12.5px}
+  details.gloss{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:4px 16px;margin-bottom:14px}
+  details.gloss summary{cursor:pointer;padding:12px 0;font-weight:600;font-size:15px}
+  .glossgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px 18px;padding:6px 0 14px}
+  .glossgrid div{font-size:13.4px}
+  .glossgrid b{color:var(--accent)}
+  footer{color:var(--muted);font-size:12px;text-align:center;padding:24px;border-top:1px solid var(--line)}
+
+  .tabview{display:none}
+  .tabview.active{display:block}
+  #zulubar{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;padding:5px 10px;text-align:right;box-shadow:var(--shadow);cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  #zulubar .zt{font-family:"Segoe UI",monospace;font-variant-numeric:tabular-nums;font-size:16px;font-weight:800;color:var(--accent);letter-spacing:.5px;line-height:1.05}
+  #zulubar .zd{font-size:14px;color:var(--muted);letter-spacing:.8px;margin-top:2px;font-weight:700}
+  #zulubar .zg{font-size:9px;color:var(--accent2);letter-spacing:.6px;margin-top:1px;font-family:monospace}
+  #topctrls{position:fixed;top:calc(var(--safe-t) + 6px);right:8px;z-index:90;display:flex;align-items:stretch;gap:8px}
+  #themeToggle{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:18px;line-height:1;cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  #themeToggle:active{transform:translateY(1px)}
+  #navHandle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:115;width:19px;height:110px;padding:0;display:flex;align-items:center;justify-content:center;font-size:0;background:var(--zbar-bg);border:1px solid var(--line);border-left:none;border-radius:0 11px 11px 0;color:var(--accent);cursor:pointer;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:left .26s cubic-bezier(.4,0,.2,1),opacity .2s}
+  #navHandle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:4px;height:66px;border-radius:3px;background:linear-gradient(var(--logo1),var(--logo2));opacity:.9}
+  #navScrim{position:fixed;inset:0;z-index:105;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s}
+  #navDrawer{position:fixed;left:0;top:0;bottom:0;z-index:110;width:min(80vw,272px);background:linear-gradient(180deg,var(--grad1),var(--panel));border-right:1px solid var(--line);box-shadow:6px 0 30px rgba(0,0,0,.45);transform:translateX(-100%);transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding-top:var(--safe-t);overflow-y:auto;-webkit-overflow-scrolling:touch}
+  body.nav-open #navDrawer{transform:none}
+  body.nav-open #navScrim{opacity:1;pointer-events:auto}
+  body.nav-open #navHandle{left:min(80vw,272px);border-radius:11px 0 0 11px;border-left:1px solid var(--line);border-right:none}
+  .nav-brand{display:flex;align-items:center;gap:12px;padding:20px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:16px}
+  .nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--logo1),var(--logo2));display:flex;align-items:center;justify-content:center;color:#12101c;flex:0 0 auto}
+  .nav-logo svg{width:19px;height:19px}
+  .navitem{display:flex;align-items:center;gap:14px;padding:15px 18px 15px 15px;background:none;border:none;border-left:3px solid transparent;color:var(--muted);font-size:16px;font-weight:600;text-align:left;cursor:pointer;width:100%;font-family:inherit}
+  .navitem .ico{font-size:20px;width:24px;text-align:center}
+  .navitem:hover{color:var(--ink)}
+  .navitem.active{color:var(--accent);background:var(--panel2);border-left-color:var(--accent)}
+  .subhead{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--grad1),var(--grad2));border-bottom:1px solid var(--line);padding:calc(14px + var(--safe-t)) 150px 12px 20px}
+  .subhead h2{margin:0;font-size:18px}
+  .subhead p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
+  .wrap{max-width:1080px;margin:0 auto;padding:16px 20px 40px}
+  .btn{background:var(--accent);color:var(--on-accent);border:none;border-radius:10px;padding:12px 16px;font-size:15px;font-weight:700;cursor:pointer}
+  .btn:active{transform:translateY(1px)}
+  .btn.ghost{background:var(--chip);color:var(--ink);border:1px solid var(--line)}
+  .btn.wide{width:100%;margin-top:6px}
+  .btn.sm{padding:8px 12px;font-size:13px}
+  .catlabel{font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin:16px 2px 8px}
+
+  .tool{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 16px;box-shadow:var(--shadow)}
+  .tool h3{margin:0 0 4px;font-size:16.5px}
+  .tool .desc{color:var(--muted);font-size:12.5px;margin-bottom:12px}
+  .clock{display:flex;gap:12px;flex-wrap:wrap}
+  .clockbox{flex:1;min-width:150px;background:var(--inset);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .clockbox .lbl{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+  .clockbox .val{font-size:30px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:1px;margin-top:4px}
+  .clockbox .dte{font-size:12px;color:var(--muted);margin-top:2px}
+  .conv{margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .conv input{background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:8px 10px;font-size:15px}
+
+  details.cx{margin-bottom:12px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;box-shadow:var(--shadow)}
+  details.cx>summary{cursor:pointer;font-weight:800;font-size:15.5px;color:var(--accent);list-style:none;display:flex;align-items:center;gap:8px;padding:2px 0}
+  details.cx>summary::-webkit-details-marker{display:none}
+  details.cx>summary::after{content:"\25B8";margin-left:auto;color:var(--muted);transition:transform .2s}
+  details.cx[open]>summary::after{transform:rotate(90deg)}
+  .toolgroup{margin:24px 0 10px;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent2);border-bottom:1px solid var(--line);padding-bottom:6px}
+  .cxrow{display:flex;align-items:center;gap:10px;margin:8px 0}
+  .cxrow label{flex:0 0 45%;font-size:13.5px;color:var(--muted)}
+  .cxrow input,.cxrow select,.cxrow textarea{flex:1;min-width:0;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:15px}
+  .cxrow textarea{min-height:38px;resize:vertical}
+  .cxout{margin-top:8px}
+  .cxout .big{font-family:monospace;font-size:18px;color:var(--accent);font-weight:800}
+  .cxmuted{font-size:12.5px;color:var(--muted);line-height:1.4}
+  .rpt pre{white-space:pre-wrap;word-break:break-word;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px;font-family:monospace;font-size:13px;color:var(--ink);margin:8px 0 4px}
+  .rpt .rbtns{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .rpt .copied{color:var(--accent);font-size:12.5px}
+  .pacecard{border:1px solid var(--line);border-radius:8px;padding:10px;margin:8px 0;background:var(--panel2)}
+  .pacecard .pchdr{display:flex;gap:8px;align-items:center;margin-bottom:6px}
+  .pacecard .pchdr input{flex:1;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-family:inherit;font-size:15px;font-weight:700}
+  .ck{display:flex;gap:12px;align-items:flex-start;padding:9px 0;border-bottom:1px solid rgba(120,110,150,.18)}
+  .ck:last-child{border-bottom:none}
+  .ck input{width:22px;height:22px;margin-top:1px;flex:0 0 auto;accent-color:var(--green)}
+  .ck label{font-size:14.3px;cursor:pointer}
+  .ck.done label{color:var(--muted);text-decoration:line-through}
+  .proc-tools{display:flex;gap:8px;margin:6px 0 2px}
+
+  .infocard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 16px}
+  .offline-ok{display:inline-flex;align-items:center;gap:7px;background:var(--note-bg);border:1px solid var(--green);color:var(--green);border-radius:20px;padding:5px 12px;font-size:12.5px;font-weight:600}
+  .empty{text-align:center;color:var(--muted);padding:50px 20px}
+  .empty .big{font-size:44px}
+  .proc-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;margin:0 0 10px;padding:12px 15px}
+  .proc-item .nm{font-weight:600;font-size:15px}
+  .notes-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  #folderManage{display:none;gap:8px}
+  .folderchips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px}
+  .fchip{background:var(--chip);border:1px solid var(--line);color:var(--muted);padding:6px 12px;border-radius:20px;font-size:12.5px;cursor:pointer;user-select:none}
+  .fchip.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:600}
+  .note-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;cursor:pointer;box-shadow:var(--shadow)}
+  .note-card h4{margin:0 0 4px;font-size:15.5px}
+  .note-card .snip{color:var(--muted);font-size:13.5px;line-height:1.4;margin-bottom:6px}
+  .note-card .nmeta{font-size:11.5px;color:var(--muted)}
+  .note-card .ftag{background:var(--chip);border:1px solid var(--line);color:var(--accent2);border-radius:5px;padding:1px 7px;font-size:10.5px}
+  .ed-top{display:flex;gap:8px;align-items:center;margin-bottom:12px}
+  .ed-title{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:17px;font-weight:600;margin-bottom:10px;outline:none}
+  .ed-folder{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:14px;margin-bottom:10px;outline:none}
+  .ed-body{width:100%;min-height:46vh;padding:14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:15px;line-height:1.5;outline:none;resize:vertical;font-family:inherit}
+  .modal-ov{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:24px}
+  .modal{background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:20px;width:100%;max-width:340px;box-shadow:var(--shadow)}
+  .modal h4{margin:0 0 12px;font-size:16px}
+  .modal-in{width:100%;padding:12px 14px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;outline:none}
+  .modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+
+  @media (max-width:700px){
+    body{font-size:15px}
+    header.top{padding:calc(10px + var(--safe-t)) 12px 8px}
+    .logo{width:32px;height:32px}.logo svg{width:19px;height:19px}
+    h1.title{font-size:16px}.sub{font-size:11px}.hint{display:none}
+    .chips{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;margin-top:10px;padding-bottom:2px}
+    .chips::-webkit-scrollbar{display:none}
+    .chip{white-space:nowrap;flex:0 0 auto;padding:7px 13px}
+    main,.wrap{padding:12px 12px 40px}
+    .subhead{padding:calc(12px + var(--safe-t)) 150px 10px 14px}
+    #zulubar{padding:4px 8px}#zulubar .zt{font-size:15px}
+    .card{padding:13px 14px;border-radius:12px;scroll-margin-top:120px}
+    table.led{font-size:12.4px;display:block;overflow-x:auto}
+    table.led th,table.led td{padding:6px 7px;min-width:86px}
+    .glossgrid{grid-template-columns:1fr}
+    .clockbox .val{font-size:26px}
+    .cxrow{flex-wrap:wrap}.cxrow label{flex:0 0 100%}
+  }
+
+  /* ---- Hurry & Wait (games) ---- */
+  .gsel{display:flex;gap:8px;margin-bottom:16px}
+  .gbtn{flex:1;background:var(--chip);border:1px solid var(--line);color:var(--muted);border-radius:10px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit}
+  .gbtn.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .gtop{display:flex;justify-content:space-between;align-items:center;font-family:monospace;font-weight:800;color:var(--accent);margin-bottom:10px;font-size:15px}
+  #snCanvas{display:block;width:100%;max-width:340px;aspect-ratio:1/1;margin:0 auto;image-rendering:pixelated;image-rendering:crisp-edges;background:var(--inset);border:2px solid var(--line);border-radius:10px;touch-action:none}
+  .gmsg{text-align:center;color:var(--muted);font-size:13px;margin:10px 0;min-height:18px}
+  .gctrls{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:7px}
+  .dbtn{background:var(--chip);border:1px solid var(--line);color:var(--accent);border-radius:12px;font-size:20px;cursor:pointer;font-family:inherit}
+  .dbtn:active{background:var(--panel2);transform:translateY(1px)}
+  .dbtn.up{grid-area:1/2}.dbtn.left{grid-area:2/1}.dbtn.right{grid-area:2/3}.dbtn.down{grid-area:3/2}
+  #solBoard{max-width:440px;margin:0 auto}
+  .sol-top{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:12px}
+  .sol-tab{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;align-items:start}
+  .pile{min-height:62px}
+  .tabpile{position:relative;min-height:62px}
+  .scard{border-radius:5px;border:1px solid rgba(0,0,0,.45);font-weight:800;user-select:none;cursor:pointer;background:#f3efe3;color:#15130f;box-shadow:0 1px 2px rgba(0,0,0,.4);height:56px;display:flex;flex-direction:column;justify-content:space-between;padding:3px 4px;font-size:13px;line-height:1}
+  .scard .bot{align-self:flex-end;transform:rotate(180deg)}
+  .scard.red{color:#c0271a}
+  .scard.back{background:repeating-linear-gradient(45deg,#4a4f9e,#4a4f9e 4px,#343878 4px,#343878 8px);color:transparent;border-color:rgba(0,0,0,.55)}
+  .scard.sel{outline:3px solid var(--accent2);outline-offset:-2px}
+  .scard.empty{background:rgba(127,110,160,.08);border:1px dashed var(--line);color:var(--muted);cursor:pointer;box-shadow:none}
+  .scard.found{background:rgba(127,110,160,.05);border:1px solid var(--line);color:var(--muted);box-shadow:none}
+  .tabpile .scard{position:absolute;left:0;right:0}
+  .solwin{text-align:center;color:var(--green);font-weight:800;font-size:16px;padding:20px}
+  /* ---- Land Nav ---- */
+  .ln-warn{font-size:12.6px}
+  .ln-stat{display:flex;gap:16px;flex-wrap:wrap;font-family:monospace;font-size:13px;margin-top:10px}
+  .ln-stat b{color:var(--accent)}
+  .ln-grid{font-family:monospace;font-size:22px;font-weight:800;color:var(--accent);letter-spacing:1px}
+  .ln-kv{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13.5px;margin-top:8px}
+  .ln-kv .k{color:var(--muted)}
+  .ln-kv .v{font-family:monospace}
+  .ln-wpin{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .ln-wpin input{flex:1;min-width:120px;background:var(--panel2);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:9px 10px;font-size:15px;font-family:inherit}
+  .wp-row{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid rgba(120,110,150,.18);cursor:pointer}
+  .wp-row:last-child{border-bottom:none}
+  .wp-row.active{background:var(--panel2);border-radius:8px}
+  .wp-row .wn{flex:1;font-size:14px;font-weight:600}
+  .wp-row .wg{font-family:monospace;font-size:11.5px;color:var(--muted)}
+  .wp-row .wx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 6px}
+  .ln-nav{text-align:center}
+  .ln-dist{font-family:monospace;font-size:30px;font-weight:800;color:var(--accent);margin-top:4px}
+  .ln-turn{font-size:16px;font-weight:700;margin-top:4px}
+  .ln-brgs{display:flex;justify-content:center;gap:16px;flex-wrap:wrap;font-family:monospace;font-size:14px;margin:8px 0}
+  .ln-brgs b{color:var(--accent2)}
+  #lnCompass{display:block;width:100%;max-width:290px;aspect-ratio:1/1;margin:6px auto 2px}
+  #lnPlot{display:block;width:100%;max-width:340px;aspect-ratio:1/1;margin:8px auto;background:var(--inset);border:1px solid var(--line);border-radius:12px}
+</style>
+</head>
+<body>
+
+<div id="topctrls"><button id="themeToggle" title="Switch to light mode" aria-label="Toggle theme">&#9728;</button><div id="zulubar" title="Zulu / UTC — tap for converter">
+  <div class="zt" id="zuluTime">--:--:--Z</div>
+  <div class="zd" id="zuluDate">-- --- ----</div>
+  <div class="zg" id="zuluDtg">------Z</div>
+</div></div>
+
+<!-- ===================== TAB: REFERENCE ===================== -->
+<section id="tab-reference" class="tabview active">
+<header class="top">
+  <div class="brandrow" id="homeBrand" style="cursor:pointer" title="Back to search">
+    <div class="logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 17.5v-11A2.5 2.5 0 0 1 6.5 4"/><path d="M9 4v16"/></svg></div>
+    <div>
+      <h1 class="title">Commo Fundamentals</h1>
+      <div class="sub">Field-radio reference &amp; tools &middot; unclassified &middot; works offline</div>
+    </div>
+  </div>
+  <div class="searchwrap">
+    <span class="sicon">&#128269;</span>
+    <input id="q" type="text" placeholder="Search" autocomplete="off">
+    <button class="clearbtn" id="clear">clear</button>
+  </div>
+  <div class="chips" id="chips"></div>
+  <div class="hint">Search the reference, or filter by category. Tap the &#9734; on a card to save it. Calculators and report builders live under <b>Tools</b>.</div>
+</header>
+<main>
+  <details class="gloss">
+    <summary>&#128218; Acronym &amp; term glossary (searchable)</summary>
+    <div class="glossgrid" id="glossgrid"></div>
+  </details>
+  <div class="meta" id="meta"></div>
+  <div id="results"></div>
+  <div class="noresult" id="noresult" style="display:none">
+    <div style="font-size:40px">&#128373;</div>
+    <p>No entries matched. Try <span class="kbd">NVIS</span>, <span class="kbd">dipole</span>, <span class="kbd">grounding</span>, <span class="kbd">PACE</span>, <span class="kbd">prowords</span>.</p>
+  </div>
+</main>
+<footer>Commo Fundamentals &middot; unclassified field reference &middot; works offline once added to your home screen</footer>
+</section>
+
+<!-- ===================== TAB: TOOLS ===================== -->
+<section id="tab-tools" class="tabview">
+  <div class="subhead"><h2>&#128736; Tools</h2><p>Calculators, report builders, and planning aids.</p></div>
+  <div class="wrap">
+    <div class="tool">
+      <h3>Zulu (UTC) &amp; local time</h3>
+      <div class="desc">Live clock plus a quick local&rarr;Zulu converter.</div>
+      <div class="clock">
+        <div class="clockbox"><div class="lbl">Zulu / UTC</div><div class="val" id="zval">--:--:--</div><div class="dte" id="zdte"></div></div>
+        <div class="clockbox"><div class="lbl">Local</div><div class="val" id="lval">--:--:--</div><div class="dte" id="ldte"></div></div>
+      </div>
+      <div class="conv">
+        <span style="font-size:13px;color:var(--muted)">Convert local</span>
+        <input id="convin" type="time" step="1">
+        <span style="font-size:13px;color:var(--muted)">&rarr; Zulu</span>
+        <span id="convout" style="font-family:monospace;font-size:16px;color:var(--accent2)">&mdash;</span>
+      </div>
+    </div>
+
+    <div class="toolgroup">Field calculators</div>
+    <details class="tool cx"><summary>&#128225; Antenna cutting chart</summary>
+      <div class="desc">Enter a frequency; get element lengths. Cut ~5% long and trim to resonance.</div>
+      <div class="cxrow"><label for="antF">Frequency (MHz)</label><input id="antF" type="number" inputmode="decimal" step="any" placeholder="e.g. 51.5"></div>
+      <div id="antOut" class="cxout"><div class="cxmuted">Enter a frequency in MHz.</div></div>
+    </details>
+    <details class="tool cx"><summary>&#128752; TACSAT antenna pointing (az / el)</summary>
+      <div class="desc">Geostationary look angle from your position. Use + for N/E, &minus; for S/W.</div>
+      <div class="cxrow"><label for="satLat">Your latitude (&deg;)</label><input id="satLat" type="number" step="any" placeholder="e.g. 34.05"></div>
+      <div class="cxrow"><label for="satLon">Your longitude (&deg;)</label><input id="satLon" type="number" step="any" placeholder="e.g. -118.25"></div>
+      <div class="cxrow"><label for="satSat">Satellite longitude (&deg;)</label><input id="satSat" type="number" step="any" placeholder="e.g. -100"></div>
+      <div id="satOut" class="cxout"><div class="cxmuted">Enter your position and the satellite longitude.</div></div>
+    </details>
+    <details class="tool cx"><summary>&#129517; Coordinate converter (DD &rarr; DM/DMS/MGRS)</summary>
+      <div class="desc">Decimal degrees &rarr; DM, DMS, and MGRS (WGS84). Verify against your GPS.</div>
+      <div class="cxrow"><label for="ccLat">Latitude (DD)</label><input id="ccLat" type="number" step="any" placeholder="e.g. 38.8977"></div>
+      <div class="cxrow"><label for="ccLon">Longitude (DD)</label><input id="ccLon" type="number" step="any" placeholder="e.g. -77.0365"></div>
+      <div id="ccOut" class="cxout"><div class="cxmuted">Enter decimal degrees (+ N/E, &minus; S/W).</div></div>
+    </details>
+    <details class="tool cx"><summary>&#129517; MGRS &rarr; lat / long</summary>
+      <div class="desc">Decode a grid to decimal degrees (WGS84). Verify against your GPS.</div>
+      <div class="cxrow"><label for="mgIn">MGRS</label><input id="mgIn" type="text" placeholder="e.g. 18S UJ 23394 07395"></div>
+      <div id="mgOut" class="cxout"><div class="cxmuted">Enter an MGRS grid: zone, band, 100 km square, then even digits.</div></div>
+    </details>
+    <details class="tool cx"><summary>&#128207; Distance &amp; bearing (two points)</summary>
+      <div class="desc">Great-circle range and true bearing from point 1 to point 2 (decimal degrees).</div>
+      <div class="cxrow"><label for="dbLat1">Lat 1 (DD)</label><input id="dbLat1" type="number" step="any" placeholder="e.g. 34.05"></div>
+      <div class="cxrow"><label for="dbLon1">Lon 1 (DD)</label><input id="dbLon1" type="number" step="any" placeholder="e.g. -118.25"></div>
+      <div class="cxrow"><label for="dbLat2">Lat 2 (DD)</label><input id="dbLat2" type="number" step="any" placeholder="e.g. 34.10"></div>
+      <div class="cxrow"><label for="dbLon2">Lon 2 (DD)</label><input id="dbLon2" type="number" step="any" placeholder="e.g. -118.10"></div>
+      <div id="dbOut" class="cxout"></div>
+    </details>
+    <details class="tool cx"><summary>&#128225; Radio line-of-sight / horizon</summary>
+      <div class="desc">Approx VHF/UHF radio horizon (4/3 earth). Terrain and foliage shorten it.</div>
+      <div class="cxrow"><label for="losA">Your antenna height (ft)</label><input id="losA" type="number" step="any" placeholder="e.g. 30"></div>
+      <div class="cxrow"><label for="losB">Far antenna height (ft)</label><input id="losB" type="number" step="any" placeholder="e.g. 6"></div>
+      <div id="losOut" class="cxout"><div class="cxmuted">Enter both antenna heights in feet.</div></div>
+    </details>
+    <details class="tool cx"><summary>&#128246; RF math (dBm &middot; loss &middot; VSWR)</summary>
+      <div class="cxrow"><label for="rfW">Power (watts)</label><input id="rfW" type="number" step="any" placeholder="e.g. 5"></div>
+      <div id="rfWOut" class="cxout"></div>
+      <div class="cxrow"><label for="rfLoss">Cable / line loss (dB)</label><input id="rfLoss" type="number" step="any" placeholder="e.g. 3"></div>
+      <div id="rfLossOut" class="cxout"></div>
+      <div class="cxrow"><label for="rfVswr">VSWR (n : 1)</label><input id="rfVswr" type="number" step="any" placeholder="e.g. 1.5"></div>
+      <div id="rfVswrOut" class="cxout"></div>
+    </details>
+    <details class="tool cx"><summary>&#129517; Azimuth converter (grid / mag / true)</summary>
+      <div class="desc">Convert an azimuth between references using your map's marginal data. Sign: <b>+ = that north is EAST of true north</b>.</div>
+      <div class="cxrow"><label for="azV">Azimuth (&deg;)</label><input id="azV" type="number" step="any" placeholder="e.g. 210"></div>
+      <div class="cxrow"><label for="azFrom">Given as</label><select id="azFrom"><option value="mag">Magnetic</option><option value="grid">Grid</option><option value="true">True</option></select></div>
+      <div class="cxrow"><label for="azDec">Declination (&deg;)</label><input id="azDec" type="number" step="any" placeholder="+ E / &minus; W  (mag vs true)"></div>
+      <div class="cxrow"><label for="azConv">Grid convergence (&deg;)</label><input id="azConv" type="number" step="any" placeholder="+ E / &minus; W  (grid vs true)"></div>
+      <div id="azOut" class="cxout"></div>
+    </details>
+
+    <div class="toolgroup">Report builders</div>
+    <div class="desc" style="margin-bottom:6px">Fill the fields, tap <b>Build</b>, then <b>Copy</b>. Blank fields are skipped. Formats are generic &mdash; follow your unit SOP.</div>
+    <div id="reportBuilders"></div>
+
+    <div class="toolgroup">Planning</div>
+    <details class="tool cx"><summary>&#128506; PACE plan builder</summary>
+      <div class="desc">Primary / Alternate / Contingency / Emergency per net. Saved on this device.</div>
+      <div class="warn">Stored <b>unencrypted</b> on this device &mdash; keep entries unclassified.</div>
+      <div id="paceRows"></div>
+      <div class="proc-tools" style="margin-top:8px"><button class="btn ghost sm" id="paceAdd">+ Net</button> <button class="btn sm" id="paceSave">Save</button> <span id="paceStatus" class="cxmuted"></span></div>
+    </details>
+
+    <div class="toolgroup">Checklists</div>
+    <div class="desc" style="margin-bottom:6px">Tap to check off; saved on this device. Reset when you start over.</div>
+    <div id="checklists"></div>
+  </div>
+</section>
+
+<!-- ===================== TAB: NOTES ===================== -->
+<section id="tab-notes" class="tabview">
+  <div class="subhead"><h2>&#128221; Notes</h2><p>Your notes, organized into folders. Saved on this device.</p></div>
+  <div class="wrap">
+    <div id="notesListView">
+      <div class="warn" style="margin-bottom:12px">Notes are stored <b>unencrypted</b> on this device. Keep them unclassified.</div>
+      <div class="notes-actions">
+        <button class="btn sm" id="newNote">+ Note</button>
+        <button class="btn ghost sm" id="newFolder">+ Folder</button>
+        <span id="folderManage">
+          <button class="btn ghost sm" id="renameFolder">Rename</button>
+          <button class="btn ghost sm" id="deleteFolder">Delete folder</button>
+        </span>
+      </div>
+      <div class="folderchips" id="folderChips"></div>
+      <div id="notesList"></div>
+    </div>
+    <div id="notesEditView" style="display:none">
+      <div class="ed-top">
+        <button class="btn ghost sm" id="edBack">&#8249; Back</button>
+        <span style="flex:1"></span>
+        <button class="btn ghost sm" id="edDelete">Delete</button>
+        <button class="btn sm" id="edSave">Save</button>
+      </div>
+      <input id="edTitle" class="ed-title" placeholder="Title">
+      <select id="edFolder" class="ed-folder"></select>
+      <textarea id="edBody" class="ed-body" placeholder="Write your note here…"></textarea>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB: MORE ===================== -->
+<section id="tab-more" class="tabview">
+  <div class="subhead"><h2>&#9733; Saved &amp; Setup</h2><p>Your saved entries, install steps, and backup.</p></div>
+  <div class="wrap">
+    <div style="margin-bottom:8px"><span class="offline-ok">&#10003; Works offline — no signal needed</span></div>
+    <div class="catlabel">Saved entries</div>
+    <div id="savedlist"></div>
+
+    <div class="catlabel" style="margin-top:22px">Install as an app</div>
+    <div class="infocard">
+      <div style="font-size:14px">
+        <p style="margin-top:0"><b>iPhone / iPad (Safari):</b> tap <b>Share</b> &rarr; <b>Add to Home Screen</b>. Opens full-screen and works with no signal.</p>
+        <p><b>Android (Chrome):</b> tap the <b>&#8942;</b> menu &rarr; <b>Add to Home screen</b> / <b>Install app</b>.</p>
+        <p style="margin-bottom:0;color:var(--muted);font-size:13px">This whole app is one HTML file &mdash; once it's on your device it needs no internet.</p>
+      </div>
+    </div>
+
+    <div class="catlabel" style="margin-top:22px">Backup &amp; restore (Notes + PACE)</div>
+    <div class="infocard">
+      <p style="margin-top:0;font-size:13.6px">Export your Notes and PACE plan to a file, then import on another device. The file is <b>plain text</b> &mdash; keep it unclassified.</p>
+      <div class="proc-tools"><button class="btn sm" id="bkExport">Export backup</button> <label class="btn ghost sm" for="bkImport" style="cursor:pointer">Import backup</label><input id="bkImport" type="file" accept="application/json,.json" style="display:none"></div>
+      <div id="bkStatus" class="cxmuted" style="margin-top:8px"></div>
+    </div>
+
+    <div class="catlabel" style="margin-top:22px">About</div>
+    <div class="infocard">
+      <p style="margin-top:0;font-size:13.6px">A general, unclassified field-radio reference and tool set: antenna and RF math, coordinate conversion, report-format builders, a live Zulu clock, and notes. Contains no system-specific operating procedures, part numbers, configuration data, or COMSEC material.</p>
+      <p style="font-size:13.6px;color:var(--muted);margin-bottom:0">Reference formulas are field rules of thumb &mdash; always verify against your equipment's manual and your unit SOP.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB: LAND NAV ===================== -->
+<section id="tab-landnav" class="tabview">
+  <div class="subhead"><h2>&#129517; Land Nav</h2><p>Offline GPS + compass. Enter a grid, get walked to it.</p></div>
+  <div class="wrap">
+    <div class="warn ln-warn"><b>Read first — this is a backup aid, not primary navigation.</b> It runs only while this screen is open (no background tracking). GPS is consumer-grade (~5&ndash;20 m) and the compass drifts near metal, vehicles, and weapons &mdash; calibrate with a figure-8 and always cross-check with map &amp; compass. Everything runs on your phone's own GPS and compass; nothing is sent anywhere.</div>
+
+    <div class="tool">
+      <h3>Sensors</h3>
+      <div class="desc">Grant Location and Motion access to use GPS and the compass. iOS asks once per permission.</div>
+      <button class="btn" id="lnEnable">Enable GPS &amp; Compass</button>
+      <div class="ln-stat"><span>GPS: <b id="lnGpsStat">off</b></span><span>Compass: <b id="lnCompStat">off</b></span></div>
+    </div>
+
+    <div class="tool">
+      <h3>Your position</h3>
+      <div class="ln-grid" id="lnGrid">&mdash;</div>
+      <div class="ln-kv">
+        <span class="k">Lat / Long</span><span class="v" id="lnLL">&mdash;</span>
+        <span class="k">Accuracy</span><span class="v" id="lnAcc">&mdash;</span>
+        <span class="k">Altitude</span><span class="v" id="lnAlt">&mdash;</span>
+        <span class="k">Speed</span><span class="v" id="lnSpd">&mdash;</span>
+        <span class="k">Declination</span><span class="v" id="lnDecl">&mdash;</span>
+      </div>
+    </div>
+
+    <div class="tool">
+      <h3>Waypoints</h3>
+      <div class="desc">Enter a full MGRS grid (e.g. <span class="kbd">18S UJ 2340 0648</span>) or <span class="kbd">lat, long</span>. An 8-digit grid is 10 m.</div>
+      <div class="ln-wpin"><input id="lnWpInput" placeholder="18S UJ 2340 0648  or  34.05,-118.25" autocomplete="off"><input id="lnWpName" placeholder="Name" style="max-width:110px" autocomplete="off"></div>
+      <div class="proc-tools"><button class="btn sm" id="lnWpAdd">Add waypoint</button><button class="btn ghost sm" id="lnWpHere">Use my position</button></div>
+      <div id="lnWpMsg" class="cxmuted" style="margin-top:6px"></div>
+      <div id="lnWpList" style="margin-top:8px"></div>
+    </div>
+
+    <div class="tool" id="lnNavCard" style="display:none">
+      <h3>Navigate &rarr; <span id="lnNavName"></span></h3>
+      <div class="ln-nav">
+        <canvas id="lnCompass" width="300" height="300"></canvas>
+        <div class="ln-dist" id="lnDist">&mdash;</div>
+        <div class="ln-turn" id="lnTurn"></div>
+        <div class="ln-brgs"><span>True <b id="lnBt">&mdash;</b></span><span>Grid <b id="lnBg">&mdash;</b></span><span>Mag <b id="lnBm">&mdash;</b></span></div>
+        <div class="cxmuted">Arrow points the way to walk (needs compass). Bearings are to the waypoint; Mag is what you set on a compass.</div>
+      </div>
+    </div>
+
+    <div class="tool">
+      <h3>Plot (north-up)</h3>
+      <canvas id="lnPlot" width="340" height="340"></canvas>
+      <div class="cxmuted" id="lnPlotScale" style="text-align:center">Enable GPS and add a waypoint to plot.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TAB: HURRY & WAIT (games) ===================== -->
+<section id="tab-game" class="tabview">
+  <div class="subhead"><h2>&#127918; Hurry &amp; Wait</h2><p>Kill some time while you wait on the net. Scores save on this device.</p></div>
+  <div class="wrap">
+    <div class="gsel">
+      <button class="gbtn active" data-game="snake">&#128013; Snake</button>
+      <button class="gbtn" data-game="solitaire">&#127183; Solitaire</button>
+    </div>
+    <div id="game-snake" class="gpane">
+      <div class="gtop"><span id="snScore">Score 0</span><span id="snHi">Best 0</span></div>
+      <canvas id="snCanvas" width="320" height="320"></canvas>
+      <div class="gmsg" id="snMsg">Tap Start — then swipe the board or use the pad.</div>
+      <div class="gctrls">
+        <button class="btn sm" id="snStart">Start</button>
+        <div class="dpad">
+          <button class="dbtn up" data-d="U" aria-label="up">&#9650;</button>
+          <button class="dbtn left" data-d="L" aria-label="left">&#9664;</button>
+          <button class="dbtn right" data-d="R" aria-label="right">&#9654;</button>
+          <button class="dbtn down" data-d="D" aria-label="down">&#9660;</button>
+        </div>
+      </div>
+    </div>
+    <div id="game-solitaire" class="gpane" style="display:none">
+      <div class="gtop"><span id="solMoves">Moves 0</span><button class="btn sm" id="solNew">New game</button></div>
+      <div id="solBoard"></div>
+      <div class="gmsg" id="solMsg">Tap a card, then tap where it goes. Tap the deck (top-left) to draw.</div>
+    </div>
+  </div>
+</section>
+
+<button id="navHandle" aria-label="Open menu" title="Menu">&#9776;</button>
+<div id="navScrim"></div>
+<nav id="navDrawer" aria-label="Sections">
+  <div class="nav-brand" id="navBrand" style="cursor:pointer" title="Back to search"><span class="nav-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h11a1 1 0 0 1 1 1v14a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 17.5v-11A2.5 2.5 0 0 1 6.5 4"/><path d="M9 4v16"/></svg></span>Commo</div>
+  <button class="navitem active" data-tab="reference"><span class="ico">&#128269;</span>Reference</button>
+  <button class="navitem" data-tab="tools"><span class="ico">&#128736;</span>Tools</button>
+  <button class="navitem" data-tab="landnav"><span class="ico">&#129517;</span>Land Nav</button>
+  <button class="navitem" data-tab="notes"><span class="ico">&#128221;</span>Notes</button>
+  <button class="navitem" data-tab="more"><span class="ico">&#9733;</span>Saved</button>
+  <button class="navitem" data-tab="game"><span class="ico">&#127918;</span>Hurry &amp; Wait</button>
+</nav>
+
+<script>
+/* ===================== GLOSSARY (general terms only) ===================== */
+const GLOSS = [
+ ["HF","High Frequency, ~3–30 MHz — long-haul skywave/groundwave and NVIS."],
+ ["VHF","Very High Frequency, ~30–300 MHz — line-of-sight FM tactical voice/data."],
+ ["UHF","Ultra High Frequency, ~300 MHz–3 GHz — line-of-sight and satellite comms."],
+ ["LOS","Line of sight — the path a VHF/UHF signal needs; blocked by terrain and curvature."],
+ ["Radio horizon","LOS range for VHF/UHF, slightly past the visual horizon from atmospheric bending (4/3 earth). Terrain shortens it."],
+ ["Groundwave","An HF/MF signal that follows the earth's surface; good close in, fades with distance."],
+ ["Skywave","A signal that refracts off the ionosphere for long haul, leaving a skip-zone gap in between."],
+ ["NVIS","Near-Vertical Incidence Skywave — HF fired nearly straight up to cover the local skip-zone/terrain-shadow gap (~0–300 mi, lower HF)."],
+ ["ALE","Automatic Link Establishment — HF radios auto-select the best working frequency and handshake to set up the link."],
+ ["TACSAT / SATCOM","Tactical satellite comms — beyond-line-of-sight via a satellite; needs an access grant and antenna pointing (azimuth/elevation)."],
+ ["RETRANS","Retransmission — a station relaying between two nets to extend range or cross terrain."],
+ ["NCS","Net Control Station — the station that controls a radio net."],
+ ["PACE","Primary / Alternate / Contingency / Emergency — the ordered comms plan for each net."],
+ ["Dipole","A center-fed half-wave wire antenna; low mount favors NVIS, higher favors longer haul."],
+ ["Whip","A vertical rod antenna — omnidirectional and simple; favors low-angle/groundwave."],
+ ["Counterpoise","Wires/radials that act as the RF ground plane for an antenna."],
+ ["Azimuth","A horizontal direction in degrees from a north reference — true, grid, or magnetic."],
+ ["Declination","Angle between true north and magnetic north (east + / west −); converts magnetic and true azimuths."],
+ ["G-M angle","Grid-Magnetic angle from a map's declination diagram; relates grid and magnetic azimuths."],
+ ["MGRS","Military Grid Reference System — zone, band, 100 km square, then easting/northing digits."],
+ ["DTG","Date-Time Group — e.g. 041530ZJUL26 (day, time, time zone, month, year)."],
+ ["dBm","Power relative to 1 milliwatt on a log scale: 0 dBm = 1 mW, +30 dBm = 1 W."],
+ ["VSWR","Voltage Standing Wave Ratio — how well an antenna/feedline is matched; 1:1 is perfect."],
+ ["RADHAZ / MPE","Radiation Hazard / Maximum Permissible Exposure — RF safety limits; keep clear of transmitting antennas."],
+ ["Prowords","Standard procedure words (OVER, OUT, ROGER, WILCO…) that keep voice traffic brief and clear."]
+];
+
+/* ===================== REFERENCE CARDS (general, unclassified) ===================== */
+const DATA = [
+/* --- Antennas & Propagation --- */
+{id:"hf-prop",cat:"Antennas & Propagation",title:"HF propagation — groundwave, skywave & NVIS",
+ tags:["hf","propagation","groundwave","skywave","nvis","skip zone","ionosphere","short range","antenna height","long haul"],
+ html:`<ul><li><b>Groundwave</b> hugs the earth &mdash; good close in, fades with distance/terrain.</li><li><b>Skywave</b> refracts off the ionosphere for long haul, but leaves a <b>skip zone</b> gap in between.</li><li><b>NVIS</b> (Near-Vertical Incidence Skywave) fires the signal nearly straight up so it rains back down over a wide local area &mdash; it fills the skip-zone / terrain-shadow gap.</li></ul>
+ <div class="note">NVIS: roughly <b>0&ndash;300 mi</b>, lower HF (~2&ndash;10 MHz), using a <b>low horizontal</b> antenna. Good in mountains, jungle, or built-up terrain with no repeaters. Figures vary with ionospheric conditions.</div>`},
+{id:"ant-basics",cat:"Antennas & Propagation",title:"Antenna basics & cutting formulas",
+ tags:["antenna","dipole","whip","long wire","cutting","quarter wave","half wave","234","468","936","length","formula","resonance"],
+ html:`<p>Pick the antenna for the job, then cut it to the frequency (MHz):</p>
+ <table class="led"><tr><th>Element</th><th>Length</th></tr>
+ <tr><td>&frac14;-wave whip</td><td>234 / f (ft) &middot; 71.5 / f (m)</td></tr>
+ <tr><td>&frac12;-wave dipole (total)</td><td>468 / f (ft)</td></tr>
+ <tr><td>&frac12;-wave dipole (each leg)</td><td>234 / f (ft)</td></tr>
+ <tr><td>Full-wave</td><td>936 / f (ft)</td></tr></table>
+ <ul><li><b>Whip</b> &mdash; omnidirectional, on the move; low-angle/groundwave.</li><li><b>Dipole</b> &mdash; tuned wire; low = NVIS, higher = longer haul.</li><li><b>Long-wire</b> &mdash; simple, broadband, field-expedient.</li></ul>
+ <div class="note">The 468 bakes in the ~5% wire/end-effect factor. <b>Cut a bit long and trim</b> to resonance. Use the <b>Antenna cutting chart</b> in Tools.</div>`},
+{id:"ant-field",cat:"Antennas & Propagation",title:"Field-expedient antennas",
+ tags:["field expedient","dipole","long wire","doublet","mast","vhf","broadband","height","improvise"],
+ html:`<p>When the issued antenna isn't enough, build a wire antenna cut to the formulas:</p>
+ <ul><li><b>Center-fed dipole</b> &mdash; two 234/f legs off a center feed, hung between supports.</li><li><b>End-fed long-wire</b> &mdash; one long conductor; usually wants a tuner and a counterpoise.</li><li>Hang it <b>as high, straight, and horizontal</b> as terrain allows; orientation affects the strongest direction.</li></ul>
+ <div class="note">A mast-mounted broadband VHF antenna at a command post greatly out-ranges a vehicle/handheld whip. Height is the biggest lever on range.</div>`},
+{id:"gnd-bond",cat:"Antennas & Propagation",title:"Grounding & bonding",
+ tags:["ground","grounding","bonding","counterpoise","ground rod","single point","strap","lightning","esd","noise","ground loop"],
+ html:`<p><b>Why:</b> personnel safety, a lightning/ESD path, equipment protection, and a lower noise floor.</p>
+ <ul><li><b>Ground rod/stake</b> for power-frequency and lightning; <b>counterpoise/radials</b> for the RF ground plane.</li><li><b>Single-point:</b> bond all gear to <b>one</b> common point &mdash; two separate earths with the radio between them creates a ground loop.</li><li><b>Short, wide, straight</b> straps &mdash; a long thin wire is a poor RF ground.</li></ul>
+ <div class="warn">Don't work on grounds or antennas during electrical storms.</div>`},
+{id:"los-plan",cat:"Antennas & Propagation",title:"Radio line-of-sight & range planning",
+ tags:["line of sight","los","radio horizon","range","vhf","uhf","planning","antenna height","4/3 earth","distance","retrans"],
+ html:`<p>VHF/UHF is essentially <b>line-of-sight</b>. The radio horizon reaches a bit past the visual horizon, and <b>raising either antenna</b> extends range the most.</p>
+ <ul><li>Higher antenna &rarr; farther horizon. Two stations add their horizons together.</li><li>Terrain, foliage, and buildings <b>shorten</b> it &mdash; plan a margin, or relay to cross a ridge.</li><li>When LOS won't close, step to <b>HF</b> (groundwave/NVIS) or <b>SATCOM</b>.</li></ul>
+ <div class="note">Use the <b>Radio LOS / horizon</b> and <b>Distance &amp; bearing</b> tools to check a link.</div>`},
+/* --- RF & Safety --- */
+{id:"rf-safety",cat:"RF & Safety",title:"RF safety (RADHAZ / MPE)",
+ tags:["rf safety","radhaz","herp","mpe","exposure","radiation hazard","burn","standoff","distance","duty cycle","hazard"],
+ html:`<p>Transmitted RF heats tissue &mdash; you may feel nothing while being exposed. Keep personnel <b>back</b> from any transmitting antenna, and keep it off your head/body.</p>
+ <ul><li><b>More power and higher duty cycle = more standoff.</b> Field strength drops fast with distance, so a few extra feet matters.</li><li><b>Never touch a transmitting HF antenna</b> &mdash; wire antennas carry very high RF voltage (deep RF burns), worst at the ends.</li><li>Never look into an energized feed or open waveguide. <b>Cease transmit</b> before working on antennas, feedlines, or connectors.</li><li>Keep radiating antennas (&le;250 W) at least <b>50 ft</b> from fueling operations.</li></ul>
+ <div class="note">There's no single "stand X feet" number &mdash; safe distance depends on power, frequency, and duty cycle. Follow your equipment manual and unit RF-safety guidance.</div>`},
+{id:"rf-fund",cat:"RF & Safety",title:"RF fundamentals (dBm, loss, VSWR)",
+ tags:["dbm","db","power","watts","cable loss","vswr","return loss","reflected","match","feedline","decibel"],
+ html:`<ul>
+ <li><b>dBm</b> is power on a log scale: 0 dBm = 1 mW, <b>+30 dBm = 1 W</b>; every +3 dB roughly doubles power, &minus;3 dB halves it.</li>
+ <li><b>Cable loss (dB)</b> eats transmit power and receive signal. A <b>3 dB</b> run delivers ~half your power to the antenna &mdash; keep feedlines short and good.</li>
+ <li><b>VSWR</b> measures the antenna/feedline match. <b>1:1</b> is perfect; higher means more power reflected back instead of radiated.</li>
+ </ul>
+ <div class="note">Use the <b>RF math</b> tool to convert watts&harr;dBm, figure cable-loss %, and turn VSWR into return loss / reflected power.</div>`},
+{id:"band-plan",cat:"RF & Safety",title:"Frequency band plan (overview)",
+ tags:["band","band plan","hf","vhf","uhf","shf","spectrum","frequency","ranges","propagation"],
+ html:`<table class="led"><tr><th>Band</th><th>Range</th><th>Typical use</th></tr>
+ <tr><td>HF</td><td>3&ndash;30 MHz</td><td>Long-haul / NVIS (skywave, groundwave)</td></tr>
+ <tr><td>VHF</td><td>30&ndash;300 MHz</td><td>Line-of-sight FM tactical; aviation AM 118&ndash;137</td></tr>
+ <tr><td>UHF</td><td>300 MHz&ndash;3 GHz</td><td>Line-of-sight; UHF satellite comms</td></tr>
+ <tr><td>SHF+</td><td>3 GHz&ndash;</td><td>Wideband / higher-capacity SATCOM &amp; data links</td></tr></table>
+ <div class="note">General spectrum only. Work off your assigned frequencies and unit frequency management.</div>`},
+/* --- Comms Reference --- */
+{id:"ref-phonetic",cat:"Comms Reference",title:"Phonetic alphabet & numbers",
+ tags:["phonetic","alphabet","nato","alpha","bravo","charlie","spelling","numbers","pronounce"],
+ html:`<p><b>A</b> Alpha &middot; <b>B</b> Bravo &middot; <b>C</b> Charlie &middot; <b>D</b> Delta &middot; <b>E</b> Echo &middot; <b>F</b> Foxtrot &middot; <b>G</b> Golf &middot; <b>H</b> Hotel &middot; <b>I</b> India &middot; <b>J</b> Juliett &middot; <b>K</b> Kilo &middot; <b>L</b> Lima &middot; <b>M</b> Mike &middot; <b>N</b> November &middot; <b>O</b> Oscar &middot; <b>P</b> Papa &middot; <b>Q</b> Quebec &middot; <b>R</b> Romeo &middot; <b>S</b> Sierra &middot; <b>T</b> Tango &middot; <b>U</b> Uniform &middot; <b>V</b> Victor &middot; <b>W</b> Whiskey &middot; <b>X</b> X-ray &middot; <b>Y</b> Yankee &middot; <b>Z</b> Zulu</p>
+ <div class="note">Numbers: 0 "ZE-RO", 3 "TREE", 4 "FOW-ER", 5 "FIFE", 9 "NIN-ER". Say digits individually.</div>`},
+{id:"ref-prowords",cat:"Comms Reference",title:"Prowords & readability",
+ tags:["prowords","over","out","roger","wilco","say again","break","wait","correction","radio check","readability","loud and clear"],
+ html:`<ul><li><b>OVER</b> &mdash; done, go ahead. <b>OUT</b> &mdash; done, no reply.</li><li><b>ROGER</b> &mdash; received. <b>WILCO</b> &mdash; received and will comply.</li><li><b>SAY AGAIN</b> &mdash; repeat. <b>I SAY AGAIN</b> &mdash; I'll repeat. <b>CORRECTION</b> &mdash; error, correct version follows.</li><li><b>BREAK</b> &mdash; separates parts. <b>WAIT</b> / <b>WAIT OUT</b> &mdash; pause.</li></ul>
+ <div class="note">Readability: <b>Loud and Clear</b> best, then Readable, Distorted, With interference, Unreadable. Strength: Loud, Good, Weak, Very weak, Fading.</div>`},
+{id:"ref-pace",cat:"Comms Reference",title:"PACE plan — how to build one",
+ tags:["pace","primary","alternate","contingency","emergency","comms plan","communications plan","redundancy"],
+ html:`<p>A <b>PACE</b> plan lists, for each net, the order you'll try to communicate if a method fails:</p>
+ <ul><li><b>P</b>rimary &mdash; the method you expect to use.</li><li><b>A</b>lternate &mdash; next best, readily available.</li><li><b>C</b>ontingency &mdash; workable but less convenient.</li><li><b>E</b>mergency &mdash; last resort.</li></ul>
+ <div class="note">Build and store yours in the <b>PACE plan builder</b> under Tools.</div>`},
+{id:"ref-battery",cat:"Comms Reference",title:"Tactical battery cross-reference",
+ tags:["battery","ba-5590","bb-2590","ba-5390","bb-390","li-ion","lithium","nimh","rechargeable","primary","voltage","chemistry"],
+ html:`<table class="led"><tr><th>Battery</th><th>Volts</th><th>Chem</th><th>Type</th></tr>
+ <tr><td>BA-5590/U</td><td>12/24</td><td>Li-SO&#8322;</td><td>Primary</td></tr>
+ <tr><td>BB-590/U</td><td>~24</td><td>NiCd</td><td>Rechargeable</td></tr>
+ <tr><td>BA-5390/U</td><td>15/30</td><td>Li-MnO&#8322;</td><td>Primary</td></tr>
+ <tr><td>BB-390/U</td><td>~27</td><td>NiMH</td><td>Rechargeable</td></tr>
+ <tr><td>BB-2590/U</td><td>~29.6</td><td>Li-Ion</td><td>Rechargeable</td></tr></table>
+ <div class="note">Primary (BA-) are single-use; rechargeable (BB-) pair with the same form factor. Confirm the exact part/stock number in your supply system &mdash; they vary by dash number.</div>`}
+];
+
+/* ===================== SEARCH ENGINE ===================== */
+const results=document.getElementById('results'), meta=document.getElementById('meta'),
+  noresult=document.getElementById('noresult'), q=document.getElementById('q'), chipsEl=document.getElementById('chips');
+let activeCat=null;
+const gg=document.getElementById('glossgrid');
+gg.innerHTML=GLOSS.map(g=>`<div><b>${g[0]}</b> — ${g[1]}</div>`).join('');
+GLOSS.forEach((g,i)=>DATA.push({id:"gl-"+i,cat:"Glossary",title:g[0],tags:[g[0].toLowerCase(),"glossary","term","acronym","definition"],html:`<p>${g[1]}</p>`}));
+const N_DOCS=DATA.length;
+DATA.forEach(e=>{ e._blob=(e.title+' '+(e.tags||[]).join(' ')+' '+e.html.replace(/<[^>]+>/g,' ')).toLowerCase(); });
+const DF={};
+function idf(t){ if(DF[t]==null){ let c=0; DATA.forEach(e=>{ if(e._blob.includes(t)) c++; }); DF[t]=c; } return Math.log((N_DOCS+1)/(1+DF[t]))+0.35; }
+const CATS=[...new Set(DATA.filter(d=>d.cat!=="Glossary").map(d=>d.cat))];
+const CAT_ORDER=["Antennas & Propagation","RF & Safety","Comms Reference"];
+CATS.sort((a,b)=>CAT_ORDER.indexOf(a)-CAT_ORDER.indexOf(b));
+chipsEl.innerHTML=`<span class="chip active" data-cat="">All</span>`+CATS.map(c=>`<span class="chip" data-cat="${c}">${c}</span>`).join('');
+chipsEl.querySelectorAll('.chip').forEach(ch=>ch.onclick=()=>{ activeCat=ch.dataset.cat||null; chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.remove('active')); ch.classList.add('active'); render(); });
+function tokenize(s){return (s.toLowerCase().match(/[a-z0-9.\-]+/g)||[]);}
+const SYN={
+ "antenna":["dipole","whip","cutting"],"radio":["antenna","band"],"hf":["propagation","nvis"],
+ "ground":["grounding","bonding"],"safety":["rf safety","radhaz"],"los":["line of sight","horizon"],
+ "horizon":["radio horizon","los"],"range":["radio horizon","los"],"mgrs":["coordinate","grid"],
+ "grid":["mgrs","coordinate"],"coordinate":["mgrs","grid"],"azimuth":["declination","grid","magnetic"],
+ "declination":["azimuth","g-m"],"battery":["ba-5590","bb-2590"],"phonetic":["alphabet"],
+ "proword":["prowords"],"band":["spectrum","band plan"],"vswr":["rf","return loss"],"dbm":["rf","power"],
+ "report":["salute","sitrep","spot","9-line","nbc-1"],"medevac":["9-line"],"nine line":["9-line"]
+};
+function expand(tokens){ const out=new Map(); tokens.forEach(t=>{ if(t) out.set(t,1); }); tokens.forEach(t=>{ if(SYN[t]) SYN[t].forEach(s=>{ if(!out.has(s)) out.set(s,0.45); }); }); return [...out.entries()].map(([t,w])=>({t,w})); }
+function scoreEntry(entry,tokens){ const title=entry.title.toLowerCase(), tags=(entry.tags||[]).join(' ').toLowerCase(), body=entry.html.toLowerCase().replace(/<[^>]+>/g,' '); let score=0;
+ tokens.forEach(({t,w})=>{ if(!t)return; let s=0; if(title.includes(t))s+=12; (entry.tags||[]).forEach(tag=>{ if(tag===t)s+=9; else if(tag.includes(t))s+=4; }); if(tags.includes(t))s+=2;
+  const n=(body.match(new RegExp('\\b'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; s+=Math.min(n,4); score+=s*w; }); return score; }
+function highlight(html,tokens){ if(!tokens||!tokens.length)return html; const words=tokens.map(x=>typeof x==='string'?x:x.t); const uniq=[...new Set(words.filter(t=>t.length>2))].sort((a,b)=>b.length-a.length); if(!uniq.length)return html;
+ const rx=new RegExp('('+uniq.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi');
+ // Walk the string: copy tags (<...>) untouched, and in text runs leave HTML entities (&...;) alone
+ // so a search like "amp" can't corrupt "&amp;". Plain text with no tags (e.g. a title) is handled too.
+ const markText=seg=>seg.replace(/&[a-zA-Z#0-9]+;|[^&]+|&/g,p=>(p[0]==='&'&&p[p.length-1]===';')?p:p.replace(rx,'<mark>$1</mark>'));
+ let out='',i=0,n=html.length;
+ while(i<n){ if(html[i]==='<'){ let j=html.indexOf('>',i); const end=j<0?n:j+1; out+=html.slice(i,end); i=end; }
+   else { let j=html.indexOf('<',i); if(j<0)j=n; out+=markText(html.slice(i,j)); i=j; } }
+ return out; }
+function cardHTML(e,tokens){ const body=highlight(e.html,tokens); const tagchips=(e.tags||[]).slice(0,10).map(t=>`<span class="tag" data-t="${t}">${t}</span>`).join('');
+ const star=e.cat==="Glossary"?'':`<button class="fav${isFav(e.id)?' on':''}" data-fav="${e.id}" title="Save">${isFav(e.id)?'&#9733;':'&#9734;'}</button>`;
+ return `<div class="card" id="card-${e.id}">${star}<span class="cat">${e.cat}</span><h3>${highlight(e.title,tokens)}</h3><div class="body">${body}</div><div class="tagline">${tagchips}</div></div>`; }
+function render(){ const raw=q.value.trim(); let tokens=raw?expand(tokenize(raw)).map(o=>({t:o.t,w:o.w*idf(o.t)})):[]; let list=DATA.slice();
+ if(activeCat) list=list.filter(d=>d.cat===activeCat);
+ if(tokens.length){ list=list.map(e=>({e,s:scoreEntry(e,tokens)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.e); }
+ else { list=list.filter(d=>d.cat!=="Glossary"); list.sort((a,b)=>CAT_ORDER.indexOf(a.cat)-CAT_ORDER.indexOf(b.cat)); }
+ if(!list.length){ results.innerHTML=''; noresult.style.display='block'; meta.textContent=`No matches for "${raw}".`; return; }
+ noresult.style.display='none';
+ meta.innerHTML=raw?`<b>${list.length}</b> result${list.length>1?'s':''} for "<b>${raw.replace(/</g,'&lt;')}</b>"${activeCat?` in ${activeCat}`:''}.`:`Showing all <b>${list.length}</b> entries${activeCat?` in ${activeCat}`:''}. Search to narrow down.`;
+ results.innerHTML=list.map(e=>cardHTML(e,tokens)).join(''); wireCards(); }
+function wireCards(){ results.querySelectorAll('.tag').forEach(t=>t.onclick=()=>{ q.value=t.dataset.t; activeCat=null; chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat==='')); render(); window.scrollTo({top:0,behavior:'smooth'}); });
+ results.querySelectorAll('.fav').forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); toggleFav(b.dataset.fav); const on=isFav(b.dataset.fav); b.classList.toggle('on',on); b.innerHTML=on?'&#9733;':'&#9734;'; renderSaved(); }); }
+let deb; q.addEventListener('input',()=>{ clearTimeout(deb); deb=setTimeout(render,120); });
+document.getElementById('clear').onclick=()=>{ q.value=''; render(); q.focus(); };
+q.addEventListener('keydown',e=>{ if(e.key==='Escape'){ q.value=''; render(); } });
+
+/* ===================== STORAGE ===================== */
+const store={ get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+let FAV=store.get('cf_fav',[]);
+function isFav(id){ return FAV.includes(id); }
+function toggleFav(id){ FAV=isFav(id)?FAV.filter(x=>x!==id):[...FAV,id]; store.set('cf_fav',FAV); }
+
+/* ===================== NAV ===================== */
+const views={ reference:document.getElementById('tab-reference'), tools:document.getElementById('tab-tools'), notes:document.getElementById('tab-notes'), more:document.getElementById('tab-more'), game:document.getElementById('tab-game'), landnav:document.getElementById('tab-landnav') };
+function switchTab(name){ Object.keys(views).forEach(k=>views[k].classList.toggle('active',k===name)); document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); document.body.classList.remove('nav-open'); store.set('cf_tab',name); window.scrollTo({top:0}); if(name==='more')renderSaved(); if(name==='notes')renderNotesTab(); if(name==='game')initGame(); if(name!=='game'&&typeof snakeStop==='function')snakeStop(); if(name==='landnav'){initLandNav(); if(typeof lnResume==='function')lnResume();} if(name!=='landnav'&&typeof lnStop==='function')lnStop(); }
+document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
+document.getElementById('navHandle').onclick=()=>document.body.classList.toggle('nav-open');
+document.getElementById('navScrim').onclick=()=>document.body.classList.remove('nav-open');
+function goHome(){ try{q.value='';}catch(e){} activeCat=null; try{chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat===''));}catch(e){} switchTab('reference'); try{render();}catch(e){} }
+var _nb=document.getElementById('navBrand'); if(_nb)_nb.onclick=goHome;
+var _hb=document.getElementById('homeBrand'); if(_hb)_hb.onclick=goHome;
+function gotoCard(id){ switchTab('reference'); q.value=''; activeCat=null; chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat==='')); render(); setTimeout(()=>{ const el=document.getElementById('card-'+id); if(el){ el.scrollIntoView({behavior:'smooth',block:'start'}); el.style.boxShadow='0 0 0 2px var(--accent)'; setTimeout(()=>el.style.boxShadow='',1400); } },120); }
+
+/* ===================== ZULU CLOCK ===================== */
+const ZMON=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function pad(n){return String(n).padStart(2,'0');}
+function tick(){ const now=new Date(); const zh=pad(now.getUTCHours()),zm=pad(now.getUTCMinutes()),zs=pad(now.getUTCSeconds());
+ const dd=pad(now.getUTCDate()),mon=ZMON[now.getUTCMonth()],yr=now.getUTCFullYear();
+ const zval=document.getElementById('zval');
+ if(zval){ zval.textContent=zh+':'+zm+':'+zs+'Z'; document.getElementById('zdte').textContent=now.toUTCString().slice(0,16);
+  document.getElementById('lval').textContent=pad(now.getHours())+':'+pad(now.getMinutes())+':'+pad(now.getSeconds());
+  document.getElementById('ldte').textContent=now.toDateString().slice(0,15); }
+ document.getElementById('zuluTime').textContent=zh+':'+zm+':'+zs+'Z';
+ document.getElementById('zuluDate').textContent=dd+' '+mon+' '+yr;
+ document.getElementById('zuluDtg').textContent=dd+zh+zm+'Z '+mon+' '+String(yr).slice(2); }
+setInterval(tick,1000); tick();
+document.getElementById('zulubar').onclick=()=>switchTab('tools');
+document.getElementById('convin').addEventListener('input',function(){ const v=this.value,out=document.getElementById('convout'); if(!v){ out.textContent='—'; return; } const [h,m,s]=v.split(':').map(Number); const d=new Date(); d.setHours(h,m,s||0,0); out.textContent=pad(d.getUTCHours())+':'+pad(d.getUTCMinutes())+':'+pad(d.getUTCSeconds())+'Z'; });
+
+/* ===================== CALCULATORS ===================== */
+(function(){
+ const $=id=>document.getElementById(id);
+ const rnd=(x,n)=>{ n=(n==null?2:n); if(!isFinite(x))return '—'; const p=Math.pow(10,n); return Math.round(x*p)/p; };
+ const DEG=Math.PI/180, a=6378137.0, f2=1/298.257223563, e2=f2*(2-f2), ep2=e2/(1-e2), k0=0.9996;
+ function Mof(latR){return a*((1-e2/4-3*e2*e2/64-5*e2*e2*e2/256)*latR-(3*e2/8+3*e2*e2/32+45*e2*e2*e2/1024)*Math.sin(2*latR)+(15*e2*e2/256+45*e2*e2*e2/1024)*Math.sin(4*latR)-(35*e2*e2*e2/3072)*Math.sin(6*latR));}
+ function dmsStr(v,pos,neg){ const h=v>=0?pos:neg; v=Math.abs(v); let ts=Math.round(v*36000)/10; let d=Math.floor(ts/3600); ts-=d*3600; let mi=Math.floor(ts/60); let se=ts-mi*60; return d+'° '+mi+"' "+se.toFixed(1)+'" '+h; }
+
+ function ant(){ const o=$('antOut'); const f=parseFloat($('antF').value); if(!(f>0)){o.innerHTML='<div class="cxmuted">Enter a frequency in MHz.</div>';return;}
+  const q=234/f,h=468/f,fw=936/f,m=x=>x*0.3048;
+  o.innerHTML='<table class="led"><tr><th>Element</th><th>Feet</th><th>Meters</th></tr>'+
+  '<tr><td>¼-wave whip</td><td class="big">'+rnd(q)+'</td><td>'+rnd(m(q))+'</td></tr>'+
+  '<tr><td>½-wave dipole (total)</td><td class="big">'+rnd(h)+'</td><td>'+rnd(m(h))+'</td></tr>'+
+  '<tr><td>½-wave dipole (each leg)</td><td>'+rnd(q)+'</td><td>'+rnd(m(q))+'</td></tr>'+
+  '<tr><td>Full-wave</td><td>'+rnd(fw)+'</td><td>'+rnd(m(fw))+'</td></tr></table>'+
+  '<div class="cxmuted" style="margin-top:6px">Cut ~5% long and trim. Low horizontal dipole ≈ NVIS; higher / vertical ≈ longer haul.</div>'; }
+ if($('antF'))$('antF').addEventListener('input',ant);
+
+ function sat(){ const o=$('satOut'); const la=parseFloat($('satLat').value),lo=parseFloat($('satLon').value),sl=parseFloat($('satSat').value);
+  if([la,lo,sl].some(v=>!isFinite(v))){o.innerHTML='<div class="cxmuted">Enter your position and the satellite longitude.</div>';return;}
+  const D=DEG,Re=6378.137,Rs=42164,phi=la*D,lam=lo*D,st=sl*D;
+  const xo=Re*Math.cos(phi)*Math.cos(lam),yo=Re*Math.cos(phi)*Math.sin(lam),zo=Re*Math.sin(phi);
+  const xs=Rs*Math.cos(st),ys=Rs*Math.sin(st); const dx=xs-xo,dy=ys-yo,dz=-zo;
+  const e=-Math.sin(lam)*dx+Math.cos(lam)*dy;
+  const n=-Math.sin(phi)*Math.cos(lam)*dx-Math.sin(phi)*Math.sin(lam)*dy+Math.cos(phi)*dz;
+  const u=Math.cos(phi)*Math.cos(lam)*dx+Math.cos(phi)*Math.sin(lam)*dy+Math.sin(phi)*dz;
+  let az=Math.atan2(e,n)/D; if(az<0)az+=360; const el=Math.atan2(u,Math.sqrt(e*e+n*n))/D;
+  if(el<0){o.innerHTML='<div class="warn">Satellite is <b>below the horizon</b> from here (elevation '+rnd(el,1)+'°) — it cannot be reached from this position.</div>';return;}
+  o.innerHTML='<table class="led"><tr><th>Azimuth (true)</th><th>Elevation</th></tr><tr><td class="big">'+rnd(az,1)+'°</td><td class="big">'+rnd(el,1)+'°</td></tr></table>'+
+  '<div class="cxmuted" style="margin-top:6px">Azimuth is from <b>true</b> north — apply your local declination for a compass bearing. Spherical-earth estimate for a geostationary satellite.</div>'; }
+ ['satLat','satLon','satSat'].forEach(id=>{ if($(id))$(id).addEventListener('input',sat); });
+
+ function dms(v,pos,neg){ const h=v>=0?pos:neg; v=Math.abs(v); let tmin=Math.round(v*60000)/1000; let d=Math.floor(tmin/60); let mf=tmin-d*60; let ts=Math.round(v*36000)/10; let dd=Math.floor(ts/3600); ts-=dd*3600; let mi=Math.floor(ts/60); let se=ts-mi*60; return {dm:d+'° '+mf.toFixed(3)+"' "+h, dms:dd+'° '+mi+"' "+se.toFixed(1)+'" '+h}; }
+ function toMGRS(lat,lon){ if(lat<-80||lat>84)return '(polar — outside UTM)';
+  let zone=Math.floor((lon+180)/6)+1; if(zone>60)zone=1; const lonO=(zone-1)*6-180+3;
+  const latR=lat*DEG,lonR=lon*DEG,lo0=lonO*DEG,s=Math.sin(latR),c=Math.cos(latR),t=Math.tan(latR);
+  const N=a/Math.sqrt(1-e2*s*s),T=t*t,C=ep2*c*c,A=c*(lonR-lo0),M=Mof(latR);
+  let E=k0*N*(A+(1-T+C)*Math.pow(A,3)/6+(5-18*T+T*T+72*C-58*ep2)*Math.pow(A,5)/120)+500000;
+  let Nn=k0*(M+N*t*(A*A/2+(5-T+9*C+4*C*C)*Math.pow(A,4)/24+(61-58*T+T*T+600*C-330*ep2)*Math.pow(A,6)/720));
+  if(lat<0)Nn+=1e7;
+  const bands="CDEFGHJKLMNPQRSTUVWX", band=bands.charAt(Math.min(19,Math.floor((lat+80)/8)));
+  const colS=["ABCDEFGH","JKLMNPQR","STUVWXYZ"], col=colS[(zone-1)%3].charAt(Math.floor(E/100000)-1);
+  const rowS=["ABCDEFGHJKLMNPQRSTUV","FGHJKLMNPQRSTUVABCDE"], row=rowS[(zone%2===0)?1:0].charAt(Math.floor(Nn/100000)%20);
+  return zone+band+' '+col+row+' '+String(Math.floor(E)%100000).padStart(5,'0')+' '+String(Math.floor(Nn)%100000).padStart(5,'0'); }
+ function cc(){ const o=$('ccOut'); const la=parseFloat($('ccLat').value),lo=parseFloat($('ccLon').value);
+  if(![la,lo].every(isFinite)||la<-90||la>90||lo<-180||lo>180){o.innerHTML='<div class="cxmuted">Enter valid decimal degrees (lat −90..90, lon −180..180).</div>';return;}
+  const A=dms(la,'N','S'),O=dms(lo,'E','W');
+  o.innerHTML='<table class="led"><tr><th>Format</th><th>Value</th></tr>'+
+  '<tr><td>DM</td><td>'+A.dm+' &nbsp; '+O.dm+'</td></tr>'+
+  '<tr><td>DMS</td><td>'+A.dms+' &nbsp; '+O.dms+'</td></tr>'+
+  '<tr><td>MGRS</td><td class="big">'+toMGRS(la,lo)+'</td></tr></table>'+
+  '<div class="cxmuted" style="margin-top:6px">MGRS is WGS84 (Norway / Svalbard exceptions not applied). Always confirm against your GPS / map.</div>'; }
+ ['ccLat','ccLon'].forEach(id=>{ if($(id))$(id).addEventListener('input',cc); });
+
+ function utmToLL(E,Nn,zone,north){ if(!north)Nn-=1e7; const lonO=(zone-1)*6-180+3;
+  const M=Nn/k0, mu=M/(a*(1-e2/4-3*e2*e2/64-5*e2*e2*e2/256)), e1=(1-Math.sqrt(1-e2))/(1+Math.sqrt(1-e2));
+  const phi1=mu+(3*e1/2-27*Math.pow(e1,3)/32)*Math.sin(2*mu)+(21*e1*e1/16-55*Math.pow(e1,4)/32)*Math.sin(4*mu)+(151*Math.pow(e1,3)/96)*Math.sin(6*mu)+(1097*Math.pow(e1,4)/512)*Math.sin(8*mu);
+  const s=Math.sin(phi1),c=Math.cos(phi1),t=Math.tan(phi1),N1=a/Math.sqrt(1-e2*s*s),R1=a*(1-e2)/Math.pow(1-e2*s*s,1.5),C1=ep2*c*c,T1=t*t,Dd=(E-500000)/(N1*k0);
+  const lat=phi1-(N1*t/R1)*(Dd*Dd/2-(5+3*T1+10*C1-4*C1*C1-9*ep2)*Math.pow(Dd,4)/24+(61+90*T1+298*C1+45*T1*T1-252*ep2-3*C1*C1)*Math.pow(Dd,6)/720);
+  const lon=lonO*DEG+(Dd-(1+2*T1+C1)*Math.pow(Dd,3)/6+(5-2*C1+28*T1-3*C1*C1+8*ep2+24*T1*T1)*Math.pow(Dd,5)/120)/c;
+  return [lat/DEG,lon/DEG]; }
+ function fromMGRS(str){ const s=String(str||'').trim().toUpperCase().replace(/\s+/g,'');
+  const m=s.match(/^(\d{1,2})([C-HJ-NP-X])([A-HJ-NP-Z])([A-HJ-NP-V])(\d*)$/); if(!m)return null;
+  const zone=+m[1],band=m[2],colL=m[3],rowL=m[4],dig=m[5]; if(zone<1||zone>60||dig.length%2)return null;
+  const prec=dig.length/2, mult=Math.pow(10,5-prec);
+  const eD=prec?parseInt(dig.slice(0,prec),10)*mult:0, nD=prec?parseInt(dig.slice(prec),10)*mult:0;
+  const colS=["ABCDEFGH","JKLMNPQR","STUVWXYZ"][(zone-1)%3], ci=colS.indexOf(colL); if(ci<0)return null;
+  const E=(ci+1)*100000+eD;
+  const rowS=["ABCDEFGHJKLMNPQRSTUV","FGHJKLMNPQRSTUVABCDE"][(zone%2===0)?1:0], ri=rowS.indexOf(rowL); if(ri<0)return null;
+  let Nn=ri*100000+nD;
+  const bands="CDEFGHJKLMNPQRSTUVWX", bi=bands.indexOf(band); if(bi<0)return null;
+  const southLat=(-80+8*bi)*DEG; let minN=k0*Mof(southLat); if(southLat<0)minN+=1e7;
+  while(Nn<minN) Nn+=2000000;
+  return utmToLL(E,Nn,zone,band>='N'); }
+ function mg(){ const o=$('mgOut'); const r=fromMGRS($('mgIn').value);
+  if(!r||!isFinite(r[0])||!isFinite(r[1])){o.innerHTML='<div class="cxmuted">Enter a valid MGRS grid, e.g. 18S UJ 23394 07395.</div>';return;}
+  o.innerHTML='<table class="led"><tr><th>Format</th><th>Value</th></tr><tr><td>Decimal</td><td class="big">'+rnd(r[0],5)+', '+rnd(r[1],5)+'</td></tr><tr><td>DMS</td><td>'+dmsStr(r[0],'N','S')+' &nbsp; '+dmsStr(r[1],'E','W')+'</td></tr></table><div class="cxmuted" style="margin-top:6px">WGS84 (Norway / Svalbard exceptions not applied). Confirm against your GPS / map.</div>'; }
+ if($('mgIn'))$('mgIn').addEventListener('input',mg);
+
+ function distbear(){ const o=$('dbOut'); const v=['dbLat1','dbLon1','dbLat2','dbLon2'].map(id=>parseFloat($(id).value));
+  if(v.some(x=>!isFinite(x))||v[0]<-90||v[0]>90||v[2]<-90||v[2]>90){o.innerHTML='<div class="cxmuted">Enter both points as decimal degrees.</div>';return;}
+  const R=6371.0088,p1=v[0]*DEG,p2=v[2]*DEG,dp=(v[2]-v[0])*DEG,dl=(v[3]-v[1])*DEG;
+  const aa=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2, km=R*2*Math.atan2(Math.sqrt(aa),Math.sqrt(1-aa));
+  let br=Math.atan2(Math.sin(dl)*Math.cos(p2),Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl))/DEG; if(br<0)br+=360;
+  o.innerHTML='<table class="led"><tr><th>Range</th><th>Bearing (true)</th></tr><tr><td class="big">'+rnd(km,2)+' km</td><td class="big">'+rnd(br,1)+'°</td></tr><tr><td>'+rnd(km*0.621371,2)+' mi</td><td class="cxmuted">from point 1 &rarr; 2</td></tr></table>'; }
+ ['dbLat1','dbLon1','dbLat2','dbLon2'].forEach(id=>{ if($(id))$(id).addEventListener('input',distbear); });
+
+ function los(){ const o=$('losOut'); const h1=parseFloat($('losA').value),h2=parseFloat($('losB').value);
+  if(!(h1>=0)||!(h2>=0)){o.innerHTML='<div class="cxmuted">Enter both antenna heights in feet.</div>';return;}
+  const mi=1.415*(Math.sqrt(h1)+Math.sqrt(h2)), km=mi*1.60934;
+  o.innerHTML='<table class="led"><tr><th>Radio horizon</th><th>Distance</th></tr><tr><td>Miles</td><td class="big">'+rnd(mi,1)+'</td></tr><tr><td>Kilometers</td><td class="big">'+rnd(km,1)+'</td></tr></table><div class="cxmuted" style="margin-top:6px">4/3-earth radio horizon between the two antennas — a best case. Terrain and foliage shorten it.</div>'; }
+ ['losA','losB'].forEach(id=>{ if($(id))$(id).addEventListener('input',los); });
+
+ function rfw(){ const o=$('rfWOut'); const w=parseFloat($('rfW').value); if(!(w>0)){o.innerHTML='';return;} o.innerHTML='<div class="cxmuted"><b>'+rnd(10*Math.log10(w*1000),1)+' dBm</b> ('+rnd(10*Math.log10(w),1)+' dBW)</div>'; }
+ function rfl(){ const o=$('rfLossOut'); const d=parseFloat($('rfLoss').value); if(!(d>=0)){o.innerHTML='';return;} const pct=Math.pow(10,-d/10)*100; o.innerHTML='<div class="cxmuted"><b>'+rnd(pct,1)+'%</b> of power reaches the far end ('+rnd(100-pct,1)+'% lost).</div>'; }
+ function rfv(){ const o=$('rfVswrOut'); const v=parseFloat($('rfVswr').value); if(!(v>=1)){o.innerHTML='<div class="cxmuted">VSWR is ≥ 1.</div>';return;} const g=(v-1)/(v+1); const rl=g>0?-20*Math.log10(g):Infinity; o.innerHTML='<div class="cxmuted">Return loss <b>'+(isFinite(rl)?rnd(rl,1)+' dB':'∞')+'</b> · reflected power <b>'+rnd(g*g*100,1)+'%</b></div>'; }
+ if($('rfW'))$('rfW').addEventListener('input',rfw);
+ if($('rfLoss'))$('rfLoss').addEventListener('input',rfl);
+ if($('rfVswr'))$('rfVswr').addEventListener('input',rfv);
+
+ function azc(){ const o=$('azOut'); const az=parseFloat($('azV').value); if(!isFinite(az)){o.innerHTML='<div class="cxmuted">Enter an azimuth.</div>';return;}
+  const dec=parseFloat($('azDec').value)||0, conv=parseFloat($('azConv').value)||0, from=$('azFrom').value;
+  let tru; if(from==='true')tru=az; else if(from==='grid')tru=az+conv; else tru=az+dec;
+  const nm=x=>{x%=360; if(x<0)x+=360; return x;};
+  const mag=nm(tru-dec), grid=nm(tru-conv); tru=nm(tru);
+  o.innerHTML='<table class="led"><tr><th>Reference</th><th>Azimuth</th></tr><tr><td>True</td><td class="big">'+rnd(tru,1)+'°</td></tr><tr><td>Magnetic</td><td class="big">'+rnd(mag,1)+'°</td></tr><tr><td>Grid</td><td class="big">'+rnd(grid,1)+'°</td></tr></table><div class="cxmuted" style="margin-top:6px">Declination = magnetic vs true; grid convergence = grid vs true; both + when that north is east of true.</div>'; }
+ ['azV','azDec','azConv'].forEach(id=>{ if($(id))$(id).addEventListener('input',azc); });
+ if($('azFrom'))$('azFrom').addEventListener('change',azc);
+
+ /* --- Report builders --- */
+ const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+ const REPORTS=[
+  {t:'&#128221; SALUTE report',h:'SALUTE REPORT',f:[
+    {o:'S – Size',l:'Size',ph:'# / strength'},{o:'A – Activity',l:'Activity',ph:'what they are doing',ta:1},
+    {o:'L – Location',l:'Location',ph:'grid'},{o:'U – Unit / Uniform',l:'Unit / Uniform',ph:'markings, type'},
+    {o:'T – Time',l:'Time (DTG)',ph:'e.g. 041530ZJUL26'},{o:'E – Equipment',l:'Equipment',ph:'weapons / vehicles'}]},
+  {t:'&#128064; SPOT report',h:'SPOT REPORT',f:[
+    {o:'Sender',l:'Sender call sign',ph:''},{o:'DTG',l:'DTG',ph:'e.g. 041530ZJUL26'},
+    {o:'Size',l:'Size',ph:''},{o:'Activity',l:'Activity',ph:'',ta:1},{o:'Location',l:'Location',ph:'grid'},
+    {o:'Unit',l:'Unit / Uniform',ph:''},{o:'Time observed',l:'Time observed',ph:''},{o:'Equipment',l:'Equipment',ph:''}]},
+  {t:'&#128220; SITREP',h:'SITUATION REPORT',f:[
+    {o:'LINE 1 – DTG',l:'DTG',ph:''},{o:'LINE 2 – Unit / call sign',l:'Unit / call sign',ph:''},
+    {o:'LINE 3 – Location',l:'Location',ph:'grid'},{o:'LINE 4 – Situation / activity',l:'Situation',ph:'',ta:1},
+    {o:'LINE 5 – Enemy',l:'Enemy',ph:'',ta:1},{o:'LINE 6 – Personnel / equip status',l:'Personnel / equip',ph:''},
+    {o:'LINE 7 – Logistics',l:'Logistics',ph:'Class I / III / V'},{o:'LINE 8 – Comms status',l:'Comms',ph:''},
+    {o:'LINE 9 – Intent / next',l:'Intent / next',ph:'',ta:1}]},
+  {t:'&#128657; 9-line MEDEVAC',h:'9-LINE MEDEVAC REQUEST',f:[
+    {o:'LINE 1 – Pickup location',l:'1 – Location',ph:'grid'},
+    {o:'LINE 2 – Freq & call sign',l:'2 – Freq / call sign',ph:''},
+    {o:'LINE 3 – Patients by precedence',l:'3 – Precedence',ph:'A-Urgent B-Urg Surg C-Priority D-Routine E-Conv'},
+    {o:'LINE 4 – Special equipment',l:'4 – Equipment',ph:'A-None B-Hoist C-Extract D-Ventilator'},
+    {o:'LINE 5 – Patients by type',l:'5 – Type',ph:'L-litter / A-ambulatory (#)'},
+    {o:'LINE 6 – Security at pickup',l:'6 – Security',ph:'N-none P-possible E-enemy X-escort'},
+    {o:'LINE 7 – Marking method',l:'7 – Marking',ph:'panel / smoke / IR / etc.'},
+    {o:'LINE 8 – Patient nationality',l:'8 – Nationality',ph:'A-US mil B-US civ C-nonUS mil D-nonUS civ E-EPW'},
+    {o:'LINE 9 – Terrain / NBC',l:'9 – Terrain / NBC',ph:'obstacles or contamination'}]},
+  {t:'&#128266; Radio / commo check',h:'RADIO CHECK',f:[
+    {o:'To (call sign)',l:'Distant call sign',ph:''},{o:'This is',l:'Your call sign',ph:''},
+    {o:'Readability',l:'Readability',ph:'Loud & Clear / Readable / Distorted / w-interference / Unreadable'},
+    {o:'Strength',l:'Strength',ph:'Loud / Good / Weak / Very weak / Fading'},{o:'Remarks',l:'Remarks',ph:'',ta:1}]},
+  {t:'&#9762; NBC-1 report',h:'NBC-1 OBSERVER REPORT',f:[
+    {o:'ALPHA – Strike serial',l:'A – Serial',ph:'unit-assigned'},
+    {o:'BRAVO – Observer location',l:'B – Observer loc',ph:'grid'},
+    {o:'CHARLIE – Direction of attack',l:'C – Direction',ph:'° or mils'},
+    {o:'DELTA – DTG attack start / end',l:'D – DTG',ph:''},
+    {o:'FOXTROT – Location of attack',l:'F – Attack loc',ph:'grid (act/est)'},
+    {o:'GOLF – Means of delivery',l:'G – Delivery',ph:'air / artillery / missile'},
+    {o:'HOTEL – Type (N/B/C) & agent',l:'H – Type / agent',ph:''},
+    {o:'Remarks',l:'Remarks',ph:'',ta:1}]}
+ ];
+ function copyText(t,el){ const done=()=>{ el.textContent='Copied ✓'; setTimeout(()=>{el.textContent='';},1600); };
+  function fb(){ try{ const ta=document.createElement('textarea'); ta.value=t; ta.style.position='fixed'; ta.style.opacity='0'; document.body.appendChild(ta); ta.focus(); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); done(); }catch(_){ el.textContent='Copy failed — select the text manually.'; } }
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(done,fb); } else fb(); }catch(e){ fb(); } }
+ (function(){ const host=$('reportBuilders'); if(!host)return;
+  host.innerHTML=REPORTS.map((r,ri)=>{ const fields=r.f.map((fl,fi)=>'<div class="cxrow"><label for="rp'+ri+'_'+fi+'">'+fl.l+'</label>'+(fl.ta?'<textarea id="rp'+ri+'_'+fi+'" placeholder="'+esc(fl.ph)+'"></textarea>':'<input id="rp'+ri+'_'+fi+'" placeholder="'+esc(fl.ph)+'">')+'</div>').join('');
+    return '<details class="tool cx rpt"><summary>'+r.t+'</summary>'+fields+'<div class="rbtns"><button class="btn sm" data-build="'+ri+'">Build</button><button class="btn ghost sm" data-copy="'+ri+'">Copy</button><span class="copied" id="rpc'+ri+'"></span></div><pre id="rpo'+ri+'" style="display:none"></pre></details>'; }).join('');
+  function build(ri){ const r=REPORTS[ri]; const lines=[r.h]; r.f.forEach((fl,fi)=>{ const el=$('rp'+ri+'_'+fi); const v=el?el.value:''; if(v&&v.trim())lines.push(fl.o+': '+v.trim()); }); const out=lines.join('\n'); const pre=$('rpo'+ri); pre.textContent=out; pre.style.display='block'; return out; }
+  host.querySelectorAll('[data-build]').forEach(b=>b.onclick=()=>build(+b.dataset.build));
+  host.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{ const ri=+b.dataset.copy; const out=build(ri); copyText(out,$('rpc'+ri)); });
+ })();
+
+ /* --- PACE builder (plain localStorage) --- */
+ let PACE=store.get('cf_pace',[]);
+ function paceRender(){ const host=$('paceRows'); if(!host)return; if(!PACE.length)PACE=[{net:'',p:'',a:'',c:'',e:''}];
+  host.innerHTML=PACE.map((row,i)=>'<div class="pacecard"><div class="pchdr"><input data-i="'+i+'" data-k="net" placeholder="Net name (e.g. CMD)" value="'+esc(row.net)+'"><button class="btn ghost sm" data-del="'+i+'">✕</button></div>'+
+    '<div class="cxrow"><label>Primary</label><input data-i="'+i+'" data-k="p" value="'+esc(row.p)+'"></div>'+
+    '<div class="cxrow"><label>Alternate</label><input data-i="'+i+'" data-k="a" value="'+esc(row.a)+'"></div>'+
+    '<div class="cxrow"><label>Contingency</label><input data-i="'+i+'" data-k="c" value="'+esc(row.c)+'"></div>'+
+    '<div class="cxrow"><label>Emergency</label><input data-i="'+i+'" data-k="e" value="'+esc(row.e)+'"></div></div>').join('');
+  host.querySelectorAll('input[data-k]').forEach(inp=>inp.oninput=()=>{ PACE[+inp.dataset.i][inp.dataset.k]=inp.value; });
+  host.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{ PACE.splice(+b.dataset.del,1); paceRender(); }); }
+ if($('paceAdd'))$('paceAdd').onclick=()=>{ PACE.push({net:'',p:'',a:'',c:'',e:''}); paceRender(); };
+ if($('paceSave'))$('paceSave').onclick=()=>{ store.set('cf_pace',PACE); const st=$('paceStatus'); if(st){ st.textContent='Saved ✓'; setTimeout(()=>{st.textContent='';},1600); } };
+ paceRender();
+
+ /* --- Checklists --- */
+ const CHECKLISTS=[
+  {id:'pcc',t:'PCC / PCI — comms',items:['Radios on hand & accounted for','Batteries charged / spares packed','Antennas & cables serviceable','Handset / headset works (sidetone)','Radio check with higher & adjacent','SOI / PACE on hand','Spare fuses / adapters']},
+  {id:'cpset',t:'CP antenna setup',items:['Site picked (clear of obstructions; masked)','Mast / antenna assembled & guyed','Grounded & bonded (single point, short leads)','Feedline routed & strain-relieved','Radio connected & powered','Comms check on each net','Label cables / record setup']},
+  {id:'cptear',t:'CP teardown',items:['Power down radios','Disconnect & coil feedlines','Lower & disassemble mast / antenna','Recover grounding','Inventory all components','Note faults for turn-in']}
+ ];
+ (function(){ const host=$('checklists'); if(!host)return;
+  host.innerHTML=CHECKLISTS.map(cl=>{ const items=cl.items.map((it,i)=>'<div class="ck"><input type="checkbox" id="cl_'+cl.id+'_'+i+'" data-cl="'+cl.id+'" data-i="'+i+'"><label for="cl_'+cl.id+'_'+i+'">'+it+'</label></div>').join('');
+    return '<details class="tool cx"><summary>'+cl.t+'</summary>'+items+'<div class="proc-tools" style="margin-top:8px"><button class="btn ghost sm" data-clreset="'+cl.id+'">Reset</button></div></details>'; }).join('');
+  CHECKLISTS.forEach(cl=>{ const key='cf_cl_'+cl.id, saved=store.get(key,[]);
+    cl.items.forEach((it,i)=>{ const inp=$('cl_'+cl.id+'_'+i); if(!inp)return; if(saved.indexOf(i)>=0){inp.checked=true; inp.closest('.ck').classList.add('done');}
+      inp.onchange=()=>{ let arr=store.get(key,[]); const ii=+inp.dataset.i; if(inp.checked){if(arr.indexOf(ii)<0)arr.push(ii);}else{arr=arr.filter(x=>x!==ii);} store.set(key,arr); inp.closest('.ck').classList.toggle('done',inp.checked); }; }); });
+  host.querySelectorAll('[data-clreset]').forEach(b=>b.onclick=()=>{ const id=b.dataset.clreset; store.set('cf_cl_'+id,[]); host.querySelectorAll('[data-cl="'+id+'"]').forEach(inp=>{inp.checked=false; inp.closest('.ck').classList.remove('done');}); });
+ })();
+})();
+
+/* ===================== SAVED ===================== */
+function renderSaved(){ const host=document.getElementById('savedlist'); if(!host)return;
+ const favs=FAV.map(id=>DATA.find(d=>d.id===id)).filter(Boolean);
+ if(!favs.length){ host.innerHTML=`<div class="empty"><div class="big">&#9734;</div><p>No saved entries yet. Tap the ★ on any card in Reference to pin it here.</p></div>`; return; }
+ host.innerHTML=favs.map(e=>`<div class="proc-item"><div style="display:flex;align-items:center;gap:10px"><div class="nm" style="flex:1">${e.title}</div><button class="btn ghost sm" data-open="${e.id}">Open</button> <button class="btn ghost sm" data-unfav="${e.id}">Remove</button></div></div>`).join('');
+ host.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>gotoCard(b.dataset.open));
+ host.querySelectorAll('[data-unfav]').forEach(b=>b.onclick=()=>{ toggleFav(b.dataset.unfav); renderSaved(); render(); }); }
+
+/* ===================== NOTES (plain) ===================== */
+let NOTES=store.get('cf_notes',{folders:[],notes:[]});
+if(!NOTES.folders)NOTES.folders=[]; if(!NOTES.notes)NOTES.notes=[];
+let noteFilter='all', editingId=null;
+function saveNotes(){ store.set('cf_notes',NOTES); }
+function uid(p){ return (p||'n')+Date.now().toString(36)+Math.floor(Math.random()*100000).toString(36); }
+function esc(s){ return (s||'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+function fmtDate(t){ if(!t)return ''; const d=new Date(t); return d.toLocaleDateString()+' '+d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}); }
+function folderName(id){ const f=NOTES.folders.find(x=>x.id===id); return f?f.name:'Unfiled'; }
+function modalText(title,initial){ return new Promise(res=>{ const ov=document.createElement('div'); ov.className='modal-ov';
+  ov.innerHTML='<div class="modal"><h4></h4><input class="modal-in" type="text"><div class="modal-btns"><button class="btn ghost sm mc">Cancel</button><button class="btn sm mo">OK</button></div></div>';
+  ov.querySelector('h4').textContent=title; document.body.appendChild(ov); const inp=ov.querySelector('.modal-in'); inp.value=initial||''; setTimeout(()=>inp.focus(),40);
+  const done=v=>{ ov.remove(); res(v); }; ov.querySelector('.mc').onclick=()=>done(null); ov.querySelector('.mo').onclick=()=>done(inp.value.trim());
+  inp.addEventListener('keydown',e=>{ if(e.key==='Enter')done(inp.value.trim()); if(e.key==='Escape')done(null); }); ov.addEventListener('click',e=>{ if(e.target===ov)done(null); }); }); }
+function modalConfirm(msg){ return new Promise(res=>{ const ov=document.createElement('div'); ov.className='modal-ov';
+  ov.innerHTML='<div class="modal"><p style="margin:0 0 14px"></p><div class="modal-btns"><button class="btn ghost sm mc">Cancel</button><button class="btn sm mo" style="background:var(--red);color:#fff">Delete</button></div></div>';
+  ov.querySelector('p').textContent=msg; document.body.appendChild(ov);
+  ov.querySelector('.mc').onclick=()=>{ ov.remove(); res(false); }; ov.querySelector('.mo').onclick=()=>{ ov.remove(); res(true); }; ov.addEventListener('click',e=>{ if(e.target===ov){ ov.remove(); res(false); } }); }); }
+function renderNotesTab(){ document.getElementById('notesEditView').style.display='none'; document.getElementById('notesListView').style.display='block';
+ const chips=document.getElementById('folderChips');
+ let html='<span class="fchip'+(noteFilter==='all'?' active':'')+'" data-f="all">All</span>'+'<span class="fchip'+(noteFilter==='unfiled'?' active':'')+'" data-f="unfiled">Unfiled</span>';
+ NOTES.folders.forEach(f=>{ html+='<span class="fchip'+(noteFilter===f.id?' active':'')+'" data-f="'+f.id+'">'+esc(f.name)+'</span>'; });
+ chips.innerHTML=html; chips.querySelectorAll('.fchip').forEach(c=>c.onclick=()=>{ noteFilter=c.dataset.f; renderNotesTab(); });
+ document.getElementById('folderManage').style.display=(noteFilter!=='all'&&noteFilter!=='unfiled')?'flex':'none';
+ let list=NOTES.notes.slice();
+ if(noteFilter==='unfiled') list=list.filter(n=>!n.folderId); else if(noteFilter!=='all') list=list.filter(n=>n.folderId===noteFilter);
+ list.sort((a,b)=>(b.updated||0)-(a.updated||0));
+ const hostl=document.getElementById('notesList');
+ if(!list.length){ hostl.innerHTML='<div class="empty"><div class="big">&#128221;</div><p>No notes here yet. Tap <b>+ Note</b> to start.</p></div>'; return; }
+ hostl.innerHTML=list.map(n=>{ const snip=esc((n.body||'').replace(/\s+/g,' ').trim().slice(0,110)); const title=esc(n.title)||'<span style="color:var(--muted)">Untitled</span>';
+  return '<div class="note-card" data-id="'+n.id+'"><h4>'+title+'</h4>'+(snip?'<div class="snip">'+snip+'</div>':'')+'<div class="nmeta"><span class="ftag">'+esc(folderName(n.folderId))+'</span> &middot; '+fmtDate(n.updated)+'</div></div>'; }).join('');
+ hostl.querySelectorAll('.note-card').forEach(c=>c.onclick=()=>openNote(c.dataset.id)); }
+function openNote(id){ editingId=id||null; const n=id?NOTES.notes.find(x=>x.id===id):null;
+ document.getElementById('notesListView').style.display='none'; document.getElementById('notesEditView').style.display='block';
+ document.getElementById('edTitle').value=n?(n.title||''):''; document.getElementById('edBody').value=n?(n.body||''):'';
+ const sel=document.getElementById('edFolder'); let opts='<option value="">Unfiled</option>'; NOTES.folders.forEach(f=>{ opts+='<option value="'+f.id+'">'+esc(f.name)+'</option>'; }); sel.innerHTML=opts;
+ sel.value=n?(n.folderId||''):((noteFilter!=='all'&&noteFilter!=='unfiled')?noteFilter:'');
+ document.getElementById('edDelete').style.display=n?'inline-block':'none'; setTimeout(()=>document.getElementById('edTitle').focus(),40); }
+function saveEditor(){ const title=document.getElementById('edTitle').value.trim(), body=document.getElementById('edBody').value, folderId=document.getElementById('edFolder').value||null;
+ if(!title&&!body.trim()){ editingId=null; renderNotesTab(); return; }
+ if(editingId){ const n=NOTES.notes.find(x=>x.id===editingId); if(n){ n.title=title; n.body=body; n.folderId=folderId; n.updated=Date.now(); } }
+ else { NOTES.notes.push({id:uid('n'),title,body,folderId,updated:Date.now()}); }
+ saveNotes(); editingId=null; renderNotesTab(); }
+document.getElementById('newNote').onclick=()=>openNote(null);
+document.getElementById('edBack').onclick=()=>{ editingId=null; renderNotesTab(); };
+document.getElementById('edSave').onclick=saveEditor;
+document.getElementById('edDelete').onclick=async()=>{ if(editingId&&await modalConfirm('Delete this note? This cannot be undone.')){ NOTES.notes=NOTES.notes.filter(x=>x.id!==editingId); saveNotes(); editingId=null; renderNotesTab(); } };
+document.getElementById('newFolder').onclick=async()=>{ const name=await modalText('New folder name',''); if(name){ const id=uid('f'); NOTES.folders.push({id,name}); saveNotes(); noteFilter=id; renderNotesTab(); } };
+document.getElementById('renameFolder').onclick=async()=>{ if(noteFilter!=='all'&&noteFilter!=='unfiled'){ const f=NOTES.folders.find(x=>x.id===noteFilter); if(f){ const name=await modalText('Rename folder',f.name); if(name){ f.name=name; saveNotes(); renderNotesTab(); } } } };
+document.getElementById('deleteFolder').onclick=async()=>{ if(noteFilter!=='all'&&noteFilter!=='unfiled'){ if(await modalConfirm('Delete this folder? Its notes move to Unfiled.')){ NOTES.notes.forEach(n=>{ if(n.folderId===noteFilter)n.folderId=null; }); NOTES.folders=NOTES.folders.filter(x=>x.id!==noteFilter); saveNotes(); noteFilter='all'; renderNotesTab(); } } };
+
+/* ===================== BACKUP / RESTORE (plain) ===================== */
+(function(){ const ex=document.getElementById('bkExport'), im=document.getElementById('bkImport'), st=document.getElementById('bkStatus'); if(!ex)return;
+ ex.onclick=()=>{ try{ const data={app:'commo-fundamentals',kind:'backup',ver:1,notes:store.get('cf_notes',null),pace:store.get('cf_pace',null)};
+   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'}), url=URL.createObjectURL(blob), an=document.createElement('a');
+   an.href=url; an.download='commo-fundamentals-backup.json'; document.body.appendChild(an); an.click(); document.body.removeChild(an); setTimeout(()=>URL.revokeObjectURL(url),1000);
+   if(st)st.textContent='Exported.'; }catch(e){ if(st)st.textContent='Export failed.'; } };
+ if(im)im.onchange=()=>{ const fl=im.files&&im.files[0]; if(!fl)return; const r=new FileReader();
+   r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!d||d.app!=='commo-fundamentals')throw 0;
+     if(d.notes)store.set('cf_notes',d.notes); if(d.pace)store.set('cf_pace',d.pace);
+     if(st)st.textContent='Imported. Reloading…'; setTimeout(()=>{try{location.reload();}catch(e){}},700);
+   }catch(e){ if(st)st.textContent='Import failed — not a valid backup file.'; } };
+   r.readAsText(fl); }; })();
+
+/* ===================== PWA icon + manifest ===================== */
+(function(){
+ function makeIcon(size){ const c=document.createElement('canvas'); c.width=c.height=size; const x=c.getContext('2d');
+  const g=x.createLinearGradient(0,0,size,size); g.addColorStop(0,'#4fd6cb'); g.addColorStop(1,'#7a5cff'); x.fillStyle=g; x.fillRect(0,0,size,size);
+  x.strokeStyle='#12101c'; x.lineWidth=size*0.055; x.lineCap='round'; x.lineJoin='round';
+  const m=size*0.30, w=size-2*m, h=size-2*m, r=size*0.05;
+  x.beginPath(); x.moveTo(m+r,m); x.lineTo(m+w-r,m); x.arcTo(m+w,m,m+w,m+r,r); x.lineTo(m+w,m+h-r); x.arcTo(m+w,m+h,m+w-r,m+h,r);
+  x.lineTo(m+r,m+h); x.arcTo(m,m+h,m,m+h-r,r); x.lineTo(m,m+r); x.arcTo(m,m,m+r,m,r); x.closePath(); x.stroke();
+  x.beginPath(); x.moveTo(m+w*0.32,m); x.lineTo(m+w*0.32,m+h); x.stroke();
+  return c.toDataURL('image/png'); }
+ try{ const i192=makeIcon(192), i512=makeIcon(512);
+  document.getElementById('appicon').href=i192;
+  const manifest={ name:'Commo Fundamentals', short_name:'Commo', start_url:'.', scope:'.', display:'standalone', orientation:'portrait', background_color:'#15131f', theme_color:'#12202c',
+    icons:[{src:i192,sizes:'192x192',type:'image/png',purpose:'any maskable'},{src:i512,sizes:'512x512',type:'image/png',purpose:'any maskable'}] };
+  const blob=new Blob([JSON.stringify(manifest)],{type:'application/manifest+json'}); const link=document.createElement('link'); link.rel='manifest'; link.href=URL.createObjectURL(blob); document.head.appendChild(link);
+ }catch(e){} })();
+
+/* ===================== OFFLINE: service worker ===================== */
+if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').then(function(){ console.info('Commo: offline service worker registered.'); }).catch(function(e){ console.warn('Commo: service worker not registered — the app still works, but full offline support needs sw.js hosted next to index.html over HTTPS.', e); }); }); }
+
+/* ===================== HURRY & WAIT (games) ===================== */
+let _gameInit=false, snakeStop=function(){};
+function initGame(){
+  if(_gameInit) return; _gameInit=true;
+  // game selector
+  document.querySelectorAll('.gbtn').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+    const g=b.dataset.game;
+    document.getElementById('game-snake').style.display=(g==='snake')?'block':'none';
+    document.getElementById('game-solitaire').style.display=(g==='solitaire')?'block':'none';
+    if(g!=='snake') snakeStop();
+    if(g==='solitaire' && !window._solDealt){ solNew(); }
+  });
+
+  /* ---------- SNAKE ---------- */
+  const cv=document.getElementById('snCanvas'), ctx=cv.getContext('2d');
+  const N=16, CELL=cv.width/N;
+  let snake,dir,ndir,food,score,hi=store.get('cf_snake_hi',0),loop=null,alive=false,speed;
+  const col={ bg:getComputedStyle(document.documentElement).getPropertyValue('--inset')||'#141121' };
+  function cssvar(n,f){ const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v||f; }
+  function placeFood(){ const free=[]; for(let x=0;x<N;x++)for(let y=0;y<N;y++){ if(!snake.some(s=>s.x===x&&s.y===y))free.push({x,y}); }
+    if(!free.length){ food=null; alive=false; if(loop){clearInterval(loop);loop=null;} setMsg('You filled the board — perfect game!'); document.getElementById('snStart').textContent='Restart'; return; }
+    food=free[(Math.random()*free.length)|0]; }
+  function draw(){
+    ctx.fillStyle=cssvar('--inset','#141121'); ctx.fillRect(0,0,cv.width,cv.height);
+    // subtle grid
+    ctx.fillStyle='rgba(127,110,160,.07)';
+    for(let i=1;i<N;i++){ ctx.fillRect(i*CELL-0.5,0,1,cv.height); ctx.fillRect(0,i*CELL-0.5,cv.width,1); }
+    // food
+    if(food){ ctx.fillStyle=cssvar('--accent2','#ecb457'); ctx.fillRect(food.x*CELL+2,food.y*CELL+2,CELL-4,CELL-4); }
+    // snake
+    const acc=cssvar('--accent','#4fd6cb'), grn=cssvar('--green','#5fd7a6');
+    snake.forEach((s,i)=>{ ctx.fillStyle=(i===0)?acc:grn; ctx.fillRect(s.x*CELL+1,s.y*CELL+1,CELL-2,CELL-2); });
+  }
+  function setMsg(t){ document.getElementById('snMsg').textContent=t; }
+  function setScore(){ document.getElementById('snScore').textContent='Score '+score; document.getElementById('snHi').textContent='Best '+hi; }
+  function step(){
+    if(ndir.x!==-dir.x||ndir.y!==-dir.y) dir=ndir;
+    const h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+    // The tail cell vacates on this same step unless we're about to eat, so exclude it from the crash test.
+    const willEat=!!food&&h.x===food.x&&h.y===food.y;
+    const body=willEat?snake:snake.slice(0,-1);
+    if(h.x<0||h.y<0||h.x>=N||h.y>=N||body.some(s=>s.x===h.x&&s.y===h.y)){ return gameOver(); }
+    snake.unshift(h);
+    if(willEat){ score++; if(score>hi){ hi=score; store.set('cf_snake_hi',hi); } setScore();
+      if(speed>70){ speed-=5; restartLoop(); } placeFood(); }
+    else snake.pop();
+    draw();
+  }
+  function restartLoop(){ if(loop)clearInterval(loop); loop=setInterval(step,speed); }
+  function start(){ snake=[{x:7,y:8},{x:6,y:8},{x:5,y:8}]; dir={x:1,y:0}; ndir={x:1,y:0}; score=0; speed=130; alive=true; placeFood(); setScore(); setMsg('Swipe the board or use the pad.'); restartLoop(); draw(); document.getElementById('snStart').textContent='Restart'; }
+  function gameOver(){ alive=false; if(loop)clearInterval(loop); loop=null; setMsg('Game over — score '+score+'. Tap Restart.'); document.getElementById('snStart').textContent='Restart'; }
+  snakeStop=function(){ if(loop){clearInterval(loop);loop=null;} alive=false; };
+  function turn(d){ if(!alive)return; if(d==='U'&&dir.y!==1)ndir={x:0,y:-1}; else if(d==='D'&&dir.y!==-1)ndir={x:0,y:1}; else if(d==='L'&&dir.x!==1)ndir={x:-1,y:0}; else if(d==='R'&&dir.x!==-1)ndir={x:1,y:0}; }
+  document.getElementById('snStart').onclick=start;
+  document.querySelectorAll('.dbtn').forEach(b=>b.onclick=()=>turn(b.dataset.d));
+  // swipe
+  let tsx,tsy;
+  cv.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; tsx=t.clientX; tsy=t.clientY; },{passive:true});
+  cv.addEventListener('touchend',e=>{ const t=e.changedTouches[0],dx=t.clientX-tsx,dy=t.clientY-tsy; if(Math.abs(dx)<14&&Math.abs(dy)<14)return; if(Math.abs(dx)>Math.abs(dy))turn(dx>0?'R':'L'); else turn(dy>0?'D':'U'); },{passive:true});
+  // keys (only on game tab, snake pane)
+  window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; if(document.getElementById('game-snake').style.display==='none')return;
+    const k=e.key; let d=null; if(k==='ArrowUp'||k==='w')d='U'; else if(k==='ArrowDown'||k==='s')d='D'; else if(k==='ArrowLeft'||k==='a')d='L'; else if(k==='ArrowRight'||k==='d')d='R'; if(d){ e.preventDefault(); turn(d); } });
+  draw ? (snake=[{x:7,y:8}],dir={x:1,y:0},ndir=dir,food={x:11,y:8},score=0,setScore(),draw()) : 0;
+
+  /* ---------- SOLITAIRE (Klondike, tap to move) ---------- */
+  const SU=['♠','♥','♦','♣'], RK=['','A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+  const isRed=c=>c.s===1||c.s===2;
+  let stock,waste,found,tab,sel,moves;
+  const board=document.getElementById('solBoard');
+  function solNew(){ window._solDealt=true;
+    let deck=[]; for(let s=0;s<4;s++)for(let r=1;r<=13;r++)deck.push({s,r});
+    for(let i=deck.length-1;i>0;i--){ const j=(Math.random()*(i+1))|0; [deck[i],deck[j]]=[deck[j],deck[i]]; }
+    tab=[[],[],[],[],[],[],[]]; found=[[],[],[],[]]; sel=null; moves=0;
+    for(let i=0;i<7;i++)for(let j=0;j<=i;j++){ tab[i].push({c:deck.pop(),up:j===i}); }
+    stock=deck.map(c=>({c,up:false})); waste=[];
+    document.getElementById('solMsg').textContent='Tap a card, then tap where it goes. Tap the deck to draw.';
+    solRender();
+  }
+  function cardEl(card,faceUp,cls){ const d=document.createElement('div'); d.className='scard'+(faceUp?(isRed(card)?' red':''):' back')+(cls?(' '+cls):'');
+    if(faceUp){ d.innerHTML='<span class="top">'+RK[card.r]+SU[card.s]+'</span><span class="bot">'+RK[card.r]+SU[card.s]+'</span>'; } return d; }
+  function emptyEl(txt,cls){ const d=document.createElement('div'); d.className='scard empty'+(cls?(' '+cls):''); d.textContent=txt||''; return d; }
+  function isSel(type,pile,idx){ return sel&&sel.type===type&&sel.pile===pile&&sel.idx===idx; }
+  function solRender(){
+    board.innerHTML='';
+    const top=document.createElement('div'); top.className='sol-top';
+    // stock
+    const st=stock.length?cardEl(null,false):emptyEl('↺'); st.onclick=()=>drawStock(); top.appendChild(st);
+    // waste
+    let wz; if(waste.length){ wz=cardEl(waste[waste.length-1].c,true, isSel('waste',0,waste.length-1)?'sel':''); wz.onclick=()=>pick('waste',0,waste.length-1); } else { wz=emptyEl(''); } top.appendChild(wz);
+    // spacer
+    top.appendChild(emptyEl(''));
+    // foundations
+    for(let f=0;f<4;f++){ let fe; if(found[f].length){ fe=cardEl(found[f][found[f].length-1],true, isSel('found',f,found[f].length-1)?'sel':''); } else { fe=emptyEl(SU[f],'found'); }
+      // Non-empty foundation: route through pick() so you can select its top card and move it back to the tableau.
+      // Empty foundation: tapPile() so a held card (e.g. an Ace) can be placed.
+      fe.onclick=()=> found[f].length ? pick('found',f,found[f].length-1) : tapPile('found',f); top.appendChild(fe); }
+    board.appendChild(top);
+    // tableau
+    const tb=document.createElement('div'); tb.className='sol-tab';
+    for(let i=0;i<7;i++){ const col=document.createElement('div'); col.className='tabpile';
+      if(!tab[i].length){ const e=emptyEl(''); e.style.position='relative'; e.onclick=()=>tapPile('tab',i); col.appendChild(e); }
+      else { tab[i].forEach((cell,j)=>{ const el=cardEl(cell.c,cell.up, isSel('tab',i,j)?'sel':''); el.style.top=(j*20)+'px'; el.onclick=(ev)=>{ ev.stopPropagation(); if(cell.up) pick('tab',i,j); else if(j===tab[i].length-1) flipLast(i); }; col.appendChild(el); });
+        col.style.height=((tab[i].length-1)*20+56)+'px'; }
+      tb.appendChild(col); }
+    board.appendChild(tb);
+    document.getElementById('solMoves').textContent='Moves '+moves;
+  }
+  function drawStock(){ sel=null; if(stock.length){ const c=stock.pop(); c.up=true; waste.push(c); moves++; } else if(waste.length){ stock=waste.reverse().map(c=>({c:c.c,up:false})); waste=[]; moves++; } solRender(); }
+  function flipLast(i){ const cell=tab[i][tab[i].length-1]; if(cell&&!cell.up){ cell.up=true; solRender(); } }
+  function runValid(cells){ for(let k=0;k<cells.length-1;k++){ const a=cells[k].c,b=cells[k+1].c; if(isRed(a)===isRed(b)||b.r!==a.r-1) return false; } return true; }
+  function pick(type,pile,idx){
+    if(sel){ // second tap: if same card deselect, else treat target pile
+      if(isSel(type,pile,idx)){ sel=null; solRender(); return; }
+      tapPile(type,pile); return;
+    }
+    if(type==='waste'){ sel={type,pile,idx}; }
+    else if(type==='found'){ sel={type,pile,idx}; }
+    else if(type==='tab'){ const run=tab[pile].slice(idx).map(x=>x); if(run.length>1 && !runValid(run)){ msg('Not a movable run — pick an ordered sequence.'); return; } sel={type,pile,idx}; }
+    solRender();
+  }
+  function msg(t){ document.getElementById('solMsg').textContent=t; }
+  function getRun(){ if(sel.type==='waste') return [waste[waste.length-1]]; if(sel.type==='found') return [{c:found[sel.pile][found[sel.pile].length-1]}]; return tab[sel.pile].slice(sel.idx); }
+  function tapPile(type,pile){
+    if(!sel){ if(type==='tab'){ /* nothing selected, tapping empty tab does nothing */ } return; }
+    const run=getRun(); const first=run[0].c;
+    if(type==='found'){
+      if(run.length!==1){ msg('Only one card at a time to a foundation.'); return; }
+      const top=found[pile].length?found[pile][found[pile].length-1]:null;
+      const ok=top?(first.s===top.s&&first.r===top.r+1):(first.r===1);
+      if(!ok){ msg('That card doesn’t go there.'); flash(); return; }
+      removeSel(); found[pile].push(first); moves++; sel=null; afterMove();
+    } else { // tab
+      const dest=tab[pile]; const top=dest.length?dest[dest.length-1].c:null;
+      const ok=top?(isRed(first)!==isRed(top)&&first.r===top.r-1):(first.r===13);
+      if(!ok){ msg(top?'Build down, alternating colors.':'Only a King goes on an empty column.'); flash(); return; }
+      const moving=removeSel(); moving.forEach(c=>dest.push(c)); moves++; sel=null; afterMove();
+    }
+  }
+  function removeSel(){ // returns array of {c,up} removed (for tab) ; also flips exposed
+    if(sel.type==='waste'){ const c=waste.pop(); return [c]; }
+    if(sel.type==='found'){ const c=found[sel.pile].pop(); return [{c,up:true}]; }
+    const arr=tab[sel.pile].splice(sel.idx); const under=tab[sel.pile][tab[sel.pile].length-1]; if(under&&!under.up)under.up=true; return arr;
+  }
+  function flash(){ board.style.transition='none'; board.style.opacity='.5'; setTimeout(()=>{ board.style.transition='opacity .2s'; board.style.opacity='1'; },60); }
+  function afterMove(){ solRender(); if(found.reduce((a,f)=>a+f.length,0)===52){ board.innerHTML='<div class="solwin">★ You win! ★<br><button class="btn sm" id="solWinNew" style="margin-top:12px">Play again</button></div>'; document.getElementById('solWinNew').onclick=solNew; } }
+  document.getElementById('solNew').onclick=solNew;
+}
+
+/* ===================== LAND NAV (Tier 1 + 2) ===================== */
+let _lnInit=false, lnStop=function(){}, lnResume=function(){};
+function initLandNav(){
+  if(_lnInit) return; _lnInit=true;
+  const $=id=>document.getElementById(id);
+  const D=Math.PI/180;
+  const norm=d=>((d%360)+360)%360;
+
+  /* --- WMM2025 declination (validated to <0.01° vs NOAA test values) --- */
+  const WMM_COF=`1 0 -29351.8 0 12 0
+1 1 -1410.8 4545.4 9.7 -21.5
+2 0 -2556.6 0 -11.6 0
+2 1 2951.1 -3133.6 -5.2 -27.7
+2 2 1649.3 -815.1 -8 -12.1
+3 0 1361 0 -1.3 0
+3 1 -2404.1 -56.6 -4.2 4
+3 2 1243.8 237.5 0.4 -0.3
+3 3 453.6 -549.5 -15.6 -4.1
+4 0 895 0 -1.6 0
+4 1 799.5 278.6 -2.4 -1.1
+4 2 55.7 -133.9 -6 4.1
+4 3 -281.1 212 5.6 1.6
+4 4 12.1 -375.6 -7 -4.4
+5 0 -233.2 0 0.6 0
+5 1 368.9 45.4 1.4 -0.5
+5 2 187.2 220.2 0 2.2
+5 3 -138.7 -122.9 0.6 0.4
+5 4 -142 43 2.2 1.7
+5 5 20.9 106.1 0.9 1.9
+6 0 64.4 0 -0.2 0
+6 1 63.8 -18.4 -0.4 0.3
+6 2 76.9 16.8 0.9 -1.6
+6 3 -115.7 48.8 1.2 -0.4
+6 4 -40.9 -59.8 -0.9 0.9
+6 5 14.9 10.9 0.3 0.7
+6 6 -60.7 72.7 0.9 0.9
+7 0 79.5 0 0 0
+7 1 -77 -48.9 -0.1 0.6
+7 2 -8.8 -14.4 -0.1 0.5
+7 3 59.3 -1 0.5 -0.8
+7 4 15.8 23.4 -0.1 0
+7 5 2.5 -7.4 -0.8 -1
+7 6 -11.1 -25.1 -0.8 0.6
+7 7 14.2 -2.3 0.8 -0.2
+8 0 23.2 0 -0.1 0
+8 1 10.8 7.1 0.2 -0.2
+8 2 -17.5 -12.6 0 0.5
+8 3 2 11.4 0.5 -0.4
+8 4 -21.7 -9.7 -0.1 0.4
+8 5 16.9 12.7 0.3 -0.5
+8 6 15 0.7 0.2 -0.6
+8 7 -16.8 -5.2 0 0.3
+8 8 0.9 3.9 0.2 0.2
+9 0 4.6 0 0 0
+9 1 7.8 -24.8 -0.1 -0.3
+9 2 3 12.2 0.1 0.3
+9 3 -0.2 8.3 0.3 -0.3
+9 4 -2.5 -3.3 -0.3 0.3
+9 5 -13.1 -5.2 0 0.2
+9 6 2.4 7.2 0.3 -0.1
+9 7 8.6 -0.6 -0.1 -0.2
+9 8 -8.7 0.8 0.1 0.4
+9 9 -12.9 10 -0.1 0.1
+10 0 -1.3 0 0.1 0
+10 1 -6.4 3.3 0 0
+10 2 0.2 0 0.1 0
+10 3 2 2.4 0.1 -0.2
+10 4 -1 5.3 0 0.1
+10 5 -0.6 -9.1 -0.3 -0.1
+10 6 -0.9 0.4 0 0.1
+10 7 1.5 -4.2 -0.1 0
+10 8 0.9 -3.8 -0.1 -0.1
+10 9 -2.7 0.9 0 0.2
+10 10 -3.9 -9.1 0 0
+11 0 2.9 0 0 0
+11 1 -1.5 0 0 0
+11 2 -2.5 2.9 0 0.1
+11 3 2.4 -0.6 0 0
+11 4 -0.6 0.2 0 0.1
+11 5 -0.1 0.5 -0.1 0
+11 6 -0.6 -0.3 0 0
+11 7 -0.1 -1.2 0 0.1
+11 8 1.1 -1.7 -0.1 0
+11 9 -1 -2.9 -0.1 0
+11 10 -0.2 -1.8 -0.1 0
+11 11 2.6 -2.3 -0.1 0
+12 0 -2 0 0 0
+12 1 -0.2 -1.3 0 0
+12 2 0.3 0.7 0 0
+12 3 1.2 1 0 -0.1
+12 4 -1.3 -1.4 0 0.1
+12 5 0.6 0 0 0
+12 6 0.6 0.6 0.1 0
+12 7 0.5 -0.1 0 0
+12 8 -0.1 0.8 0 0
+12 9 -0.4 0.1 0 0
+12 10 -0.2 -1 -0.1 0
+12 11 -1.3 0.1 0 0
+12 12 -0.7 0.2 -0.1 -0.1`;
+  const WMM=(function(){
+    const NMAX=12, EPOCH=2025.0, RE=6371200.0, A=6378137.0, f=1/298.257223563, e2=f*(2-f);
+    const g=[],h=[],gd=[],hd=[];
+    for(let n=0;n<=NMAX;n++){ g[n]=new Array(NMAX+1).fill(0); h[n]=g[n].slice(); gd[n]=g[n].slice(); hd[n]=g[n].slice(); }
+    WMM_COF.split('\n').forEach(ln=>{ const p=ln.trim().split(/\s+/); if(p.length!==6)return; const n=+p[0],m=+p[1]; g[n][m]=+p[2]; h[n][m]=+p[3]; gd[n][m]=+p[4]; hd[n][m]=+p[5]; });
+    const fac=k=>{ let r=1; for(let i=2;i<=k;i++)r*=i; return r; };
+    const S=[]; for(let n=0;n<=NMAX;n++){ S[n]=[]; for(let m=0;m<=n;m++) S[n][m]=Math.sqrt((m>0?2:1)*fac(n-m)/fac(n+m)); }
+    function declination(lat,lon,year){
+      const dt=year-EPOCH, phi=lat*D, lam=lon*D, sp=Math.sin(phi), cp=Math.cos(phi);
+      const Rn=A/Math.sqrt(1-e2*sp*sp), x=Rn*cp, z=Rn*(1-e2)*sp, r=Math.sqrt(x*x+z*z);
+      const sphip=z/r; let ct=sphip, st=x/r; if(Math.abs(st)<1e-10)st=1e-10;
+      const P=[],dP=[]; for(let n=0;n<=NMAX;n++){ P[n]=new Array(NMAX+1).fill(0); dP[n]=P[n].slice(); }
+      P[0][0]=1;
+      for(let m=0;m<=NMAX;m++){ if(m>0)P[m][m]=(2*m-1)*st*P[m-1][m-1]; if(m+1<=NMAX)P[m+1][m]=(2*m+1)*ct*P[m][m]; for(let n=m+2;n<=NMAX;n++)P[n][m]=((2*n-1)*ct*P[n-1][m]-(n+m-1)*P[n-2][m])/(n-m); }
+      for(let n=1;n<=NMAX;n++)for(let m=0;m<=n;m++){ const pn1=(m<=n-1)?P[n-1][m]:0; dP[n][m]=(n*ct*P[n][m]-(n+m)*pn1)/st; }
+      let Xp=0,Yp=0,Zp=0;
+      for(let n=1;n<=NMAX;n++){ const rr=Math.pow(RE/r,n+2);
+        for(let m=0;m<=n;m++){ const gt=g[n][m]+dt*gd[n][m], ht=h[n][m]+dt*hd[n][m];
+          const cm=Math.cos(m*lam), sm=Math.sin(m*lam), Pnm=S[n][m]*P[n][m], dPnm=S[n][m]*dP[n][m];
+          Xp+=rr*(gt*cm+ht*sm)*dPnm; Yp+=rr*m*(gt*sm-ht*cm)*Pnm/st; Zp+=-(n+1)*rr*(gt*cm+ht*sm)*Pnm; } }
+      const psi=Math.asin(sphip)-phi, X=Xp*Math.cos(psi)-Zp*Math.sin(psi);
+      return Math.atan2(Yp,X)/D;
+    }
+    return { declination };
+  })();
+  function yearDec(){ const d=new Date(), y=d.getUTCFullYear(), s=Date.UTC(y,0,1), e=Date.UTC(y+1,0,1); return y+(d.getTime()-s)/(e-s); }
+  function decl(lat,lon){ try{ return WMM.declination(lat,lon,yearDec()); }catch(e){ return 0; } }
+
+  /* --- UTM / MGRS --- */
+  const AA=6378137.0, F=1/298.257223563, E2=F*(2-F), EP2=E2/(1-E2), K0=0.9996;
+  function Mof(latR){return AA*((1-E2/4-3*E2*E2/64-5*E2*E2*E2/256)*latR-(3*E2/8+3*E2*E2/32+45*E2*E2*E2/1024)*Math.sin(2*latR)+(15*E2*E2/256+45*E2*E2*E2/1024)*Math.sin(4*latR)-(35*E2*E2*E2/3072)*Math.sin(6*latR));}
+  function toUTM(lat,lon){ let zone=Math.floor((lon+180)/6)+1; if(zone>60)zone=1; const lonO=(zone-1)*6-180+3;
+    const latR=lat*D,lonR=lon*D,lo0=lonO*D,s=Math.sin(latR),c=Math.cos(latR),t=Math.tan(latR);
+    const N=AA/Math.sqrt(1-E2*s*s),T=t*t,C=EP2*c*c,A=c*(lonR-lo0),M=Mof(latR);
+    let E=K0*N*(A+(1-T+C)*Math.pow(A,3)/6+(5-18*T+T*T+72*C-58*EP2)*Math.pow(A,5)/120)+500000;
+    let Nn=K0*(M+N*t*(A*A/2+(5-T+9*C+4*C*C)*Math.pow(A,4)/24+(61-58*T+T*T+600*C-330*EP2)*Math.pow(A,6)/720)); if(lat<0)Nn+=1e7;
+    return {zone,E,N:Nn,north:lat>=0}; }
+  function toMGRS(lat,lon,digits){ digits=digits||4; if(lat<-80||lat>84)return '(polar)';
+    const u=toUTM(lat,lon), zone=u.zone;
+    const bands="CDEFGHJKLMNPQRSTUVWX", band=bands.charAt(Math.min(19,Math.floor((lat+80)/8)));
+    const colS=["ABCDEFGH","JKLMNPQR","STUVWXYZ"], col=colS[(zone-1)%3].charAt(Math.floor(u.E/100000)-1);
+    const rowS=["ABCDEFGHJKLMNPQRSTUV","FGHJKLMNPQRSTUVABCDE"], row=rowS[(zone%2===0)?1:0].charAt(Math.floor(u.N/100000)%20);
+    const f=Math.pow(10,5-digits);
+    const eS=String(Math.floor((u.E%100000)/f)).padStart(digits,'0'), nS=String(Math.floor((u.N%100000)/f)).padStart(digits,'0');
+    return zone+band+' '+col+row+' '+eS+' '+nS; }
+  function utmToLL(E,Nn,zone,north){ if(!north)Nn-=1e7; const lonO=(zone-1)*6-180+3;
+    const M=Nn/K0, mu=M/(AA*(1-E2/4-3*E2*E2/64-5*E2*E2*E2/256)), e1=(1-Math.sqrt(1-E2))/(1+Math.sqrt(1-E2));
+    const phi1=mu+(3*e1/2-27*Math.pow(e1,3)/32)*Math.sin(2*mu)+(21*e1*e1/16-55*Math.pow(e1,4)/32)*Math.sin(4*mu)+(151*Math.pow(e1,3)/96)*Math.sin(6*mu)+(1097*Math.pow(e1,4)/512)*Math.sin(8*mu);
+    const s=Math.sin(phi1),c=Math.cos(phi1),t=Math.tan(phi1),N1=AA/Math.sqrt(1-E2*s*s),R1=AA*(1-E2)/Math.pow(1-E2*s*s,1.5),C1=EP2*c*c,T1=t*t,Dd=(E-500000)/(N1*K0);
+    const lat=phi1-(N1*t/R1)*(Dd*Dd/2-(5+3*T1+10*C1-4*C1*C1-9*EP2)*Math.pow(Dd,4)/24+(61+90*T1+298*C1+45*T1*T1-252*EP2-3*C1*C1)*Math.pow(Dd,6)/720);
+    const lon=lonO*D+(Dd-(1+2*T1+C1)*Math.pow(Dd,3)/6+(5-2*C1+28*T1-3*C1*C1+8*EP2+24*T1*T1)*Math.pow(Dd,5)/120)/c;
+    return [lat/D,lon/D]; }
+  function fromMGRS(str){ const s=String(str||'').trim().toUpperCase().replace(/\s+/g,'');
+    const m=s.match(/^(\d{1,2})([C-HJ-NP-X])([A-HJ-NP-Z])([A-HJ-NP-V])(\d*)$/); if(!m)return null;
+    const zone=+m[1],band=m[2],colL=m[3],rowL=m[4],dig=m[5]; if(zone<1||zone>60||dig.length%2)return null;
+    const prec=dig.length/2, mult=Math.pow(10,5-prec);
+    const eD=prec?parseInt(dig.slice(0,prec),10)*mult:0, nD=prec?parseInt(dig.slice(prec),10)*mult:0;
+    const colS=["ABCDEFGH","JKLMNPQR","STUVWXYZ"][(zone-1)%3], ci=colS.indexOf(colL); if(ci<0)return null;
+    const E=(ci+1)*100000+eD;
+    const rowS=["ABCDEFGHJKLMNPQRSTUV","FGHJKLMNPQRSTUVABCDE"][(zone%2===0)?1:0], ri=rowS.indexOf(rowL); if(ri<0)return null;
+    let Nn=ri*100000+nD;
+    const bands="CDEFGHJKLMNPQRSTUVWX", bi=bands.indexOf(band); if(bi<0)return null;
+    const southLat=(-80+8*bi)*D; let minN=K0*Mof(southLat); if(southLat<0)minN+=1e7;
+    while(Nn<minN) Nn+=2000000;
+    return utmToLL(E,Nn,zone,band>='N'); }
+  function gc(la1,lo1,la2,lo2){ const R=6371008.8,p1=la1*D,p2=la2*D,dp=(la2-la1)*D,dl=(lo2-lo1)*D;
+    const a=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2, m=R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+    let b=Math.atan2(Math.sin(dl)*Math.cos(p2),Math.cos(p1)*Math.sin(p2)-Math.sin(p1)*Math.cos(p2)*Math.cos(dl))/D; if(b<0)b+=360;
+    return {m, brg:b}; }
+  function parseWp(str){ str=(str||'').trim(); if(!str)return null;
+    const r=fromMGRS(str); if(r)return {lat:r[0],lon:r[1]};
+    const m=str.replace(/[,\s]+/g,' ').split(' ').map(Number); if(m.length===2&&isFinite(m[0])&&isFinite(m[1])&&Math.abs(m[0])<=90&&Math.abs(m[1])<=180)return {lat:m[0],lon:m[1]};
+    return null; }
+
+  /* --- state --- */
+  let pos=null, heading=null, haveComp=false, watchId=null, orientOn=false, enabled=false;
+  let WPS=store.get('cf_waypoints',[]); let active=store.get('cf_wp_active',null);
+  function save(){ store.set('cf_waypoints',WPS); store.set('cf_wp_active',active); }
+
+  /* --- sensors --- */
+  function startGPS(){ if(!navigator.geolocation){ $('lnGpsStat').textContent='unavailable'; return; }
+    $('lnGpsStat').textContent='acquiring…';
+    try{ if(watchId!=null)navigator.geolocation.clearWatch(watchId);
+      watchId=navigator.geolocation.watchPosition(p=>{ pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude,spd:p.coords.speed}; $('lnGpsStat').textContent='fix ±'+Math.round(pos.acc||0)+' m'; render(); },
+        err=>{ $('lnGpsStat').textContent='denied/err'; }, {enableHighAccuracy:true,maximumAge:1000,timeout:20000}); }catch(e){ $('lnGpsStat').textContent='error'; } }
+  function onOrient(e){ let hd=null; if(e.webkitCompassHeading!=null&&isFinite(e.webkitCompassHeading)) hd=e.webkitCompassHeading; else if(e.absolute===true&&e.alpha!=null) hd=norm(360-e.alpha); if(hd!=null){ heading=hd; haveComp=true; $('lnCompStat').textContent=Math.round(hd)+'°'; render(); } }
+  function startCompass(){ const add=()=>{ if(orientOn)return; orientOn=true; window.addEventListener('deviceorientationabsolute',onOrient,true); window.addEventListener('deviceorientation',onOrient,true); $('lnCompStat').textContent='on…'; };
+    try{ if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){ DeviceOrientationEvent.requestPermission().then(st=>{ if(st==='granted')add(); else $('lnCompStat').textContent='denied'; }).catch(()=>{ $('lnCompStat').textContent='denied'; }); } else add(); }catch(e){ $('lnCompStat').textContent='n/a'; } }
+  $('lnEnable').onclick=()=>{ enabled=true; startGPS(); startCompass(); };
+  // Stop the live sensors (called when leaving the tab) but remember that the
+  // user had them on, so re-entering the tab can bring them back automatically.
+  lnStop=function(){ try{ if(watchId!=null){navigator.geolocation.clearWatch(watchId); watchId=null;} }catch(e){} if(orientOn){ window.removeEventListener('deviceorientationabsolute',onOrient,true); window.removeEventListener('deviceorientation',onOrient,true); orientOn=false; } if(enabled){ $('lnGpsStat').textContent='paused'; $('lnCompStat').textContent='paused'; } };
+  // Re-entering the Land Nav tab: if sensors were enabled, restart them.
+  lnResume=function(){ if(enabled){ startGPS(); startCompass(); } };
+
+  /* --- waypoints --- */
+  function addWp(lat,lon,name){ const id='w'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36); WPS.push({id,name:name||('WP'+(WPS.length+1)),lat,lon}); active=id; save(); render(); }
+  $('lnWpAdd').onclick=()=>{ const p=parseWp($('lnWpInput').value); const msg=$('lnWpMsg'); if(!p){ msg.textContent='Could not read that — use a full MGRS grid or "lat, long".'; return; } addWp(p.lat,p.lon,$('lnWpName').value.trim()); $('lnWpInput').value=''; $('lnWpName').value=''; msg.textContent='Added.'; setTimeout(()=>msg.textContent='',1500); };
+  $('lnWpHere').onclick=()=>{ const msg=$('lnWpMsg'); if(!pos){ msg.textContent='No GPS fix yet — enable sensors first.'; return; } addWp(pos.lat,pos.lon,$('lnWpName').value.trim()||'My pos'); $('lnWpName').value=''; };
+  function renderWpList(){ const host=$('lnWpList'); if(!WPS.length){ host.innerHTML='<div class="cxmuted">No waypoints yet.</div>'; return; }
+    host.innerHTML=WPS.map(w=>'<div class="wp-row'+(w.id===active?' active':'')+'" data-id="'+w.id+'"><div><div class="wn">'+esc(w.name||'WP')+'</div><div class="wg">'+toMGRS(w.lat,w.lon,4)+'</div></div><span style="flex:1"></span><button class="wx" data-del="'+w.id+'" title="Delete">&times;</button></div>').join('');
+    host.querySelectorAll('.wp-row').forEach(r=>r.onclick=e=>{ if(e.target.dataset.del)return; active=r.dataset.id; save(); render(); });
+    host.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.del; WPS=WPS.filter(w=>w.id!==id); if(active===id)active=null; save(); render(); }); }
+
+  /* --- rendering --- */
+  function fmtDist(m){ return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
+  function renderPos(){ if(!pos){ $('lnGrid').textContent='—'; $('lnLL').textContent='—'; $('lnAcc').textContent='—'; $('lnAlt').textContent='—'; $('lnSpd').textContent='—'; $('lnDecl').textContent='—'; return; }
+    $('lnGrid').textContent=toMGRS(pos.lat,pos.lon,4);
+    $('lnLL').textContent=pos.lat.toFixed(5)+', '+pos.lon.toFixed(5);
+    $('lnAcc').textContent=pos.acc!=null?'± '+Math.round(pos.acc)+' m':'—';
+    $('lnAlt').textContent=pos.alt!=null?Math.round(pos.alt)+' m':'—';
+    $('lnSpd').textContent=pos.spd!=null?(pos.spd*3.6).toFixed(1)+' km/h':'—';
+    const dv=decl(pos.lat,pos.lon); $('lnDecl').textContent=(dv>=0?'+':'')+dv.toFixed(1)+'° '+(dv>=0?'E':'W')+' (auto)'; }
+  function activeWp(){ return WPS.find(w=>w.id===active)||null; }
+  function renderNav(){ const w=activeWp(), card=$('lnNavCard');
+    if(!w){ card.style.display='none'; return; } card.style.display='block';
+    $('lnNavName').textContent=w.name||'WP';
+    if(!pos){ $('lnDist').textContent='need GPS fix'; $('lnTurn').textContent=''; $('lnBt').textContent=$('lnBg').textContent=$('lnBm').textContent='—'; drawCompass(null,null); return; }
+    const g=gc(pos.lat,pos.lon,w.lat,w.lon), dv=decl(pos.lat,pos.lon);
+    const trueB=g.brg, magB=norm(trueB-dv);
+    const u1=toUTM(pos.lat,pos.lon), u2=toUTM(w.lat,w.lon);
+    let gridB=null; if(u1.zone===u2.zone){ gridB=norm(Math.atan2(u2.E-u1.E,u2.N-u1.N)/D); }
+    $('lnDist').textContent=fmtDist(g.m);
+    $('lnBt').textContent=Math.round(trueB)+'°'; $('lnBg').textContent=gridB!=null?Math.round(gridB)+'°':'—'; $('lnBm').textContent=Math.round(magB)+'°';
+    if(haveComp&&heading!=null){ const trueHead=norm(heading+dv); const rel=norm(trueB-trueHead); const off=rel>180?360-rel:rel; const dir=rel>180?'LEFT':'RIGHT';
+      $('lnTurn').textContent=off<4?'On heading — go':'Turn '+dir+' '+Math.round(off)+'°'; drawCompass(trueB,trueHead); }
+    else { $('lnTurn').textContent='Enable compass for the homing arrow'; drawCompass(trueB,null); } }
+  function pt(cx,cy,r,deg){ const a=deg*D; return [cx+r*Math.sin(a), cy-r*Math.cos(a)]; }
+  function drawCompass(trueB,trueHead){ const cv=$('lnCompass'); if(!cv)return; const ctx=cv.getContext('2d'), W=cv.width, cx=W/2, cy=W/2, R=W/2-18;
+    const cssv=(n,f)=>{ const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v||f; };
+    const ink=cssv('--ink','#e9e6f4'), mut=cssv('--muted','#9b95b6'), acc=cssv('--accent','#4fd6cb'), acc2=cssv('--accent2','#ecb457'), line=cssv('--line','#332e49'), panel=cssv('--inset','#141121');
+    ctx.clearRect(0,0,W,W); ctx.fillStyle=panel; ctx.beginPath(); ctx.arc(cx,cy,R+14,0,7); ctx.fill();
+    const hd=(trueHead!=null)?trueHead:0;
+    ctx.strokeStyle=line; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,R,0,7); ctx.stroke();
+    for(let d=0;d<360;d+=30){ const sa=norm(d-hd); const p1=pt(cx,cy,R,sa), p2=pt(cx,cy,R-(d%90===0?16:9),sa);
+      ctx.strokeStyle=(d%90===0)?ink:mut; ctx.lineWidth=(d%90===0)?2.5:1.3; ctx.beginPath(); ctx.moveTo(p1[0],p1[1]); ctx.lineTo(p2[0],p2[1]); ctx.stroke();
+      if(d%90===0){ const L={0:'N',90:'E',180:'S',270:'W'}[d]; const lp=pt(cx,cy,R-30,sa); ctx.fillStyle=(d===0)?acc2:ink; ctx.font='bold 15px "Segoe UI",Arial'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(L,lp[0],lp[1]); } }
+    // fixed index (your facing) at top
+    ctx.fillStyle=mut; ctx.beginPath(); ctx.moveTo(cx,cy-R-2); ctx.lineTo(cx-7,cy-R-13); ctx.lineTo(cx+7,cy-R-13); ctx.closePath(); ctx.fill();
+    // homing arrow to waypoint
+    if(trueB!=null){ const rel=norm(trueB-hd); const tip=pt(cx,cy,R-24,rel), bl=pt(cx,cy,16,rel+140), br=pt(cx,cy,16,rel-140);
+      ctx.fillStyle=acc; ctx.beginPath(); ctx.moveTo(tip[0],tip[1]); ctx.lineTo(bl[0],bl[1]); ctx.lineTo(cx,cy); ctx.lineTo(br[0],br[1]); ctx.closePath(); ctx.fill(); }
+    ctx.fillStyle=ink; ctx.beginPath(); ctx.arc(cx,cy,4,0,7); ctx.fill(); }
+  function drawPlot(){ const cv=$('lnPlot'); if(!cv)return; const ctx=cv.getContext('2d'), W=cv.width, cx=W/2, cy=W/2, R=W/2-16;
+    const cssv=(n,f)=>{ const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v||f; };
+    const ink=cssv('--ink','#e9e6f4'), mut=cssv('--muted','#9b95b6'), acc=cssv('--accent','#4fd6cb'), acc2=cssv('--accent2','#ecb457'), line=cssv('--line','#332e49');
+    ctx.clearRect(0,0,W,W);
+    if(!pos){ $('lnPlotScale').textContent='Enable GPS and add a waypoint to plot.'; return; }
+    // meters offsets
+    const mPerLat=111320, mPerLon=111320*Math.cos(pos.lat*D);
+    const pts=WPS.map(w=>({w, dE:(w.lon-pos.lon)*mPerLon, dN:(w.lat-pos.lat)*mPerLat}));
+    let maxd=50; pts.forEach(p=>{ maxd=Math.max(maxd,Math.hypot(p.dE,p.dN)); }); maxd*=1.15;
+    const scale=R/maxd;
+    // range rings
+    const niceStep=(x=>{ const p=Math.pow(10,Math.floor(Math.log10(x))); const n=x/p; const s=n<1.5?1:n<3.5?2:n<7.5?5:10; return s*p; })(maxd/2);
+    ctx.strokeStyle=line; ctx.fillStyle=mut; ctx.font='10px monospace'; ctx.textAlign='left';
+    for(let rr=niceStep; rr*scale<=R+1; rr+=niceStep){ ctx.beginPath(); ctx.arc(cx,cy,rr*scale,0,7); ctx.stroke(); ctx.fillText((rr<1000?Math.round(rr)+'m':(rr/1000).toFixed(1)+'km'),cx+2,cy-rr*scale-2); }
+    // N marker
+    ctx.fillStyle=mut; ctx.textAlign='center'; ctx.font='bold 12px "Segoe UI",Arial'; ctx.fillText('N',cx,14);
+    // waypoints
+    pts.forEach(p=>{ const x=cx+p.dE*scale, y=cy-p.dN*scale; const on=p.w.id===active;
+      if(on){ ctx.strokeStyle=acc; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke(); }
+      ctx.fillStyle=on?acc:acc2; ctx.beginPath(); ctx.arc(x,y,on?6:4,0,7); ctx.fill();
+      ctx.fillStyle=ink; ctx.font='10px "Segoe UI",Arial'; ctx.textAlign='left'; ctx.fillText(p.w.name||'',x+7,y+3); });
+    // you + heading
+    if(haveComp&&heading!=null){ const dv=decl(pos.lat,pos.lon), th=(heading+dv)*D; ctx.strokeStyle=ink; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+18*Math.sin(th),cy-18*Math.cos(th)); ctx.stroke(); }
+    ctx.fillStyle=acc; ctx.beginPath(); ctx.arc(cx,cy,5,0,7); ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.stroke();
+    $('lnPlotScale').textContent='Rings every '+(niceStep<1000?Math.round(niceStep)+' m':(niceStep/1000).toFixed(1)+' km')+' · you at center · north up'; }
+  function render(){ renderPos(); renderWpList(); renderNav(); drawPlot(); }
+  render();
+}
+
+/* ===================== BOOT ===================== */
+function applyTheme(t){ document.documentElement.setAttribute("data-theme",t); var b=document.getElementById("themeToggle"); if(b){ b.innerHTML=(t==="light")?"\u263E":"\u2600"; b.title=(t==="light")?"Switch to dark mode":"Switch to light mode"; } }
+var theme=store.get("cf_theme","dark"); applyTheme(theme);
+var _tt=document.getElementById("themeToggle"); if(_tt)_tt.onclick=function(){ theme=(theme==="light")?"dark":"light"; store.set("cf_theme",theme); applyTheme(theme); };
+render(); renderSaved();
+var startTab=store.get('cf_tab','reference'); if(startTab&&views[startTab]) switchTab(startTab);
+</script>
+</body>
+</html>
