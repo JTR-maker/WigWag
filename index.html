@@ -106,9 +106,9 @@
   .map-pinbar .map-pinsel,.map-pinbar .map-pinmove{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
   .map-pinbar b{color:var(--accent2)}
   .map-exit{display:none}
-  #mapFsHost{display:none}
+  #mapFsHost{display:none;pointer-events:none}
   body.map-fs{overflow:hidden}
-  body.map-fs #mapFsHost{display:block;position:fixed;inset:0;z-index:500;background:#0d1420}
+  body.map-fs #mapFsHost{display:block;pointer-events:auto;position:fixed;inset:0;z-index:500;background:#0d1420}
   body.map-fs .map-wrap{position:fixed;inset:0;width:100%;height:100%;max-width:none;margin:0;border:none;border-radius:0;z-index:500}
   body.map-fs .map-exit{display:flex;position:fixed;top:calc(var(--safe-t) + 10px);left:10px;z-index:520;transform:translateZ(0);width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--zbar-bg);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:var(--shadow);align-items:center;justify-content:center}
   body.map-fs .map-zoom{position:fixed;top:calc(var(--safe-t) + 10px);right:10px;left:auto;z-index:520;transform:translateZ(0)}
@@ -541,6 +541,11 @@
   window.__errShow=show;
   window.addEventListener('error',function(e){ show('ERR: '+(e.message||(e.error&&e.error.stack)||'error')+'\n@ '+((e.filename||'').split('/').pop())+':'+e.lineno+':'+e.colno); });
   window.addEventListener('unhandledrejection',function(e){ var r=e.reason; show('PROMISE: '+((r&&(r.stack||r.message))||r||'?')); });
+  /* ---- Tap inspector (diagnostic): shows what element each tap actually hits ---- */
+  function tdesc(el){ if(!el)return 'null'; var d=el.tagName.toLowerCase(); if(el.id)d+='#'+el.id; else if(el.className&&typeof el.className==='string'&&el.className.trim())d+='.'+el.className.trim().split(/\s+/)[0]; return d; }
+  var tdbg; function trb(){ if(!tdbg){ tdbg=document.createElement('div'); tdbg.id='__tapdbg'; tdbg.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99998;background:rgba(0,0,0,.82);color:#6fe;font:10px/1.3 monospace;padding:3px 7px;border-radius:5px;pointer-events:none;max-width:96vw;white-space:nowrap;overflow:hidden'; (document.body||document.documentElement).appendChild(tdbg); } return tdbg; }
+  document.addEventListener('touchstart',function(e){ try{ var t=e.touches[0], el=t?document.elementFromPoint(t.clientX,t.clientY):null; trb().textContent='hit: '+tdesc(el)+'  fs:'+(document.body.classList.contains('map-fs')?1:0)+' n:'+e.touches.length; }catch(_){ } },true);
+  document.addEventListener('click',function(e){ try{ trb().textContent='click: '+tdesc(e.target)+'  fs:'+(document.body.classList.contains('map-fs')?1:0); }catch(_){ } },true);
 })();
 </script>
 
@@ -577,7 +582,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v39</b></div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v40</b></div>
   </div>
 </section>
 
