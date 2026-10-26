@@ -96,6 +96,9 @@
   .map-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
   .map-wrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:#0d1420}
   #mapCanvas,#lnMapCanvas{display:block;width:100%;touch-action:none;cursor:grab}
+  body.map-night #lnMapCanvas{filter:brightness(.72) sepia(1) saturate(4) hue-rotate(-52deg) contrast(1.05)}
+  body.map-night .map-cross{color:#ff3a2a}
+  #lnMapNight.on{background:#3a0f0c;border-color:#ff5a46;color:#ff9e92}
   #mapCanvas:active,#lnMapCanvas:active{cursor:grabbing}
   .map-cross{position:absolute;left:50%;top:50%;width:26px;height:26px;margin:-13px 0 0 -13px;pointer-events:none;z-index:3;opacity:.5;transition:opacity .15s,color .15s;color:#ff6f4a;border:2px solid currentColor;border-radius:50%;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
   .map-wrap.moving .map-cross{opacity:1;color:#ffcf4a}
@@ -521,6 +524,15 @@
   .wpe-btns{display:flex;flex-wrap:wrap;gap:8px}
   .wpe-msg{min-height:14px;color:var(--red)}
   .ln-opt-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+  .dr-grid{display:flex;gap:10px;margin-top:10px}
+  .dr-f{flex:1;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+  .dr-f input{width:100%;min-width:0;background:var(--inset);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px 10px;font-size:15px;font-weight:700}
+  .dr-u{color:var(--muted);font-size:12px;white-space:nowrap}
+  #lnPaceCount{background:var(--inset);border:1px solid var(--line);border-radius:8px;color:var(--ink);padding:8px 10px;font-size:15px;font-weight:700}
+  .dr-out{margin-top:10px;font-size:14px;line-height:1.5;display:none}
+  .dr-out.on{display:block}
+  .dr-out .dr-big{font-size:17px;font-weight:800;color:var(--ink)}
+  .dr-out .dr-grid-val{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:700;color:var(--accent);letter-spacing:.5px}
   .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--inset)}
   .seg button{border:none;background:none;color:var(--muted);font-size:13px;font-weight:700;padding:8px 18px;cursor:pointer}
   .seg button.on{background:var(--accent);color:var(--on-accent)}
@@ -605,7 +617,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v44</b></div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v45</b></div>
   </div>
 </section>
 
@@ -1062,7 +1074,12 @@
         <span class="k">Speed</span><span class="v" id="lnSpd">&mdash;</span>
         <span class="k">Declination</span><span class="v" id="lnDecl">&mdash;</span>
       </div>
-      <button class="btn ghost sm" id="lnSpeak" style="margin-top:10px"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8.5a4 4 0 0 1 0 7"/></svg> Speak position</button>
+      <div class="proc-tools" style="margin-top:10px">
+        <button class="btn sm" id="lnMarkPos">&#9873; Mark my position</button>
+        <button class="btn ghost sm" id="lnShareGrid">&#8682; Share grid</button>
+        <button class="btn ghost sm" id="lnSpeak"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16 8.5a4 4 0 0 1 0 7"/></svg> Speak</button>
+      </div>
+      <div id="lnPosMsg" class="cxmuted" style="margin-top:6px"></div>
     </div>
 
     <div class="tool">
@@ -1072,6 +1089,7 @@
         <select id="lnMapSrc" class="cb-colbtn"><option value="usgs">USGS Topo (US)</option><option value="otm">OpenTopoMap (World)</option></select>
         <span style="flex:1"></span>
         <button class="btn ghost sm" id="lnMapFs" aria-label="Full screen"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg> Full screen</button>
+        <button class="btn ghost sm" id="lnMapNight" aria-label="Night / red-light mode">&#9790; Night</button>
         <button class="btn ghost sm" id="lnMapLocate">&#9678; Locate me</button>
       </div>
       <div class="map-wrap">
@@ -1112,7 +1130,7 @@
       <div class="ln-routetot" id="lnRouteTot"></div>
       <div class="ln-routelegs" id="lnRouteLegs"></div>
       <div class="ln-routeopts">
-        <label class="ln-pace">Pace <input id="lnPace" type="number" min="1" max="12" step="0.5" value="4" inputmode="decimal"> km/h</label>
+        <label class="ln-pace">Pace <input id="lnPace" type="number" min="1" max="12" step="0.5" value="4" inputmode="decimal"> <span id="lnPaceUnit">km/h</span></label>
         <label class="ln-snap"><input type="checkbox" id="lnRouteSnap"> Snap to roads (online)</label>
       </div>
       <div class="map-dlstat" id="lnRouteStat" style="text-align:left;margin-top:6px"></div>
@@ -1135,6 +1153,19 @@
       <h3>Plot (north-up)</h3>
       <canvas id="lnPlot" width="340" height="340"></canvas>
       <div class="cxmuted" id="lnPlotScale" style="text-align:center">Enable GPS and add a waypoint to plot.</div>
+    </div>
+
+    <div class="tool">
+      <h3>Pace count &amp; dead reckoning</h3>
+      <div class="desc">Calibrate your pace count over a known 100&nbsp;m, then get the paces to walk any leg &mdash; and project a grid from your position along a bearing.</div>
+      <div class="ln-opt-row"><span>Your pace count (paces&nbsp;/&nbsp;100&nbsp;m)</span><input id="lnPaceCount" type="number" min="20" max="120" step="1" value="65" inputmode="numeric" style="max-width:84px;text-align:center"></div>
+      <div class="dr-grid">
+        <label class="dr-f">Leg distance<input id="lnDRDist" type="number" min="0" step="1" placeholder="300" inputmode="decimal"><span class="dr-u" id="lnDRDistU">m</span></label>
+        <label class="dr-f">Bearing<input id="lnDRBrg" type="number" min="0" max="360" step="1" placeholder="045" inputmode="decimal"><span class="dr-u">&deg;mag</span></label>
+      </div>
+      <div class="proc-tools" style="margin-top:8px"><button class="btn sm" id="lnDRCompute">Compute</button><button class="btn ghost sm" id="lnDRUseActive">Use active target</button></div>
+      <div id="lnDROut" class="dr-out"></div>
+      <div class="cxmuted" style="margin-top:6px;font-size:12px">Pace count = how many of your paces cover 100&nbsp;m (count every other step; typical 60&ndash;70). Projection converts your magnetic bearing to true using local declination and walks the distance from your current GPS fix.</div>
     </div>
 
     <div class="tool">
@@ -2287,16 +2318,18 @@ function initLandNav(){
   function addWp(lat,lon,name,type){ const id='w'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36); WPS.push({id,name:name||('WP'+(WPS.length+1)),lat,lon,type:type||'obj'}); active=id; save(); render(); }
   $('lnWpAdd').onclick=()=>{ const p=parseWp($('lnWpInput').value); const msg=$('lnWpMsg'); if(!p){ msg.textContent='Could not read that — use a full MGRS grid or "lat, long".'; return; } addWp(p.lat,p.lon,$('lnWpName').value.trim()); $('lnWpInput').value=''; $('lnWpName').value=''; msg.textContent='Added.'; setTimeout(()=>msg.textContent='',1500); };
   $('lnWpHere').onclick=()=>{ const msg=$('lnWpMsg'); if(!pos){ msg.textContent='No GPS fix yet — enable sensors first.'; return; } addWp(pos.lat,pos.lon,$('lnWpName').value.trim()||'My pos'); $('lnWpName').value=''; };
-  (function(){ const pc=$('lnPace'); if(pc){ pc.value=pace; const upd=()=>{ let v=parseFloat(pc.value); if(!isFinite(v)||v<=0)v=4; v=Math.min(12,Math.max(1,v)); pace=v; try{store.set('cf_pace',pace);}catch(_){} renderRoute(); }; pc.addEventListener('input',()=>{ const v=parseFloat(pc.value); if(isFinite(v)&&v>0){ pace=Math.min(12,Math.max(1,v)); try{store.set('cf_pace',pace);}catch(_){} renderRoute(); } }); pc.addEventListener('change',upd); }
+  function syncPaceUI(){ const pc=$('lnPace'); if(!pc)return; const mi=cfUnits()==='mi', u=$('lnPaceUnit'); if(u)u.textContent=mi?'mph':'km/h'; pc.min=mi?'0.5':'1'; pc.max=mi?'8':'12'; pc.value=Math.round((mi?pace*0.621371:pace)*10)/10; }
+  function setPaceFromInput(){ const pc=$('lnPace'); if(!pc)return; let v=parseFloat(pc.value); if(!isFinite(v)||v<=0)return; let kmh=cfUnits()==='mi'?v/0.621371:v; pace=Math.min(12,Math.max(1,kmh)); try{store.set('cf_pace',pace);}catch(_){} renderRoute(); }
+  (function(){ const pc=$('lnPace'); if(pc){ syncPaceUI(); pc.addEventListener('input',setPaceFromInput); pc.addEventListener('change',()=>{ setPaceFromInput(); syncPaceUI(); }); }
     const sn=$('lnRouteSnap'); if(sn){ sn.checked=store.get('cf_snaproads',false); sn.onchange=()=>{ try{store.set('cf_snaproads',sn.checked);}catch(_){} if(!sn.checked){ const st=$('lnRouteStat'); if(st)st.textContent=''; } if(typeof mapRouteSync==='function')try{mapRouteSync();}catch(_){} if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; }
     const cl=$('lnRouteClear'); if(cl)cl.onclick=clearRoute; })();
   /* --- units toggle + waypoint export/import --- */
   (function(){ const seg=$('lnUnits'); const iomsg=t=>{ const m=$('lnWpIOmsg'); if(m)m.textContent=t||''; };
     if(seg){ const mark=()=>seg.querySelectorAll('[data-u]').forEach(b=>b.classList.toggle('on',b.dataset.u===cfUnits()));
-      seg.querySelectorAll('[data-u]').forEach(b=>{ const fn=()=>{ try{store.set('cf_units',b.dataset.u==='mi'?'mi':'km');}catch(e){} mark(); render(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; }); mark(); }
+      seg.querySelectorAll('[data-u]').forEach(b=>{ const fn=()=>{ try{store.set('cf_units',b.dataset.u==='mi'?'mi':'km');}catch(e){} mark(); try{syncPaceUI();}catch(_){} render(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; }); mark(); }
     const ex=$('lnWpExport'); if(ex){ const fn=()=>{ if(!WPS.length){ iomsg('No waypoints to export yet.'); return; } const data=JSON.stringify({app:'five-by-five',kind:'waypoints',ver:1,waypoints:WPS,route:ROUTE}); const fname='waypoints-'+new Date().toISOString().slice(0,10)+'.json'; const blob=new Blob([data],{type:'application/json'});
       try{ const file=new File([blob],fname,{type:'application/json'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Five by Five waypoints'}).then(()=>iomsg('Shared '+WPS.length+' waypoints.')).catch(()=>{}); return; } }catch(e){}
-      try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); iomsg('Exported '+fname+' ('+WPS.length+' waypoints).'); }catch(e){ try{ navigator.clipboard.writeText(data); iomsg('Copied waypoints JSON to clipboard.'); }catch(_){ iomsg('Export not supported on this device.'); } } };
+      try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); iomsg('Exported '+fname+' ('+WPS.length+' waypoints).'); }catch(e){ try{ const p=navigator.clipboard.writeText(data); if(p&&p.catch)p.catch(()=>iomsg('Export not supported on this device.')); iomsg('Copied waypoints JSON to clipboard.'); }catch(_){ iomsg('Export not supported on this device.'); } } };
       if(window.tapBind)window.tapBind(ex,fn); else ex.onclick=fn; }
     const im=$('lnWpImport'), imf=$('lnWpImportFile');
     function importWpText(text){ try{ const d=JSON.parse(text); const incoming=(d&&Array.isArray(d.waypoints))?d.waypoints:(Array.isArray(d)?d:null); if(!incoming){ iomsg('No waypoints found in that file.'); return; } let added=0;
@@ -2304,6 +2337,34 @@ function initLandNav(){
       if(added){ save(); render(); } iomsg('Imported '+added+' waypoint'+(added!==1?'s':'')+'.'); }catch(e){ iomsg('Could not read that file — expected a waypoints JSON.'); } }
     if(im&&imf){ const fn=()=>imf.click(); if(window.tapBind)window.tapBind(im,fn); else im.onclick=fn;
       imf.onchange=()=>{ const f=imf.files&&imf.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ importWpText(String(r.result||'')); imf.value=''; }; r.onerror=()=>iomsg('Could not read that file.'); r.readAsText(f); }; } })();
+  function dest(lat,lon,brgTrue,distM){ const R=6371008.8, d=distM/R, b=brgTrue*D, p1=lat*D, l1=lon*D;
+    const p2=Math.asin(Math.sin(p1)*Math.cos(d)+Math.cos(p1)*Math.sin(d)*Math.cos(b));
+    const l2=l1+Math.atan2(Math.sin(b)*Math.sin(d)*Math.cos(p1),Math.cos(d)-Math.sin(p1)*Math.sin(p2));
+    return {lat:p2/D, lon:((l2/D+540)%360)-180}; }
+  /* --- night / red-light map mode --- */
+  (function(){ const b=$('lnMapNight'); function apply(on){ document.body.classList.toggle('map-night',!!on); if(b)b.classList.toggle('on',!!on); }
+    apply(store.get('cf_mapnight',false));
+    if(b){ const fn=()=>{ const on=!document.body.classList.contains('map-night'); try{store.set('cf_mapnight',on);}catch(_){} apply(on); }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; } })();
+  /* --- mark my position + share grid --- */
+  (function(){ const pmsg=t=>{ const m=$('lnPosMsg'); if(m){ m.textContent=t||''; if(t)setTimeout(()=>{ if(m.textContent===t)m.textContent=''; },2600); } };
+    const mk=$('lnMarkPos'); if(mk){ const fn=()=>{ if(!pos){ pmsg('No GPS fix yet — enable sensors first.'); return; } const t=new Date(); const nm='Mark '+String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0'); addWp(pos.lat,pos.lon,nm); pmsg('Marked '+nm+' — set as active target.'); }; if(window.tapBind)window.tapBind(mk,fn); else mk.onclick=fn; }
+    const sh=$('lnShareGrid'); if(sh){ const fn=()=>{ if(!pos){ pmsg('No GPS fix yet — enable sensors first.'); return; } const grid=toMGRS(pos.lat,pos.lon,5), ll=pos.lat.toFixed(5)+', '+pos.lon.toFixed(5); const txt='My position\n'+grid+'\n'+ll+'\nhttps://maps.google.com/?q='+pos.lat.toFixed(6)+','+pos.lon.toFixed(6);
+      try{ if(navigator.share){ navigator.share({title:'My position',text:txt}).then(()=>pmsg('Shared.')).catch(()=>{}); return; } }catch(e){}
+      try{ const p=navigator.clipboard.writeText(txt); if(p&&p.catch)p.catch(()=>pmsg(grid)); pmsg('Copied grid to clipboard.'); }catch(_){ pmsg(grid); } }; if(window.tapBind)window.tapBind(sh,fn); else sh.onclick=fn; } })();
+  /* --- pace count & dead reckoning --- */
+  (function(){ const pcEl=$('lnPaceCount'); if(pcEl){ pcEl.value=store.get('cf_pacecount',65); pcEl.addEventListener('change',()=>{ let v=parseInt(pcEl.value,10); if(!isFinite(v)||v<20)v=65; v=Math.min(120,Math.max(20,v)); pcEl.value=v; try{store.set('cf_pacecount',v);}catch(_){} }); }
+    const du=$('lnDRDistU'); function syncDRUnit(){ if(du)du.textContent=cfUnits()==='mi'?'yd':'m'; }
+    const un=$('lnUnits'); if(un)un.addEventListener('click',()=>setTimeout(syncDRUnit,0)); syncDRUnit();
+    function distToM(v){ return cfUnits()==='mi'? v*0.9144 : v; }
+    const ua=$('lnDRUseActive'); if(ua){ const fn=()=>{ const w=WPS.find(x=>x.id===active); const out=$('lnDROut'); if(!w){ if(out){ out.className='dr-out on'; out.innerHTML='Pick an active target first (tap a waypoint).'; } return; } if(!pos){ if(out){ out.className='dr-out on'; out.innerHTML='Set a target distance manually — no GPS fix for the bearing yet.'; } } const g=gc(pos?pos.lat:w.lat,pos?pos.lon:w.lon,w.lat,w.lon), dv=decl(w.lat,w.lon); $('lnDRDist').value=cfUnits()==='mi'?Math.round(g.m/0.9144):Math.round(g.m); if(pos)$('lnDRBrg').value=Math.round(norm(g.brg-dv)); compute(); }; if(window.tapBind)window.tapBind(ua,fn); else ua.onclick=fn; }
+    function compute(){ const out=$('lnDROut'); if(!out)return; const dv=parseFloat($('lnDRDist').value); const pc=parseInt($('lnPaceCount').value,10)||65;
+      if(!isFinite(dv)||dv<=0){ out.className='dr-out on'; out.innerHTML='Enter a leg distance.'; return; }
+      const m=distToM(dv), paces=Math.round(m/100*pc); let html='<div class="dr-big">'+paces.toLocaleString()+' paces</div><div class="cxmuted">'+cfDist(m)+' at '+pc+' paces/100 m</div>';
+      const brg=parseFloat($('lnDRBrg').value);
+      if(isFinite(brg)){ if(pos){ const tru=norm(brg+decl(pos.lat,pos.lon)); const d=dest(pos.lat,pos.lon,tru,m); html+='<div style="margin-top:8px">Project <b>'+Math.round(norm(brg))+'&deg;mag</b> &rarr; <span class="dr-grid-val">'+toMGRS(d.lat,d.lon,5)+'</span><div class="cxmuted">'+d.lat.toFixed(5)+', '+d.lon.toFixed(5)+' &middot; true '+Math.round(tru)+'&deg;</div></div>'; }
+        else { html+='<div class="cxmuted" style="margin-top:8px">Enable GPS to project a destination grid from your position.</div>'; } }
+      out.className='dr-out on'; out.innerHTML=html; }
+    const cb=$('lnDRCompute'); if(cb){ if(window.tapBind)window.tapBind(cb,compute); else cb.onclick=compute; } })();
   function bearingTo(w){ if(!pos)return null; const g=gc(pos.lat,pos.lon,w.lat,w.lon), dv=decl(pos.lat,pos.lon); return {dist:g.m, mag:norm(g.brg-dv)}; }
   function wpEditorHTML(w){ const chips=WP_TYPES.map(t=>'<button class="wp-tchip'+((w.type||'obj')===t.k?' on':'')+'" data-type="'+t.k+'" style="--c:'+t.color+'">'+t.name+'</button>').join('');
     return '<div class="wp-editor" data-for="'+w.id+'">'+
@@ -2353,7 +2414,7 @@ function initLandNav(){
       const u1=toUTM(prev.lat,prev.lon),u2=toUTM(to.lat,to.lon); let gridB=null; if(u1.zone===u2.zone)gridB=norm(Math.atan2(u2.E-u1.E,u2.N-u1.N)/D);
       legs.push({from:prev.name||'WP',to,dist:g.m,mag:magB,grid:gridB,ridx:i}); total+=g.m; prev=to; }
     const mps=(pace>0?pace:4)/3.6, secs=total/mps;
-    $('lnRouteTot').innerHTML='Total '+fmtDist(total)+'  ·  ~'+fmtTime(secs)+'<span class="rt-sub">'+rwps.length+' waypoint'+(rwps.length>1?'s':'')+(pos?' · from your position at '+(pace>0?pace:4)+' km/h':' · enable GPS for the leg from your position')+'</span>';
+    $('lnRouteTot').innerHTML='Total '+fmtDist(total)+'  ·  ~'+fmtTime(secs)+'<span class="rt-sub">'+rwps.length+' waypoint'+(rwps.length>1?'s':'')+(pos?' · from your position at '+(cfUnits()==='mi'?(Math.round((pace>0?pace:4)*0.621371*10)/10)+' mph':(pace>0?pace:4)+' km/h'):' · enable GPS for the leg from your position')+'</span>';
     const host=$('lnRouteLegs');
     host.innerHTML=legs.map((lg,i)=>{ const cur=lg.to.id===active; return '<div class="leg-row'+(cur?' cur':'')+'" data-i="'+i+'"><div class="leg-n">'+(i+1)+'</div><div class="leg-main"><div class="leg-to">'+esc(lg.from)+' → '+esc(lg.to.name||'WP')+'</div><div class="leg-sub">'+fmtDist(lg.dist)+' · '+Math.round(lg.mag)+'°M'+(lg.grid!=null?(' / '+Math.round(lg.grid)+'°G'):'')+'</div></div><div class="leg-btns"><button data-up="'+lg.ridx+'" '+(lg.ridx<=0?'disabled':'')+' aria-label="Move earlier">▲</button><button data-down="'+lg.ridx+'" '+(lg.ridx>=ROUTE.length-1?'disabled':'')+' aria-label="Move later">▼</button><button data-rm="'+lg.ridx+'" aria-label="Remove">×</button></div></div>'; }).join('');
     host.querySelectorAll('[data-up]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); moveLeg(+b.dataset.up,-1); });
