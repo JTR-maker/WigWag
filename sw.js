@@ -3,7 +3,7 @@
    no signal), and quietly refreshes the cache from the network when online.
    Bump CACHE (e.g. ...-v2) whenever you update index.html to force everyone
    onto the new version immediately. */
-const CACHE = 'commo-fundamentals-v37';
+const CACHE = 'commo-fundamentals-v38';
 const ASSETS = ['./', './index.html'];
 
 self.addEventListener('install', e => {
