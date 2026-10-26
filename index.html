@@ -76,6 +76,22 @@
   .card.flash-top{box-shadow:0 0 0 2px var(--accent),0 0 18px rgba(79,214,203,.35)}
   #cfToast{position:fixed;left:50%;bottom:calc(26px + var(--safe-b));transform:translateX(-50%) translateY(12px);z-index:400;max-width:88vw;background:var(--panel);border:1px solid var(--accent);color:var(--ink);padding:12px 18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.55);font-size:14.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;text-align:center}
   #cfToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+  /* ---- Startup splash ---- */
+  #splash{position:fixed;inset:0;z-index:5000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(135% 95% at 50% 36%,var(--grad1) 0%,var(--bg) 72%);animation:spOut 2.2s ease-in forwards;will-change:opacity}
+  @keyframes spOut{0%,72%{opacity:1}100%{opacity:0;visibility:hidden;pointer-events:none}}
+  #splash.sp-skip{opacity:0;visibility:hidden;pointer-events:none;animation:none;transition:opacity .3s}
+  .sp-logo{width:96px;height:96px;border-radius:25px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--logo1),var(--logo2));color:#12101c;box-shadow:0 14px 48px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.1) inset;position:relative;overflow:hidden;animation:spLogoIn .9s cubic-bezier(.18,.7,.2,1.02) both}
+  .sp-logo svg{width:54px;height:54px;display:block}
+  .sp-logo .spc{opacity:0;animation:spCell .5s ease forwards;animation-delay:var(--d)}
+  @keyframes spCell{from{opacity:.06}to{opacity:1}}
+  .sp-logo::after{content:"";position:absolute;top:0;left:-65%;width:55%;height:100%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-18deg);animation:spShine 1.5s ease .55s 1 both}
+  @keyframes spLogoIn{0%{opacity:0;transform:scale(.72) translateY(6px)}60%{opacity:1;transform:scale(1.06)}100%{opacity:1;transform:scale(1)}}
+  @keyframes spShine{0%{left:-65%}55%,100%{left:170%}}
+  .sp-title{font-size:23px;font-weight:800;letter-spacing:.3em;color:var(--ink);padding-left:.3em;animation:spTitleIn .8s ease .35s both}
+  @keyframes spTitleIn{0%{opacity:0;transform:translateY(10px);letter-spacing:.6em}100%{opacity:1;transform:translateY(0);letter-spacing:.3em}}
+  .sp-sub{font-size:11px;font-weight:700;letter-spacing:.42em;color:var(--accent2);padding-left:.42em;animation:spSubIn .8s ease .6s both}
+  @keyframes spSubIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+  @media (prefers-reduced-motion:reduce){#splash{animation:spOut 1.1s linear forwards}.sp-logo,.sp-title,.sp-sub,.sp-logo .spc{animation:none}.sp-logo .spc{opacity:1}.sp-logo::after{display:none}}
   .card h3{margin:0 0 3px;font-size:16.5px;padding-right:34px}
   .cat{display:inline-block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:8px}
   .card .body{font-size:14.6px}
@@ -145,6 +161,9 @@
   .nav-chk input{width:18px;height:18px}
   .nav-chk input:disabled{opacity:.5}
   .hap-note{color:var(--muted);font-size:11.5px;font-style:italic}
+  .nav-voice{width:100%;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:10px 12px;font-size:14px;font-family:inherit;cursor:pointer;margin-bottom:8px}
+  .nav-voice:disabled{opacity:.6}
+  #voiceRate{accent-color:var(--accent)}
   #gameSelect{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237aa2c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
   .idot{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--chip);border:1px solid var(--line);color:var(--accent2);font-size:18px;font-weight:800;font-style:italic;font-family:Georgia,'Times New Roman',serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .idot:active{transform:translateY(1px)}
@@ -429,6 +448,12 @@
 </style>
 </head>
 <body>
+
+<div id="splash" aria-hidden="true" onclick="this.classList.add('sp-skip')">
+  <div class="sp-logo"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="1.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="15.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.30s" x="1.50" y="19.50" width="3" height="3" rx="0.9"/><rect x="6.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.42s" x="6.00" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.42s" x="6.00" y="19.50" width="3" height="3" rx="0.9"/><rect x="10.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="10.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.54s" x="10.50" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.54s" x="10.50" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.54s" x="10.50" y="19.50" width="3" height="3" rx="0.9"/><rect x="15.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.66s" x="15.00" y="6.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="19.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="1.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="6.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="19.50" width="3" height="3" rx="0.9"/></svg></div>
+  <div class="sp-title">FIVE BY FIVE</div>
+  <div class="sp-sub">FIELD COMMS</div>
+</div>
 
 <div id="topctrls"><button id="hamBtn" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3.5" y1="7" x2="20.5" y2="7"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><line x1="3.5" y1="17" x2="20.5" y2="17"/></svg></button><div id="zulubar" title="Zulu / UTC — tap for converter">
   <div class="zt" id="zuluTime">--:--:--Z</div>
@@ -1028,6 +1053,9 @@
     <button id="cmdOpen" class="nav-setitem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>Search everything</button>
     <div class="nav-setrow"><span>Text size</span><button id="textSize" title="Text size" aria-label="Text size">A</button></div>
     <div class="nav-setrow"><span>Theme</span><button id="themeToggle" title="Switch theme" aria-label="Toggle theme">&#9728;</button></div>
+    <div class="nav-seclbl" style="margin-top:12px">Read-aloud voice</div>
+    <select id="voiceSel" class="nav-voice"><option value="">Device default</option></select>
+    <div class="nav-setrow" style="gap:8px"><input id="voiceRate" type="range" min="0.6" max="1.4" step="0.05" value="0.95" style="flex:1"><button id="voiceTest" class="btn ghost sm">&#9654; Test</button></div>
     <div class="nav-seclbl" style="margin-top:12px">Game audio</div>
     <label class="nav-chk"><input type="checkbox" id="soundTog"> Sound</label>
     <label class="nav-chk"><input type="checkbox" id="musicTog"> Music</label>
@@ -2893,8 +2921,11 @@ function speak(text,display){ showToast(display||text);   // always give visual 
     if(!_ttsPrimed){ try{ const w=new SpeechSynthesisUtterance(''); w.volume=0; speechSynthesis.speak(w); }catch(_){} _ttsPrimed=true; }
     try{ speechSynthesis.resume(); }catch(_){}
     if(speechSynthesis.speaking||speechSynthesis.pending){ try{ speechSynthesis.cancel(); }catch(_){} }
-    const u=new SpeechSynthesisUtterance(text); u.rate=0.95; u.lang='en-US';
-    try{ const vs=speechSynthesis.getVoices()||[]; const v=vs.find(x=>/en[-_]us/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang)); if(v)u.voice=v; }catch(_){}
+    const u=new SpeechSynthesisUtterance(text); u.rate=(+store.get('cf_voicerate',0))||0.95; u.lang='en-US';
+    try{ const vs=speechSynthesis.getVoices()||[]; const pref=store.get('cf_voice','');
+      let v=pref?vs.find(x=>x.voiceURI===pref||x.name===pref):null;
+      if(!v)v=vs.find(x=>/en[-_]us/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang));
+      if(v){ u.voice=v; if(v.lang)u.lang=v.lang; } }catch(_){}
     speechSynthesis.speak(u); return true;
   }catch(e){ return false; } }
 function _spaceDigits(s){ return s.replace(/\d/g,d=>d+' ').replace(/([A-Za-z])/g,'$1 '); }
@@ -2946,6 +2977,19 @@ function initSpeak(){ const $=id=>document.getElementById(id);
   const l=$('lnSpeak'); if(l)l.onclick=()=>{ const grid=((document.getElementById('lnGrid')||{}).textContent||'').trim(); const ll=((document.getElementById('lnLL')||{}).textContent||'').trim();
     if(!grid||grid==='—'||grid==='—'){ speak('No position yet. Enable sensors first.','No position yet — enable sensors first.'); return; }
     speak('Grid. '+_spaceDigits(grid)+'. Latitude longitude '+ll+'.', grid+(ll&&ll!=='—'?('  ·  '+ll):'')); };
+}
+function initVoicePicker(){ const sel=document.getElementById('voiceSel'), rate=document.getElementById('voiceRate'), test=document.getElementById('voiceTest'); if(!sel)return;
+  if(!('speechSynthesis' in window)){ sel.disabled=true; sel.innerHTML='<option>Not supported on this device</option>'; if(rate)rate.disabled=true; if(test)test.style.display='none'; return; }
+  function fill(){ let vs=[]; try{ vs=speechSynthesis.getVoices()||[]; }catch(_){}
+    const en=vs.filter(v=>/^en/i.test(v.lang)), rest=vs.filter(v=>!/^en/i.test(v.lang)); const list=en.concat(rest);
+    const cur=store.get('cf_voice','');
+    sel.innerHTML='<option value="">Device default</option>'+list.map(v=>{ const u=(v.voiceURI||v.name).replace(/"/g,'&quot;'); return '<option value="'+u+'"'+((v.voiceURI===cur||v.name===cur)?' selected':'')+'>'+esc(v.name)+' ('+esc(v.lang)+')'+(v.default?' — default':'')+'</option>'; }).join(''); }
+  fill(); try{ speechSynthesis.onvoiceschanged=fill; }catch(_){}
+  // some engines populate voices late; retry a couple of times
+  let tries=0; const iv=setInterval(()=>{ if(sel.options.length>1||++tries>8){ clearInterval(iv); } else fill(); },400);
+  sel.onchange=()=>{ store.set('cf_voice',sel.value); };
+  if(rate){ rate.value=(+store.get('cf_voicerate',0))||0.95; rate.oninput=()=>store.set('cf_voicerate',+rate.value); }
+  if(test)test.onclick=()=>{ speak('Radio check, radio check. This is the read-aloud voice.','Testing read-aloud voice'); };
 }
 
 /* ============ DR / NET / OHM / HAPTIC ============ */
@@ -3527,6 +3571,7 @@ try{ initExtraTools2(); }catch(e){}
 try{ initA11y(); }catch(e){}
 try{ initTimers(); }catch(e){}
 try{ initSpeak(); }catch(e){}
+try{ initVoicePicker(); }catch(e){}
 try{ initExtraTools4(); }catch(e){}
 try{ initHaptic(); }catch(e){}
 try{ initExtras5(); }catch(e){}
