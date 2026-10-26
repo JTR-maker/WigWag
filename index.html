@@ -3876,21 +3876,23 @@ function initMap(){
 
   // ---- zoom / pan / pinch ----
   function zoomTo(nz,fx,fy){ nz=Math.max(2,Math.min(MAP_SRC[srcKey].max+0.6,nz)); const f=Math.pow(2,nz-z); cx=((cx-W/2)+fx)*f - fx + W/2; cy=((cy-H/2)+fy)*f - fy + H/2; z=nz; saveView(); scheduleDraw(); }
-  const ptrs=new Map(); let panPrev=null, pinchPrev=null, moved=false, lastTap=0, twoStart=0, twoMoved=false, downX=0, downY=0, maxD=0;
+  const ptrs=new Map(); let panPrev=null, pinchPrev=null, moved=false, lastTap=0, twoStart=0, twoMoved=false, downX=0, downY=0, maxD=0, downT=0;
   function pinchState(){ const a=[...ptrs.values()]; const dx=a[0].x-a[1].x, dy=a[0].y-a[1].y; return {d:Math.hypot(dx,dy)||1, mx:(a[0].x+a[1].x)/2, my:(a[0].y+a[1].y)/2}; }
-  function onDown(e){ try{e.target.setPointerCapture(e.pointerId);}catch(_){} ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY}); moved=false; if(ptrs.size===1){ panPrev={x:e.offsetX,y:e.offsetY}; downX=e.offsetX; downY=e.offsetY; maxD=0; } else if(ptrs.size===2){ panPrev=null; pinchPrev=pinchState(); twoStart=Date.now(); twoMoved=false; } }
+  // NOTE: no setPointerCapture — on iOS it suppresses taps/clicks and can leave later taps (e.g. the menu button) unresponsive.
+  function onDown(e){ ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY}); if(ptrs.size===1){ panPrev={x:e.offsetX,y:e.offsetY}; downX=e.offsetX; downY=e.offsetY; maxD=0; moved=false; downT=Date.now(); } else if(ptrs.size===2){ panPrev=null; pinchPrev=pinchState(); twoStart=Date.now(); twoMoved=false; } }
   function onMove(e){ if(!ptrs.has(e.pointerId))return; ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
     if(ptrs.size===1&&panPrev){ const dx=e.offsetX-panPrev.x, dy=e.offsetY-panPrev.y; maxD=Math.max(maxD,Math.hypot(e.offsetX-downX,e.offsetY-downY)); if(Math.abs(dx)>2||Math.abs(dy)>2){ moved=true; follow=false; } cx-=dx; cy-=dy; panPrev={x:e.offsetX,y:e.offsetY}; scheduleDraw(); }
     else if(ptrs.size===2&&pinchPrev){ const ps=pinchState(), r=ps.d/pinchPrev.d; if(r>0&&isFinite(r)){ const dz=Math.log2(r); if(Math.abs(dz)>0.015){ zoomTo(z+dz,ps.mx,ps.my); moved=true; twoMoved=true; follow=false; } } pinchPrev=ps; } }
-  function onUp(e){ const was=ptrs.size; ptrs.delete(e.pointerId);
-    if(was===2){ if(!twoMoved&&Date.now()-twoStart<300)zoomTo(z-1,W/2,H/2); pinchPrev=null; moved=true; }
-    if(ptrs.size===1){ const p=[...ptrs.values()][0]; panPrev={x:p.x,y:p.y}; }
-    else if(ptrs.size===0){ panPrev=null; if(moved)saveView(); } }
-  function onWheel(e){ e.preventDefault(); zoomTo(z - Math.sign(e.deltaY)*0.5, e.offsetX, e.offsetY); }
-  function onClick(e){ if(moveId||maxD>12)return; const hit=hitWp(e.offsetX,e.offsetY), now=Date.now();
+  function handleTap(px,py){ if(moveId)return; const now=Date.now(), hit=hitWp(px,py);
     if(hit){ setActive(hit); wpChanged(); syncPinBar(); lastTap=now; return; }
-    if(now-lastTap<300){ zoomTo(z+1,e.offsetX,e.offsetY); lastTap=0; } else lastTap=now; }
-  function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true; c.addEventListener('pointerdown',onDown); c.addEventListener('pointermove',onMove); c.addEventListener('pointerup',onUp); c.addEventListener('pointercancel',onUp); c.addEventListener('wheel',onWheel,{passive:false}); c.addEventListener('click',onClick); }
+    if(now-lastTap<320){ zoomTo(z+1,px,py); lastTap=0; } else lastTap=now; }
+  function onUp(e){ if(!ptrs.has(e.pointerId))return; const was=ptrs.size; ptrs.delete(e.pointerId);
+    if(was>=2){ if(!twoMoved&&Date.now()-twoStart<300)zoomTo(z-1,W/2,H/2); pinchPrev=null; maxD=999; if(ptrs.size===1){ const p=[...ptrs.values()][0]; panPrev={x:p.x,y:p.y}; } return; }
+    if(was===1){ if(maxD<=12&&Date.now()-downT<600)handleTap(downX,downY); else if(moved)saveView(); panPrev=null; } }
+  function onWheel(e){ e.preventDefault(); zoomTo(z - Math.sign(e.deltaY)*0.5, e.offsetX, e.offsetY); }
+  function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true; c.addEventListener('pointerdown',onDown); c.addEventListener('pointermove',onMove); c.addEventListener('wheel',onWheel,{passive:false}); }
+  // Up/cancel on window so a finger lifting ANYWHERE always completes the gesture and clears state.
+  window.addEventListener('pointerup',onUp); window.addEventListener('pointercancel',onUp);
 
   // ---- GPS ----
   function startGPS(){ if(!navigator.geolocation||watchId!=null)return;
