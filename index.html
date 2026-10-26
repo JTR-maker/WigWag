@@ -93,7 +93,28 @@
   @keyframes spSubIn{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
   @media (prefers-reduced-motion:reduce){#splash{animation:spOut 1.1s linear forwards}.sp-logo,.sp-title,.sp-sub,.sp-logo .spc{animation:none}.sp-logo .spc{opacity:1}.sp-logo::after{display:none}}
   /* ---- Map ---- */
-  .map-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+  .map-bar{display:flex;flex-direction:column;gap:8px;margin-bottom:10px}
+  .map-bar .map-src{width:100%}
+  .map-bar .map-acts{display:flex;gap:8px}
+  .map-bar .map-acts .btn{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding-left:8px;padding-right:8px;white-space:nowrap}
+  .map-bar .map-acts .btn svg.bi{margin-right:0}
+  .map-layers{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-top:10px}
+  .lchip{background:var(--chip);border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 14px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit}
+  .lchip.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .lring{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+  .lring select{padding:6px 10px;font-size:13px}
+  .lring.off{opacity:.45;pointer-events:none}
+  .sunmoon .sm-grid{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:14px;margin-top:2px}
+  .sunmoon .sm-grid .k{color:var(--muted)}
+  .sunmoon .sm-grid .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+  .sunmoon .sm-hd{margin-top:12px;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700}
+  .sunmoon .sm-moon{display:flex;align-items:center;gap:12px;margin-top:8px}
+  .sunmoon .sm-moon .moon-face{width:42px;height:42px;border-radius:50%;flex:none;background:#0b1017;border:1px solid var(--line);position:relative;overflow:hidden;box-shadow:inset 0 0 6px rgba(0,0,0,.6)}
+  .sunmoon .sm-moon .moon-lit{position:absolute;inset:0;background:radial-gradient(circle at 50% 42%,#eef2f6,#aab4c0)}
+  .sunmoon .sm-moon .moon-name{font-weight:800;font-size:15px}
+  .rec-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ff3b5b;margin-right:6px;vertical-align:-1px;animation:recpulse 1.2s ease-in-out infinite}
+  @keyframes recpulse{0%,100%{opacity:1}50%{opacity:.25}}
+  #lnTrkRec.on{background:#3a0f16;border:1px solid #ff3b5b;color:#ff9fb2}
   .map-wrap{position:relative;border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:#0d1420}
   #mapCanvas,#lnMapCanvas{display:block;width:100%;touch-action:none;cursor:grab}
   body.map-night #lnMapCanvas{filter:brightness(.72) sepia(1) saturate(4) hue-rotate(-52deg) contrast(1.05)}
@@ -617,7 +638,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v45</b></div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v46</b></div>
   </div>
 </section>
 
@@ -1086,11 +1107,12 @@
       <h3>Map</h3>
       <div class="desc">Offline-capable topo map with your live position, waypoints, and routes. Pre-load an area while you have signal.</div>
       <div class="map-bar">
-        <select id="lnMapSrc" class="cb-colbtn"><option value="usgs">USGS Topo (US)</option><option value="otm">OpenTopoMap (World)</option></select>
-        <span style="flex:1"></span>
-        <button class="btn ghost sm" id="lnMapFs" aria-label="Full screen"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg> Full screen</button>
-        <button class="btn ghost sm" id="lnMapNight" aria-label="Night / red-light mode">&#9790; Night</button>
-        <button class="btn ghost sm" id="lnMapLocate">&#9678; Locate me</button>
+        <select id="lnMapSrc" class="cb-colbtn map-src"><option value="usgs">USGS Topo (US)</option><option value="otm">OpenTopoMap (World)</option></select>
+        <div class="map-acts">
+          <button class="btn ghost sm" id="lnMapFs" aria-label="Full screen"><svg class="bi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5"/><path d="M20 9V4h-5"/><path d="M4 15v5h5"/><path d="M20 15v5h-5"/></svg> Full screen</button>
+          <button class="btn ghost sm" id="lnMapNight" aria-label="Night / red-light mode">&#9790; Night</button>
+          <button class="btn ghost sm" id="lnMapLocate" aria-label="Locate me">&#9678; Locate</button>
+        </div>
       </div>
       <div class="map-wrap">
         <canvas id="lnMapCanvas"></canvas>
@@ -1103,6 +1125,11 @@
         <button class="btn sm" id="lnMapWpDrop">&#8982; Drop pin at center</button>
         <span class="map-pinsel" id="lnMapWpSel" style="display:none">&#9873; <b id="lnMapWpSelName"></b><button class="btn ghost sm" id="lnMapWpMove">Move</button><button class="btn ghost sm" id="lnMapWpDel">Delete</button></span>
         <span class="map-pinmove" id="lnMapWpMoving" style="display:none">Centering <b id="lnMapWpMovingName"></b> &mdash;<button class="btn sm" id="lnMapWpSet">Set here</button><button class="btn ghost sm" id="lnMapWpCancel">Cancel</button></span>
+      </div>
+      <div class="map-layers">
+        <button type="button" class="lchip" id="lnGridTog">&#9638; MGRS grid</button>
+        <button type="button" class="lchip" id="lnRingTog">&#9678; Range rings</button>
+        <label class="lring" id="lnRingWrap">every <select id="lnRingInt" class="cb-colbtn"></select></label>
       </div>
       <div class="cxmuted" style="margin-top:6px;text-align:center">Drag empty map to pan &middot; pinch or +/&minus; to zoom &middot; two-finger-tap to zoom out &middot; tap a pin to select it &middot; <b>drag a pin to move it</b>.</div>
       <div class="map-info" id="lnMapInfo"></div>
@@ -1156,6 +1183,16 @@
     </div>
 
     <div class="tool">
+      <h3>Track recording</h3>
+      <div class="desc">Record a breadcrumb trail from GPS as you move; it draws on the map in magenta. Export or import tracks and waypoints as a standard GPX file.</div>
+      <div class="proc-tools"><button class="btn sm" id="lnTrkRec">&#9679; Record track</button><button class="btn ghost sm" id="lnTrkClear">Clear</button></div>
+      <div id="lnTrkStat" class="cxmuted" style="margin-top:8px">No track recorded yet.</div>
+      <div class="proc-tools" style="margin-top:10px"><button class="btn sm" id="lnTrkExport">&#8682; Export GPX</button><button class="btn ghost sm" id="lnTrkImport">&#8681; Import GPX</button></div>
+      <input id="lnTrkImportFile" type="file" accept=".gpx,application/gpx+xml,application/xml,text/xml" style="display:none">
+      <div id="lnTrkIO" class="cxmuted" style="margin-top:8px"></div>
+    </div>
+
+    <div class="tool">
       <h3>Pace count &amp; dead reckoning</h3>
       <div class="desc">Calibrate your pace count over a known 100&nbsp;m, then get the paces to walk any leg &mdash; and project a grid from your position along a bearing.</div>
       <div class="ln-opt-row"><span>Your pace count (paces&nbsp;/&nbsp;100&nbsp;m)</span><input id="lnPaceCount" type="number" min="20" max="120" step="1" value="65" inputmode="numeric" style="max-width:84px;text-align:center"></div>
@@ -1166,6 +1203,12 @@
       <div class="proc-tools" style="margin-top:8px"><button class="btn sm" id="lnDRCompute">Compute</button><button class="btn ghost sm" id="lnDRUseActive">Use active target</button></div>
       <div id="lnDROut" class="dr-out"></div>
       <div class="cxmuted" style="margin-top:6px;font-size:12px">Pace count = how many of your paces cover 100&nbsp;m (count every other step; typical 60&ndash;70). Projection converts your magnetic bearing to true using local declination and walks the distance from your current GPS fix.</div>
+    </div>
+
+    <div class="tool">
+      <h3>Light &amp; moon</h3>
+      <div class="desc">Sunrise, sunset, first/last light (nautical twilight), and moon data &mdash; computed offline for your position and today&rsquo;s date.</div>
+      <div id="lnSunMoon" class="sunmoon"><div class="cxmuted">Enable GPS to compute light data for your position.</div></div>
     </div>
 
     <div class="tool">
@@ -2326,7 +2369,7 @@ function initLandNav(){
   /* --- units toggle + waypoint export/import --- */
   (function(){ const seg=$('lnUnits'); const iomsg=t=>{ const m=$('lnWpIOmsg'); if(m)m.textContent=t||''; };
     if(seg){ const mark=()=>seg.querySelectorAll('[data-u]').forEach(b=>b.classList.toggle('on',b.dataset.u===cfUnits()));
-      seg.querySelectorAll('[data-u]').forEach(b=>{ const fn=()=>{ try{store.set('cf_units',b.dataset.u==='mi'?'mi':'km');}catch(e){} mark(); try{syncPaceUI();}catch(_){} render(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; }); mark(); }
+      seg.querySelectorAll('[data-u]').forEach(b=>{ const fn=()=>{ try{store.set('cf_units',b.dataset.u==='mi'?'mi':'km');}catch(e){} mark(); try{syncPaceUI();}catch(_){} try{syncRingOpts();}catch(_){} render(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; }); mark(); }
     const ex=$('lnWpExport'); if(ex){ const fn=()=>{ if(!WPS.length){ iomsg('No waypoints to export yet.'); return; } const data=JSON.stringify({app:'five-by-five',kind:'waypoints',ver:1,waypoints:WPS,route:ROUTE}); const fname='waypoints-'+new Date().toISOString().slice(0,10)+'.json'; const blob=new Blob([data],{type:'application/json'});
       try{ const file=new File([blob],fname,{type:'application/json'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Five by Five waypoints'}).then(()=>iomsg('Shared '+WPS.length+' waypoints.')).catch(()=>{}); return; } }catch(e){}
       try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); iomsg('Exported '+fname+' ('+WPS.length+' waypoints).'); }catch(e){ try{ const p=navigator.clipboard.writeText(data); if(p&&p.catch)p.catch(()=>iomsg('Export not supported on this device.')); iomsg('Copied waypoints JSON to clipboard.'); }catch(_){ iomsg('Export not supported on this device.'); } } };
@@ -2345,6 +2388,25 @@ function initLandNav(){
   (function(){ const b=$('lnMapNight'); function apply(on){ document.body.classList.toggle('map-night',!!on); if(b)b.classList.toggle('on',!!on); }
     apply(store.get('cf_mapnight',false));
     if(b){ const fn=()=>{ const on=!document.body.classList.contains('map-night'); try{store.set('cf_mapnight',on);}catch(_){} apply(on); }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; } })();
+  /* --- map layers: MGRS grid, range rings, track recording --- */
+  function syncRingOpts(){ const sel=$('lnRingInt'); if(!sel)return; const mi=cfUnits()==='mi';
+    const opts=mi?[[91.44,'100 yd'],[402.336,'¼ mi'],[804.672,'½ mi'],[1609.344,'1 mi']]:[[50,'50 m'],[100,'100 m'],[250,'250 m'],[500,'500 m'],[1000,'1 km']];
+    const cur=+store.get('cf_ringint',100)||100; sel.innerHTML=opts.map(o=>'<option value="'+o[0]+'">'+o[1]+'</option>').join('');
+    let best=opts[0][0],bd=1e9; opts.forEach(o=>{ const d=Math.abs(o[0]-cur); if(d<bd){bd=d;best=o[0];} }); sel.value=String(best); }
+  (function(){
+    const gt=$('lnGridTog'); if(gt){ const upd=()=>gt.classList.toggle('on',store.get('cf_mapgrid',false)); upd();
+      const fn=()=>{ const on=!store.get('cf_mapgrid',false); try{store.set('cf_mapgrid',on);}catch(_){} upd(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(gt,fn); else gt.onclick=fn; }
+    const rt=$('lnRingTog'), rw=$('lnRingWrap'); const updR=()=>{ const on=store.get('cf_maprings',false); if(rt)rt.classList.toggle('on',on); if(rw)rw.classList.toggle('off',!on); };
+    if(rt){ const fn=()=>{ const on=!store.get('cf_maprings',false); try{store.set('cf_maprings',on);}catch(_){} updR(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(rt,fn); else rt.onclick=fn; }
+    syncRingOpts(); updR();
+    const ri=$('lnRingInt'); if(ri)ri.onchange=()=>{ const m=parseFloat(ri.value)||100; try{store.set('cf_ringint',m);}catch(_){} if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} };
+    try{ if(typeof mapTrack!=='undefined'&&mapTrack.refresh)mapTrack.refresh(); }catch(_){}
+    const tr=$('lnTrkRec'); if(tr){ const fn=()=>{ try{mapTrack.toggle();}catch(_){} }; if(window.tapBind)window.tapBind(tr,fn); else tr.onclick=fn; }
+    const tc=$('lnTrkClear'); if(tc){ const fn=()=>{ try{ if(mapTrack.hasData())mapTrack.clear(); }catch(_){} }; if(window.tapBind)window.tapBind(tc,fn); else tc.onclick=fn; }
+    const te=$('lnTrkExport'); if(te){ const fn=()=>{ try{mapTrack.exportGPX();}catch(_){} }; if(window.tapBind)window.tapBind(te,fn); else te.onclick=fn; }
+    const tim=$('lnTrkImport'), tif=$('lnTrkImportFile'); if(tim&&tif){ const fn=()=>tif.click(); if(window.tapBind)window.tapBind(tim,fn); else tim.onclick=fn;
+      tif.onchange=()=>{ const f=tif.files&&tif.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ try{mapTrack.importGPX(String(r.result||''));}catch(_){} tif.value=''; }; r.onerror=()=>{}; r.readAsText(f); }; }
+  })();
   /* --- mark my position + share grid --- */
   (function(){ const pmsg=t=>{ const m=$('lnPosMsg'); if(m){ m.textContent=t||''; if(t)setTimeout(()=>{ if(m.textContent===t)m.textContent=''; },2600); } };
     const mk=$('lnMarkPos'); if(mk){ const fn=()=>{ if(!pos){ pmsg('No GPS fix yet — enable sensors first.'); return; } const t=new Date(); const nm='Mark '+String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0'); addWp(pos.lat,pos.lon,nm); pmsg('Marked '+nm+' — set as active target.'); }; if(window.tapBind)window.tapBind(mk,fn); else mk.onclick=fn; }
@@ -2490,7 +2552,31 @@ function initLandNav(){
     if(haveComp&&heading!=null){ const dv=decl(pos.lat,pos.lon), th=(heading+dv)*D; ctx.strokeStyle=ink; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+18*Math.sin(th),cy-18*Math.cos(th)); ctx.stroke(); }
     ctx.fillStyle=acc; ctx.beginPath(); ctx.arc(cx,cy,5,0,7); ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.stroke();
     $('lnPlotScale').textContent='Rings every '+cfDist(niceStep)+' · you at center · north up'; }
-  function render(){ try{ WPS=store.get('cf_waypoints',[])||[]; active=store.get('cf_wp_active',null); ROUTE=(store.get('cf_route',[])||[]).slice(); }catch(_){} renderPos(); renderWpList(); renderRoute(); renderNav(); drawPlot(); }
+  function renderSunMoon(){ const host=$('lnSunMoon'); if(!host)return; const A=(window.__astro&&window.__astro.Astro); if(!A)return;
+    if(!pos){ host.innerHTML='<div class="cxmuted">Enable GPS to compute light data for your position.</div>'; return; }
+    let st,mi,mt; try{ const now=new Date(); st=A.sunTimes(now,pos.lat,pos.lon); mi=A.moonIllum(now); mt=A.moonTimes(now,pos.lat,pos.lon); }catch(e){ return; }
+    const fmt=d=>{ if(!d||isNaN(d.getTime()))return '—'; return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); };
+    let dayLen='—'; if(st.sun.rise&&st.sun.set){ const ms=st.sun.set-st.sun.rise; if(ms>0){ dayLen=Math.floor(ms/3600000)+'h '+Math.round((ms%3600000)/60000)+'m'; } }
+    const waxing=mi.phase<0.5, pct=Math.round(mi.fraction*100), lit='#e8edf3', dark='#0b1017';
+    const bg=waxing?('linear-gradient(to left,'+lit+' 0 '+pct+'%,'+dark+' '+pct+'% 100%)'):('linear-gradient(to right,'+lit+' 0 '+pct+'%,'+dark+' '+pct+'% 100%)');
+    host.innerHTML=
+      '<div class="sm-grid">'+
+        '<span class="k">First light · BMNT</span><span class="v">'+fmt(st.nautical.rise)+'</span>'+
+        '<span class="k">Sunrise</span><span class="v">'+fmt(st.sun.rise)+'</span>'+
+        '<span class="k">Solar noon</span><span class="v">'+fmt(st.noon)+'</span>'+
+        '<span class="k">Sunset</span><span class="v">'+fmt(st.sun.set)+'</span>'+
+        '<span class="k">Last light · EENT</span><span class="v">'+fmt(st.nautical.set)+'</span>'+
+        '<span class="k">Day length</span><span class="v">'+dayLen+'</span>'+
+      '</div>'+
+      '<div class="sm-hd">Moon</div>'+
+      '<div class="sm-moon"><div class="moon-face"><div class="moon-lit" style="background:'+bg+'"></div></div>'+
+        '<div><div class="moon-name">'+A.phaseName(mi.phase)+'</div><div class="cxmuted">'+pct+'% illuminated</div></div></div>'+
+      '<div class="sm-grid" style="margin-top:8px">'+
+        '<span class="k">Moonrise</span><span class="v">'+(mt.rise?fmt(mt.rise):(mt.alwaysUp?'up all day':'—'))+'</span>'+
+        '<span class="k">Moonset</span><span class="v">'+(mt.set?fmt(mt.set):(mt.alwaysDown?'down all day':'—'))+'</span>'+
+      '</div>'+
+      '<div class="cxmuted" style="margin-top:8px;font-size:12px">Times are local. BMNT/EENT use nautical twilight (sun 12° below the horizon).</div>'; }
+  function render(){ try{ WPS=store.get('cf_waypoints',[])||[]; active=store.get('cf_wp_active',null); ROUTE=(store.get('cf_route',[])||[]).slice(); }catch(_){} renderPos(); renderWpList(); renderRoute(); renderNav(); drawPlot(); try{renderSunMoon();}catch(_){} }
   lnRefresh=render;
   render();
   // Resume sensors automatically if they were engaged before (GPS permission persists for the site;
@@ -3458,6 +3544,52 @@ function initVoicePicker(){ const sel=document.getElementById('voiceSel'), rate=
   root.CoordDR={toUTM,toMGRS,utmToLL,fromMGRS,dest};
 })(typeof window!=="undefined"?(window.__coorddr={}):{});
 
+/* ===== sun / moon math (SunCalc, MIT © Vladimir Agafonkin) — offline, Node-testable ===== */
+(function(root){
+  const rad=Math.PI/180, dayMs=864e5, J1970=2440588, J2000=2451545, e=rad*23.4397;
+  function toJulian(d){ return d.valueOf()/dayMs-0.5+J1970; }
+  function fromJulian(j){ return new Date((j+0.5-J1970)*dayMs); }
+  function toDays(d){ return toJulian(d)-J2000; }
+  function rightAscension(l,b){ return Math.atan2(Math.sin(l)*Math.cos(e)-Math.tan(b)*Math.sin(e),Math.cos(l)); }
+  function declination(l,b){ return Math.asin(Math.sin(b)*Math.cos(e)+Math.cos(b)*Math.sin(e)*Math.sin(l)); }
+  function solarMeanAnomaly(d){ return rad*(357.5291+0.98560028*d); }
+  function eclipticLongitude(M){ const C=rad*(1.9148*Math.sin(M)+0.02*Math.sin(2*M)+0.0003*Math.sin(3*M)), P=rad*102.9372; return M+C+P+Math.PI; }
+  function sunCoords(d){ const M=solarMeanAnomaly(d), L=eclipticLongitude(M); return {dec:declination(L,0),ra:rightAscension(L,0)}; }
+  const J0=0.0009;
+  function julianCycle(d,lw){ return Math.round(d-J0-lw/(2*Math.PI)); }
+  function approxTransit(Ht,lw,n){ return J0+(Ht+lw)/(2*Math.PI)+n; }
+  function solarTransitJ(ds,M,L){ return J2000+ds+0.0053*Math.sin(M)-0.0069*Math.sin(2*L); }
+  function hourAngle(h,phi,d){ return Math.acos((Math.sin(h)-Math.sin(phi)*Math.sin(d))/(Math.cos(phi)*Math.cos(d))); }
+  function getSetJ(h,lw,phi,dec,n,M,L){ const w=hourAngle(h,phi,dec), a=approxTransit(w,lw,n); return solarTransitJ(a,M,L); }
+  function sunTimes(date,lat,lng){ const lw=rad*-lng, phi=rad*lat, d=toDays(date), n=julianCycle(d,lw), ds=approxTransit(0,lw,n),
+      M=solarMeanAnomaly(ds), L=eclipticLongitude(M), dec=declination(L,0), Jnoon=solarTransitJ(ds,M,L);
+    function ev(h){ const Jset=getSetJ(h*rad,lw,phi,dec,n,M,L); if(isNaN(Jset))return {rise:null,set:null}; return {rise:fromJulian(Jnoon-(Jset-Jnoon)),set:fromJulian(Jset)}; }
+    return {noon:fromJulian(Jnoon), nadir:fromJulian(Jnoon-0.5), sun:ev(-0.833), civil:ev(-6), nautical:ev(-12), astro:ev(-18)}; }
+  function moonCoords(d){ const L=rad*(218.316+13.176396*d), M=rad*(134.963+13.064993*d), F=rad*(93.272+13.229350*d),
+      l=L+rad*6.289*Math.sin(M), b=rad*5.128*Math.sin(F), dt=385001-20905*Math.cos(M);
+    return {ra:rightAscension(l,b), dec:declination(l,b), dist:dt}; }
+  function moonIllum(date){ const d=toDays(date||new Date()), s=sunCoords(d), m=moonCoords(d), sdist=149598000,
+      phi=Math.acos(Math.sin(s.dec)*Math.sin(m.dec)+Math.cos(s.dec)*Math.cos(m.dec)*Math.cos(s.ra-m.ra)),
+      inc=Math.atan2(sdist*Math.sin(phi),m.dist-sdist*Math.cos(phi)),
+      angle=Math.atan2(Math.cos(s.dec)*Math.sin(s.ra-m.ra),Math.sin(s.dec)*Math.cos(m.dec)-Math.cos(s.dec)*Math.sin(m.dec)*Math.cos(s.ra-m.ra));
+    return {fraction:(1+Math.cos(inc))/2, phase:0.5+0.5*inc*(angle<0?-1:1)/Math.PI, angle}; }
+  function siderealTime(d,lw){ return rad*(280.16+360.9856235*d)-lw; }
+  function altitude(H,phi,dec){ return Math.asin(Math.sin(phi)*Math.sin(dec)+Math.cos(phi)*Math.cos(dec)*Math.cos(H)); }
+  function astroRefraction(h){ if(h<0)h=0; return 0.0002967/Math.tan(h+0.00312536/(h+0.08901179)); }
+  function moonPos(date,lat,lng){ const lw=rad*-lng, phi=rad*lat, d=toDays(date), c=moonCoords(d), H=siderealTime(d,lw)-c.ra; let h=altitude(H,phi,c.dec); h+=astroRefraction(h); return {altitude:h}; }
+  function hoursLater(date,h){ return new Date(date.valueOf()+h*dayMs/24); }
+  function moonTimes(date,lat,lng){ const t=new Date(date); t.setHours(0,0,0,0); const hc=0.133*rad; let h0=moonPos(t,lat,lng).altitude-hc, rise,set,ye;
+    for(let i=1;i<=24;i+=2){ const h1=moonPos(hoursLater(t,i),lat,lng).altitude-hc, h2=moonPos(hoursLater(t,i+1),lat,lng).altitude-hc,
+        a=(h0+h2)/2-h1, b=(h2-h0)/2, xe=-b/(2*a); ye=(a*xe+b)*xe+h1; const d=b*b-4*a*ye; let roots=0,x1,x2;
+      if(d>=0){ const dx=Math.sqrt(d)/(Math.abs(a)*2); x1=xe-dx; x2=xe+dx; if(Math.abs(x1)<=1)roots++; if(Math.abs(x2)<=1)roots++; if(x1<-1)x1=x2; }
+      if(roots===1){ if(h0<0)rise=i+x1; else set=i+x1; } else if(roots===2){ rise=i+(ye<0?x2:x1); set=i+(ye<0?x1:x2); }
+      if(rise!=null&&set!=null)break; h0=h2; }
+    const r={}; if(rise!=null)r.rise=hoursLater(t,rise); if(set!=null)r.set=hoursLater(t,set); if(rise==null&&set==null)r[ye>0?'alwaysUp':'alwaysDown']=true; return r; }
+  function phaseName(p){ const names=['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'];
+    return names[Math.round(p*8)%8]; }
+  root.Astro={sunTimes,moonIllum,moonTimes,phaseName};
+})(typeof window!=="undefined"?(window.__astro={}):{});
+
 /* ===== browser UI ===== */
 function haptic(p){ try{ if(typeof store!=='undefined'&&store.get('cf_haptic',false)&&navigator.vibrate)navigator.vibrate(p||15); }catch(e){} }
 var HAPTIC_OK=(typeof navigator!=='undefined')&&('vibrate' in navigator)&&typeof navigator.vibrate==='function';
@@ -3908,6 +4040,7 @@ function initMaze(){
 
 /* ---------- Offline-capable topo map with live GPS (shared engine, renders in Map tab or Land Nav) ---------- */
 var _mapInit=false, mapStop=function(){}, mapAttach=function(){}, mapRefresh=function(){}, mapRouteSync=function(){};
+var mapTrack={start:function(){},stop:function(){},toggle:function(){},clear:function(){},isRec:function(){return false;},exportGPX:function(){},importGPX:function(){},refresh:function(){},hasData:function(){return false;}};
 var MAP_TILECACHE='fbf-tiles-v1';
 var MAP_SRC={
   usgs:{name:'USGS Topo (US)', max:16, attr:'USGS The National Map', url:function(z,x,y){ return 'https://basemap.nationalmap.gov/arcgis/rest/services/USGSTopo/MapServer/tile/'+z+'/'+y+'/'+x; }},
@@ -3918,6 +4051,7 @@ function initMap(){
   let srcKey=store.get('cf_mapsrc','usgs'); if(!MAP_SRC[srcKey])srcKey='usgs';
   let z=+store.get('cf_mapz',13)||13, cx=0, cy=0, W=0, H=0;
   let cv=null, ctx=null, gps=null, heading=null, watchId=null, follow=true, drawReq=false, gotFix=false, started=false;
+  let recording=store.get('cf_trackrec',false)===true, track=(store.get('cf_track',[])||[]), trackSaveT=0;
   const memTiles=new Map(); let memOrder=[];
   const $=id=>document.getElementById(id);
 
@@ -3959,6 +4093,9 @@ function initMap(){
       if(t&&t!=='loading'&&t!=='error'){ try{ ctx.drawImage(t,sx,sy,d,d); }catch(_){} }
       else { ctx.fillStyle='#111a28'; ctx.fillRect(sx,sy,d,d); ctx.strokeStyle='rgba(255,255,255,.04)'; ctx.strokeRect(sx+.5,sy+.5,tsz,tsz); if(t!=='loading')ensureTile(zb,xw,y); }
     }
+    drawGrid(worldLeft,worldTop);
+    drawRings(worldLeft,worldTop);
+    drawTrack(worldLeft,worldTop);
     drawRoute(worldLeft,worldTop);
     drawWaypoints(worldLeft,worldTop);
     if(gps){ const gx=lon2wx(gps.lon,z)-worldLeft, gy=lat2wy(gps.lat,z)-worldTop;
@@ -4003,6 +4140,42 @@ function initMap(){
       else { routeGeom=null; setRouteStat('No road route found — showing straight-line legs.'); scheduleDraw(); } }
     catch(e){ routeGeom=null; setRouteStat('Routing service unreachable — showing straight-line legs.'); scheduleDraw(); } }
   mapRouteSync=function(){ try{ fetchSnap(); }catch(_){} };
+  function drawGrid(worldLeft,worldTop){ if(!store.get('cf_mapgrid',false))return; const C=(window.__coorddr&&window.__coorddr.CoordDR); if(!C)return;
+    const c=centerLL(), mpp=156543.03392*Math.cos(c.lat*Math.PI/180)/Math.pow(2,z);
+    const cand=[10,100,1000,10000,100000]; let interval=100000; for(const iv of cand){ if(iv/mpp>=52){ interval=iv; break; } }
+    let u0; try{ u0=C.toUTM(c.lat,c.lon); }catch(e){ return; } const zone=u0.zone, north=u0.north;
+    let Emin=Infinity,Emax=-Infinity,Nmin=Infinity,Nmax=-Infinity, ok=false;
+    [0,W/2,W].forEach(px=>[0,H/2,H].forEach(py=>{ const ll=llAt(worldLeft+px,worldTop+py); let u; try{ u=C.toUTM(ll.lat,ll.lon); }catch(e){ return; } if(u.zone===zone){ ok=true; if(u.E<Emin)Emin=u.E; if(u.E>Emax)Emax=u.E; if(u.N<Nmin)Nmin=u.N; if(u.N>Nmax)Nmax=u.N; } }));
+    if(!ok||!isFinite(Emin))return;
+    function S(E,N){ const ll=C.utmToLL(E,N,zone,north); return {x:lon2wx(ll.lon,z)-worldLeft, y:lat2wy(ll.lat,z)-worldTop}; }
+    function glabel(v){ return interval>=1000?String(((Math.floor(v/1000)%100)+100)%100).padStart(2,'0'):String(((Math.floor(v/100)%1000)+1000)%1000).padStart(3,'0'); }
+    const NS=8, gcol='rgba(130,185,255,.5)';
+    ctx.save(); ctx.lineWidth=1; ctx.strokeStyle=gcol; ctx.font='700 10px system-ui,sans-serif'; ctx.textBaseline='alphabetic';
+    for(let E=Math.ceil(Emin/interval)*interval; E<=Emax; E+=interval){ ctx.beginPath(); for(let i=0;i<=NS;i++){ const s=S(E,Nmin+(Nmax-Nmin)*i/NS); if(i===0)ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y); } ctx.strokeStyle=gcol; ctx.stroke();
+      const t=S(E,Nmax), lx=Math.max(2,Math.min(W-16,t.x+2)), lbl=glabel(E); ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(lbl,lx,13); ctx.fillStyle='rgba(185,212,255,.95)'; ctx.fillText(lbl,lx,13); ctx.lineWidth=1; }
+    for(let N=Math.ceil(Nmin/interval)*interval; N<=Nmax; N+=interval){ ctx.beginPath(); for(let i=0;i<=NS;i++){ const s=S(Emin+(Emax-Emin)*i/NS,N); if(i===0)ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y); } ctx.strokeStyle=gcol; ctx.stroke();
+      const l=S(Emin,N), ly=Math.max(22,Math.min(H-4,l.y-3)), lbl=glabel(N); ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(lbl,3,ly); ctx.fillStyle='rgba(185,212,255,.95)'; ctx.fillText(lbl,3,ly); ctx.lineWidth=1; }
+    const cap=(interval>=1000?(interval/1000)+' km':interval+' m')+' grid · zone '+zone; ctx.font='600 10px system-ui'; ctx.textAlign='right'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(cap,W-6,H-20); ctx.fillStyle='rgba(185,212,255,.9)'; ctx.fillText(cap,W-6,H-20); ctx.textAlign='start'; ctx.lineWidth=1;
+    ctx.restore(); }
+  function distM(a,b){ const R=6371008.8,p1=a.lat*Math.PI/180,p2=b.lat*Math.PI/180,dp=(b.lat-a.lat)*Math.PI/180,dl=(b.lon-a.lon)*Math.PI/180;
+    const s=Math.sin(dp/2)**2+Math.cos(p1)*Math.cos(p2)*Math.sin(dl/2)**2; return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s)); }
+  function drawRings(worldLeft,worldTop){ if(!store.get('cf_maprings',false))return;
+    let clat,clon,lbl0=''; const act=store.get('cf_wp_active',null), wps=getWps(), aw=act&&wps.find(w=>w.id===act);
+    if(aw){ clat=aw.lat; clon=aw.lon; lbl0=aw.name||''; } else if(gps){ clat=gps.lat; clon=gps.lon; lbl0='you'; } else return;
+    const mpp=156543.03392*Math.cos(clat*Math.PI/180)/Math.pow(2,z); let interval=+store.get('cf_ringint',100)||100; if(interval<10)interval=10;
+    const cxp=lon2wx(clon,z)-worldLeft, cyp=lat2wy(clat,z)-worldTop, maxPx=Math.hypot(W,H);
+    ctx.save(); ctx.font='700 10px system-ui'; ctx.textBaseline='alphabetic';
+    for(let k=1;k<=8;k++){ const r=(interval*k)/mpp; if(r>maxPx*0.8)break;
+      ctx.setLineDash([5,4]); ctx.lineWidth=1.5; ctx.strokeStyle='rgba(255,207,74,.55)'; ctx.beginPath(); ctx.arc(cxp,cyp,r,0,7); ctx.stroke();
+      const lbl=(typeof cfDist==='function')?cfDist(interval*k):(interval*k+' m'); ctx.setLineDash([]); ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(lbl,cxp+3,cyp-r-3); ctx.fillStyle='rgba(255,224,150,.95)'; ctx.fillText(lbl,cxp+3,cyp-r-3); }
+    ctx.setLineDash([]); ctx.beginPath(); ctx.arc(cxp,cyp,3.5,0,7); ctx.fillStyle='rgba(255,207,74,.95)'; ctx.fill();
+    ctx.restore(); }
+  function drawTrack(worldLeft,worldTop){ let tk=track; if(!tk||tk.length<2)return;
+    ctx.save(); ctx.lineJoin='round'; ctx.lineCap='round'; ctx.beginPath();
+    for(let i=0;i<tk.length;i++){ const x=lon2wx(tk[i].lon,z)-worldLeft, y=lat2wy(tk[i].lat,z)-worldTop; if(i===0)ctx.moveTo(x,y); else ctx.lineTo(x,y); }
+    ctx.strokeStyle='rgba(255,91,176,.65)'; ctx.lineWidth=5; ctx.stroke(); ctx.strokeStyle='rgba(255,91,176,.95)'; ctx.lineWidth=2; ctx.stroke();
+    if(recording){ const last=tk[tk.length-1], x=lon2wx(last.lon,z)-worldLeft, y=lat2wy(last.lat,z)-worldTop; ctx.beginPath(); ctx.arc(x,y,4,0,7); ctx.fillStyle='#ff5bb0'; ctx.fill(); }
+    ctx.restore(); }
   function drawScaleBar(){ const c=centerLL(), mpp=156543.03392*Math.cos(c.lat*Math.PI/180)/Math.pow(2,z);
     const mi=(typeof cfUnits==='function'&&cfUnits()==='mi'); const maxM=110*mpp; let m, lbl;
     if(mi){ const ftT=[50,100,250,500,1000,2000], miT=[0.5,1,2,5,10,20,50]; m=ftT[0]/3.28084; lbl='50 ft';
@@ -4081,10 +4254,37 @@ function initMap(){
   // ---- GPS ----
   function startGPS(){ if(!navigator.geolocation||watchId!=null)return;
     watchId=navigator.geolocation.watchPosition(p=>{ const first=!gotFix; gotFix=true; gps={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy}; if(p.coords.heading!=null&&!isNaN(p.coords.heading)&&p.coords.speed>0.3)heading=p.coords.heading;
+        if(recording){ const last=track[track.length-1], d=last?distM(last,gps):999; if((!last||d>=5)&&(!gps.acc||gps.acc<=50)){ track.push({lat:gps.lat,lon:gps.lon,t:Date.now()}); const now=Date.now(); if(now-trackSaveT>5000){ trackSaveT=now; try{store.set('cf_track',track);}catch(_){} } trackStats(); } }
         if(follow){ if(first&&z<12)z=14; setCenterLL(gps.lat,gps.lon); if(first)saveView(); } if(first&&store.get('cf_snaproads',false))fetchSnap(); scheduleDraw(); },
       ()=>{ scheduleDraw(); }, {enableHighAccuracy:true,maximumAge:2000,timeout:20000}); }
   function stopGPS(){ if(watchId!=null){ try{navigator.geolocation.clearWatch(watchId);}catch(_){} watchId=null; } }
   mapStop=stopGPS;
+
+  // ---- track recording + GPX ----
+  function trackDist(){ let m=0; for(let i=1;i<track.length;i++)m+=distM(track[i-1],track[i]); return m; }
+  function fmtDur(ms){ const s=Math.round(ms/1000),h=Math.floor(s/3600),mn=Math.floor((s%3600)/60),ss=s%60; return h?(h+'h '+mn+'m'):(mn?(mn+'m '+ss+'s'):(ss+'s')); }
+  function trackStats(){ const e=$('lnTrkStat'); if(!e)return; if(!track.length){ e.innerHTML=recording?'<span class="rec-dot"></span>Recording — waiting for GPS fixes…':'No track recorded yet.'; return; }
+    const m=trackDist(), t0=track[0].t, t1=track[track.length-1].t, dur=(t0&&t1&&t1>t0)?(t1-t0):0, dd=(typeof cfDist==='function')?cfDist(m):Math.round(m)+' m';
+    e.innerHTML=(recording?'<span class="rec-dot"></span>Recording · ':'')+track.length+' pts · '+dd+(dur>1000?' · '+fmtDur(dur):''); }
+  function updateTrackBtns(){ const r=$('lnTrkRec'); if(r){ r.innerHTML=recording?'&#9632; Stop recording':'&#9679; Record track'; r.classList.toggle('on',recording); } }
+  function startRec(){ recording=true; try{store.set('cf_trackrec',true);}catch(_){} if(gps){ const last=track[track.length-1]; if(!last||distM(last,gps)>=3)track.push({lat:gps.lat,lon:gps.lon,t:Date.now()}); } trackStats(); updateTrackBtns(); scheduleDraw(); }
+  function stopRec(){ recording=false; try{store.set('cf_trackrec',false); store.set('cf_track',track);}catch(_){} trackStats(); updateTrackBtns(); }
+  function clearTrack(){ track.length=0; try{store.set('cf_track',[]);}catch(_){} trackStats(); scheduleDraw(); }
+  function gpxEsc(x){ return String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+  function trackGPX(){ let s='<?xml version="1.0" encoding="UTF-8"?>\n<gpx version="1.1" creator="Five by Five" xmlns="http://www.topografix.com/GPX/1/1">\n';
+    getWps().forEach(w=>{ s+='<wpt lat="'+(+w.lat).toFixed(7)+'" lon="'+(+w.lon).toFixed(7)+'"><name>'+gpxEsc(w.name||'WP')+'</name></wpt>\n'; });
+    if(track.length){ s+='<trk><name>Five by Five track</name><trkseg>\n'; track.forEach(p=>{ s+='<trkpt lat="'+(+p.lat).toFixed(7)+'" lon="'+(+p.lon).toFixed(7)+'">'+(p.t?'<time>'+new Date(p.t).toISOString()+'</time>':'')+'</trkpt>\n'; }); s+='</trkseg></trk>\n'; }
+    return s+'</gpx>\n'; }
+  function setTrkIO(t){ const e=$('lnTrkIO'); if(e){ e.textContent=t||''; if(t)setTimeout(()=>{ if(e.textContent===t)e.textContent=''; },3500); } }
+  function exportGPX(){ if(!track.length&&!getWps().length){ setTrkIO('Nothing to export yet.'); return; } const data=trackGPX(), fname='fivebyfive-'+new Date().toISOString().slice(0,10)+'.gpx', blob=new Blob([data],{type:'application/gpx+xml'});
+    try{ const file=new File([blob],fname,{type:'application/gpx+xml'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Five by Five GPX'}).then(()=>setTrkIO('Shared GPX.')).catch(()=>{}); return; } }catch(e){}
+    try{ const url=URL.createObjectURL(blob), a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); setTrkIO('Exported '+fname+'.'); }catch(e){ try{ const p=navigator.clipboard.writeText(data); if(p&&p.catch)p.catch(()=>setTrkIO('Export not supported here.')); setTrkIO('Copied GPX to clipboard.'); }catch(_){ setTrkIO('Export not supported here.'); } } }
+  function importGPX(text){ try{ const doc=new DOMParser().parseFromString(text,'application/xml'); if(doc.getElementsByTagName('parsererror').length){ setTrkIO('Could not read that GPX file.'); return; }
+    const wps=getWps(); let aw=0; [].forEach.call(doc.getElementsByTagName('wpt'),n=>{ const la=+n.getAttribute('lat'), lo=+n.getAttribute('lon'); if(isFinite(la)&&isFinite(lo)){ const nmN=n.getElementsByTagName('name')[0]; wps.push({id:genId(),name:(nmN&&nmN.textContent)||('WP'+(wps.length+1)),lat:la,lon:lo,type:'other'}); aw++; } });
+    if(aw)setWps(wps);
+    let at=0; const tp=doc.getElementsByTagName('trkpt'); if(tp.length){ [].forEach.call(tp,n=>{ const la=+n.getAttribute('lat'), lo=+n.getAttribute('lon'); if(isFinite(la)&&isFinite(lo)){ const tN=n.getElementsByTagName('time')[0]; track.push({lat:la,lon:lo,t:(tN&&Date.parse(tN.textContent))||Date.now()}); at++; } }); try{store.set('cf_track',track);}catch(_){} }
+    wpChanged(); trackStats(); scheduleDraw(); setTrkIO('Imported '+aw+' waypoint'+(aw!==1?'s':'')+' · '+at+' track point'+(at!==1?'s':'')+'.'); }catch(e){ setTrkIO('Could not read that GPX file.'); } }
+  mapTrack={start:startRec,stop:stopRec,toggle:function(){ recording?stopRec():startRec(); },clear:clearTrack,isRec:function(){return recording;},exportGPX:exportGPX,importGPX:importGPX,refresh:function(){ trackStats(); updateTrackBtns(); },hasData:function(){return track.length>0;}};
 
   // ---- actions ----
   function doLocate(){ follow=true; if(gps){ setCenterLL(gps.lat,gps.lon); if(z<14)zoomTo(15,W/2,H/2); else { saveView(); scheduleDraw(); } }
@@ -4128,7 +4328,7 @@ function initMap(){
   if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{ if(cv&&document.body.classList.contains('map-fs')){ size(); scheduleDraw(); } });
 
   mapRefresh=function(){ scheduleDraw(); try{ syncPinBar(); }catch(_){} };
-  wireCtl('map'); wireCtl('lnMap'); syncSrc(); updateStorage(); syncPinBar(); if(store.get('cf_snaproads',false))fetchSnap();
+  wireCtl('map'); wireCtl('lnMap'); syncSrc(); updateStorage(); syncPinBar(); try{ trackStats(); updateTrackBtns(); }catch(_){} if(store.get('cf_snaproads',false))fetchSnap();
   const ctr=store.get('cf_mapctr',null);
   if(ctr&&typeof ctr.lat==='number'){ setCenterLL(ctr.lat,ctr.lon); } else { setCenterLL(39.5,-98.35); z=4; }
 }
