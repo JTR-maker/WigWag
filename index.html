@@ -51,7 +51,7 @@
   }
   [data-theme="hc"] .card,[data-theme="hc"] .tool,[data-theme="hc"] details.cx,[data-theme="hc"] .note-card{border-width:2px}
   *{box-sizing:border-box}
-  html,body{margin:0;padding:0}
+  html,body{margin:0;padding:0;overscroll-behavior:none}
   body{background:var(--bg);color:var(--ink);font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;line-height:1.55;font-size:16px;-webkit-text-size-adjust:100%;padding-bottom:calc(var(--safe-b) + 20px)}
   a{color:var(--accent)}
   header.top{position:sticky;top:0;z-index:50;background:linear-gradient(180deg,var(--grad1),var(--grad2));border-bottom:1px solid var(--line);padding:calc(14px + var(--safe-t)) 20px 12px}
@@ -134,21 +134,15 @@
   #cmdOpen,#toTop{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:17px;line-height:1;cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
   #cmdOpen:active,#toTop:active{transform:translateY(1px)}
   #cmdOpen svg{width:18px;height:18px;display:block}
-  #menuBtn{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);cursor:pointer;padding:0 10px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-  #menuBtn:active{transform:translateY(1px)}
-  #menuBtn svg{width:21px;height:21px;display:block}
-  #topMenu{position:fixed;top:calc(var(--safe-t) + 58px);right:8px;z-index:200;width:230px;max-width:calc(100vw - 16px);background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5);padding:8px;opacity:0;transform:translateY(-6px);transition:opacity .16s,transform .16s}
-  #topMenu.show{opacity:1;transform:none}
-  #topMenu .tm-item{display:flex;align-items:center;gap:10px;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:14.5px;font-weight:600;padding:11px 12px;cursor:pointer;font-family:inherit;box-shadow:none}
-  #topMenu .tm-item svg{width:17px;height:17px;flex:0 0 auto}
-  #topMenu .tm-item:active{transform:translateY(1px)}
-  #topMenu #cmdOpen{justify-content:flex-start;width:100%;padding:11px 12px;font-size:14.5px;background:var(--panel2);border-radius:10px}
-  #topMenu .tm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 4px;font-size:14px;color:var(--ink)}
-  #topMenu .tm-row #textSize,#topMenu .tm-row #themeToggle{position:static;min-width:40px;height:34px;font-size:16px}
-  #topMenu .tm-sep{height:1px;background:var(--line);margin:7px 2px}
-  #topMenu .tm-lbl{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin:2px 4px 5px}
-  #topMenu .tm-chk{display:flex;align-items:center;gap:9px;padding:8px 4px;font-size:14px;color:var(--ink);cursor:pointer}
-  #topMenu .tm-chk input{width:17px;height:17px}
+  .nav-settings{margin-top:auto;border-top:1px solid var(--line);padding:14px 15px calc(18px + var(--safe-b))}
+  .nav-seclbl{font-size:10.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin:0 0 7px}
+  .nav-setitem{display:flex;align-items:center;gap:12px;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:14.5px;font-weight:600;padding:11px 12px;cursor:pointer;font-family:inherit;text-align:left;margin-bottom:10px}
+  .nav-setitem .ico{display:flex}.nav-setitem svg{width:18px;height:18px}
+  .nav-setitem:active{transform:translateY(1px)}
+  .nav-setrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 2px;font-size:14px;color:var(--ink)}
+  .nav-setrow #textSize,.nav-setrow #themeToggle{position:static;min-width:42px;height:36px;font-size:16px}
+  .nav-chk{display:flex;align-items:center;gap:10px;padding:7px 2px;font-size:14px;color:var(--ink);cursor:pointer}
+  .nav-chk input{width:18px;height:18px}
   #gameSelect{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237aa2c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
   .idot{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--chip);border:1px solid var(--line);color:var(--accent2);font-size:18px;font-weight:800;font-style:italic;font-family:Georgia,'Times New Roman',serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .idot:active{transform:translateY(1px)}
@@ -430,21 +424,11 @@
 </head>
 <body>
 
-<div id="topctrls"><button id="menuBtn" title="Menu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><div id="zulubar" title="Zulu / UTC — tap for converter">
+<div id="topctrls"><div id="zulubar" title="Zulu / UTC — tap for converter">
   <div class="zt" id="zuluTime">--:--:--Z</div>
   <div class="zd" id="zuluDate">-- --- ----</div>
   <div class="zg" id="zuluDtg">------Z</div>
 </div></div>
-<div id="topMenu" hidden>
-  <button id="cmdOpen" class="tm-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg><span>Search everything</span></button>
-  <div class="tm-row"><span>Text size</span><button id="textSize" title="Text size" aria-label="Text size">A</button></div>
-  <div class="tm-row"><span>Theme</span><button id="themeToggle" title="Switch theme" aria-label="Toggle theme">&#9728;</button></div>
-  <div class="tm-sep"></div>
-  <div class="tm-lbl">Game audio</div>
-  <label class="tm-chk"><input type="checkbox" id="soundTog"> Sound</label>
-  <label class="tm-chk"><input type="checkbox" id="musicTog"> Music</label>
-  <label class="tm-chk"><input type="checkbox" id="hapticTog"> Haptics</label>
-</div>
 
 <!-- ===================== TAB: REFERENCE ===================== -->
 <section id="tab-reference" class="tabview active">
@@ -963,7 +947,7 @@
         <div id="cbBoard"></div>
         <div id="cbStatus"></div>
         <div class="cb-bar"><button class="btn sm" id="cbNew">New game</button><button class="btn ghost sm" id="cbUndo">Undo</button><button class="btn ghost sm" id="cbResign">Resign</button></div>
-        <div id="cbMoves"></div>
+        <div id="cbMoves" class="gscroll"></div>
       </div>
       <div id="cbPromo"><div class="cb-pbox">
         <button data-pp="5" title="Queen">&#9819;</button><button data-pp="4" title="Rook">&#9820;</button><button data-pp="3" title="Bishop">&#9821;</button><button data-pp="2" title="Knight">&#9822;</button>
@@ -1002,12 +986,6 @@
       <div class="gmsg" id="mzMsg"></div>
       <div class="gctrls">
         <button class="btn sm" id="mzStart">Start</button>
-        <div class="dpad">
-          <button class="dbtn up" data-d="U" aria-label="up">&#9650;</button>
-          <button class="dbtn left" data-d="L" aria-label="left">&#9664;</button>
-          <button class="dbtn right" data-d="R" aria-label="right">&#9654;</button>
-          <button class="dbtn down" data-d="D" aria-label="down">&#9660;</button>
-        </div>
       </div>
     </div>
   </div>
@@ -1048,6 +1026,16 @@
   <button class="navitem" data-tab="sketch"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/><line x1="14" y1="6" x2="18" y2="10"/></svg></span>Sketch</button>
   <button class="navitem" data-tab="more"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span>Saved</button>
   <button class="navitem" data-tab="game"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span>Hurry &amp; Wait</button>
+  <div class="nav-settings">
+    <div class="nav-seclbl">Settings</div>
+    <button id="cmdOpen" class="nav-setitem"><span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></span>Search everything</button>
+    <div class="nav-setrow"><span>Text size</span><button id="textSize" title="Text size" aria-label="Text size">A</button></div>
+    <div class="nav-setrow"><span>Theme</span><button id="themeToggle" title="Switch theme" aria-label="Toggle theme">&#9728;</button></div>
+    <div class="nav-seclbl" style="margin-top:12px">Game audio</div>
+    <label class="nav-chk"><input type="checkbox" id="soundTog"> Sound</label>
+    <label class="nav-chk"><input type="checkbox" id="musicTog"> Music</label>
+    <label class="nav-chk"><input type="checkbox" id="hapticTog"> Haptics</label>
+  </div>
 </nav>
 
 <script>
@@ -1252,13 +1240,10 @@ function switchTab(name){ Object.keys(views).forEach(k=>views[k].classList.toggl
 document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 document.getElementById('navHandle').onclick=()=>document.body.classList.toggle('nav-open');
 document.getElementById('navScrim').onclick=()=>document.body.classList.remove('nav-open');
-/* ---- Top settings menu (search / text size / theme / game audio) ---- */
-(function(){ const btn=document.getElementById('menuBtn'), menu=document.getElementById('topMenu'); if(!btn||!menu)return;
-  function open(){ menu.hidden=false; requestAnimationFrame(()=>menu.classList.add('show')); }
-  function close(){ menu.classList.remove('show'); setTimeout(()=>{ if(!menu.classList.contains('show'))menu.hidden=true; },180); }
-  btn.onclick=e=>{ e.stopPropagation(); if(menu.hidden)open(); else close(); };
-  document.addEventListener('click',e=>{ if(!menu.hidden && !menu.contains(e.target) && e.target!==btn && !btn.contains(e.target))close(); });
-  const search=document.getElementById('cmdOpen'); if(search)search.addEventListener('click',close); })();
+/* ---- Settings live in the left drawer now; close the drawer when Search is opened ---- */
+(function(){ const search=document.getElementById('cmdOpen'); if(search)search.addEventListener('click',()=>document.body.classList.remove('nav-open')); })();
+/* ---- Fixed game screen: block page scroll while on the games tab (swipes stay in the game) ---- */
+document.addEventListener('touchmove',function(e){ if(!views.game.classList.contains('active'))return; const t=e.target; if(t&&t.closest&&t.closest('.gscroll, #navDrawer, .modal-ov, #cmdPalette'))return; e.preventDefault(); },{passive:false});
 /* ---- Left nav handle: slightly larger + auto-hide after 3s idle ---- */
 (function(){ const h=document.getElementById('navHandle'); if(!h)return; let t=null;
   function show(){ h.classList.remove('nav-hide'); clearTimeout(t); t=setTimeout(()=>{ if(!document.body.classList.contains('nav-open'))h.classList.add('nav-hide'); },3000); }
@@ -1621,7 +1606,7 @@ function initGame(){
     g2048:['2048','Swipe to slide all tiles. Two tiles with the same number merge into one that doubles. Keep merging to reach the 2048 tile — the board fills up if you run out of moves.'],
     mines:['Mines','Tap a cell to reveal it. A number tells how many mines touch that cell. Switch <b>Flag</b> on to mark suspected mines instead of revealing. Clear every safe cell to win; tap a mine and it&rsquo;s over.'],
     sudoku:['Sudoku','Fill every row, column, and 3×3 box with the digits 1–9, no repeats. Tap a cell then a number. Turn on <b>Notes</b> for small pencil marks, <b>Erase</b> to clear, and <b>Check</b> to find mistakes.'],
-    maze:['Maze Muncher','Swipe or use the pad to move. Chomp every dot to clear the maze. Grab a big corner dot to turn the chasers blue for a few seconds — catch them for bonus points. Touch a chaser while it&rsquo;s not blue and you lose a life.']
+    maze:['Maze Muncher','Swipe anywhere on the board to move (arrow keys work too). Chomp every dot to clear the maze. Grab a big corner dot to turn the chasers blue for a few seconds — catch them for bonus points. Touch a chaser while it&rsquo;s not blue and you lose a life.']
   };
   function showGameHelp(){ const g=gsel?gsel.value:'snake'; const h=GAME_HELP[g]||['How to play','']; if(typeof modalInfo==='function')modalInfo(h[0],h[1]); }
   const gi=document.getElementById('gameInfo'); if(gi)gi.onclick=showGameHelp;
