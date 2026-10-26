@@ -72,7 +72,10 @@
   .chip.active{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:600}
   main{max-width:1080px;margin:0 auto;padding:18px 20px 40px}
   .meta{color:var(--muted);font-size:13px;margin:6px 2px 14px}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:150px;position:relative}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:0 0 14px;box-shadow:var(--shadow);scroll-margin-top:150px;position:relative;transition:box-shadow .3s}
+  .card.flash-top{box-shadow:0 0 0 2px var(--accent),0 0 18px rgba(79,214,203,.35)}
+  #cfToast{position:fixed;left:50%;bottom:calc(26px + var(--safe-b));transform:translateX(-50%) translateY(12px);z-index:400;max-width:88vw;background:var(--panel);border:1px solid var(--accent);color:var(--ink);padding:12px 18px;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.55);font-size:14.5px;font-weight:600;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s;text-align:center}
+  #cfToast.show{opacity:1;transform:translateX(-50%) translateY(0)}
   .card h3{margin:0 0 3px;font-size:16.5px;padding-right:34px}
   .cat{display:inline-block;font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin-bottom:8px}
   .card .body{font-size:14.6px}
@@ -113,7 +116,7 @@
   #zulubar .zt{font-family:"Segoe UI",monospace;font-variant-numeric:tabular-nums;font-size:16px;font-weight:800;color:var(--accent);letter-spacing:.5px;line-height:1.05}
   #zulubar .zd{font-size:14px;color:var(--muted);letter-spacing:.8px;margin-top:2px;font-weight:700}
   #zulubar .zg{font-size:9px;color:var(--accent2);letter-spacing:.6px;margin-top:1px;font-family:monospace}
-  #topctrls{position:fixed;top:calc(var(--safe-t) + 6px);right:8px;z-index:90;display:flex;align-items:stretch;gap:8px}
+  #topctrls{position:fixed;top:calc(var(--safe-t) + 6px);right:8px;z-index:210;display:flex;align-items:stretch;gap:8px}
   #themeToggle{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:18px;line-height:1;cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
   #themeToggle:active{transform:translateY(1px)}
   #textSize{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:15px;font-weight:800;line-height:1;cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);min-width:34px}
@@ -123,9 +126,6 @@
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   body.readable{font-family:Verdana,Tahoma,"Segoe UI",system-ui,sans-serif;letter-spacing:.03em;word-spacing:.08em}
   body.readable .card .body,body.readable p,body.readable .cxmuted,body.readable li{line-height:1.85}
-  body.lefthand #navHandle{left:auto;right:0;border-radius:11px 0 0 11px;border-left:1px solid var(--line);border-right:none}
-  body.lefthand #navDrawer{left:auto;right:0;border-right:none;border-left:1px solid var(--line);transform:translateX(100%)}
-  body.lefthand.nav-open #navHandle{left:auto;right:min(80vw,272px);border-radius:0 11px 11px 0;border-right:1px solid var(--line);border-left:none}
   body.cbsafe .scell.bad{color:#1f6fd6!important;text-decoration:underline;text-decoration-thickness:2px}
   body.cbsafe .scell.same{background:rgba(255,127,14,.3)}
   body.cbsafe .cb-cap{box-shadow:inset 0 0 0 4px rgba(31,111,214,.85)}
@@ -143,6 +143,8 @@
   .nav-setrow #textSize,.nav-setrow #themeToggle{position:static;min-width:42px;height:36px;font-size:16px}
   .nav-chk{display:flex;align-items:center;gap:10px;padding:7px 2px;font-size:14px;color:var(--ink);cursor:pointer}
   .nav-chk input{width:18px;height:18px}
+  .nav-chk input:disabled{opacity:.5}
+  .hap-note{color:var(--muted);font-size:11.5px;font-style:italic}
   #gameSelect{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237aa2c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
   .idot{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--chip);border:1px solid var(--line);color:var(--accent2);font-size:18px;font-weight:800;font-style:italic;font-family:Georgia,'Times New Roman',serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
   .idot:active{transform:translateY(1px)}
@@ -162,16 +164,14 @@
   .cmdres{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line);color:var(--ink);font-size:14.5px;padding:12px 14px;cursor:pointer;font-family:inherit}
   .cmdres:hover,.cmdres:focus-visible{background:var(--panel2)}
   #snCanvas,#g2048grid{overscroll-behavior:contain}
-  #navHandle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:115;width:27px;height:132px;padding:0;display:flex;align-items:center;justify-content:center;font-size:0;background:var(--zbar-bg);border:1px solid var(--line);border-left:none;border-radius:0 13px 13px 0;color:var(--accent);cursor:pointer;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:left .26s cubic-bezier(.4,0,.2,1),opacity .35s,transform .35s}
-  #navHandle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:80px;border-radius:3px;background:linear-gradient(var(--logo1),var(--logo2));opacity:.9}
-  #navHandle.nav-hide{opacity:0;pointer-events:none;transform:translateY(-50%) translateX(-60%)}
-  body.nav-open #navHandle.nav-hide{opacity:1;pointer-events:auto;transform:translateY(-50%)}
-  #navScrim{position:fixed;inset:0;z-index:105;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s}
-  #navDrawer{position:fixed;left:0;top:0;bottom:0;z-index:110;width:min(80vw,272px);background:linear-gradient(180deg,var(--grad1),var(--panel));border-right:1px solid var(--line);box-shadow:6px 0 30px rgba(0,0,0,.45);transform:translateX(-100%);transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding-top:var(--safe-t);overflow-y:auto;-webkit-overflow-scrolling:touch}
-  body.nav-open #navDrawer{transform:none}
+  #hamBtn{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  #hamBtn:active{transform:translateY(1px)}
+  #hamBtn svg{width:22px;height:22px;display:block}
+  #navScrim{position:fixed;inset:0;z-index:150;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .2s}
   body.nav-open #navScrim{opacity:1;pointer-events:auto}
-  body.nav-open #navHandle{left:min(80vw,272px);border-radius:11px 0 0 11px;border-left:1px solid var(--line);border-right:none}
-  .nav-brand{display:flex;align-items:center;gap:12px;padding:20px 18px;border-bottom:1px solid var(--line);font-weight:800;font-size:16px}
+  #navDrawer{position:fixed;top:calc(var(--safe-t) + 58px);right:8px;z-index:200;width:min(86vw,300px);max-height:calc(100vh - var(--safe-t) - 72px - var(--safe-b));background:var(--panel);border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 40px rgba(0,0,0,.55);display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;transform:translateY(-8px) scale(.98);transform-origin:top right;pointer-events:none;transition:opacity .16s,transform .16s}
+  body.nav-open #navDrawer{opacity:1;transform:none;pointer-events:auto}
+  .nav-brand{display:none}
   .nav-logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--logo1),var(--logo2));display:flex;align-items:center;justify-content:center;color:#12101c;flex:0 0 auto}
   .nav-logo svg{width:19px;height:19px}
   .navitem{display:flex;align-items:center;gap:14px;padding:15px 18px 15px 15px;background:none;border:none;border-left:3px solid transparent;color:var(--muted);font-size:16px;font-weight:600;text-align:left;cursor:pointer;width:100%;font-family:inherit}
@@ -299,6 +299,7 @@
   #snCanvas{display:block;width:100%;max-width:340px;aspect-ratio:1/1;margin:0 auto;image-rendering:pixelated;image-rendering:crisp-edges;background:var(--inset);border:2px solid var(--line);border-radius:10px;touch-action:none}
   .gmsg{text-align:center;color:var(--muted);font-size:13px;margin:10px 0;min-height:18px}
   .gctrls{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .gctrls-top{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 12px}
   .dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:7px}
   .dbtn{background:var(--chip);border:1px solid var(--line);color:var(--accent);border-radius:12px;font-size:20px;cursor:pointer;font-family:inherit}
   .dbtn:active{background:var(--panel2);transform:translateY(1px)}
@@ -424,7 +425,7 @@
 </head>
 <body>
 
-<div id="topctrls"><div id="zulubar" title="Zulu / UTC — tap for converter">
+<div id="topctrls"><button id="hamBtn" aria-label="Menu" title="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3.5" y1="7" x2="20.5" y2="7"/><line x1="3.5" y1="12" x2="20.5" y2="12"/><line x1="3.5" y1="17" x2="20.5" y2="17"/></svg></button><div id="zulubar" title="Zulu / UTC — tap for converter">
   <div class="zt" id="zuluTime">--:--:--Z</div>
   <div class="zd" id="zuluDate">-- --- ----</div>
   <div class="zg" id="zuluDtg">------Z</div>
@@ -925,12 +926,12 @@
       <button id="gameInfo" class="idot" aria-label="How to play" title="How to play">i</button>
     </div>
     <div id="game-snake" class="gpane">
+      <div class="gctrls gctrls-top">
+        <button class="btn sm" id="snStart">Start</button>
+      </div>
       <div class="gtop"><span id="snScore">Score 0</span><span id="snHi">Best 0</span></div>
       <canvas id="snCanvas" width="320" height="320"></canvas>
       <div class="gmsg" id="snMsg"></div>
-      <div class="gctrls">
-        <button class="btn sm" id="snStart">Start</button>
-      </div>
     </div>
     <div id="game-solitaire" class="gpane" style="display:none">
       <div class="gtop"><span id="solMoves">Moves 0</span><span style="display:flex;gap:8px"><button class="btn sm" id="solAuto" style="display:none">Auto-finish &#9733;</button><button class="btn sm" id="solNew">New game</button></span></div>
@@ -944,9 +945,9 @@
           <div class="cb-colors"><button class="cb-colbtn on" id="cbColorW">White</button><button class="cb-colbtn" id="cbColorB">Black</button></div>
         </div>
         <div class="cb-elowrap"><input type="range" id="cbElo" min="400" max="2000" step="50" value="1200"><span id="cbEloLbl">~1200 &middot; Casual</span></div>
+        <div class="cb-bar"><button class="btn sm" id="cbNew">New game</button><button class="btn ghost sm" id="cbUndo">Undo</button><button class="btn ghost sm" id="cbResign">Resign</button></div>
         <div id="cbBoard"></div>
         <div id="cbStatus"></div>
-        <div class="cb-bar"><button class="btn sm" id="cbNew">New game</button><button class="btn ghost sm" id="cbUndo">Undo</button><button class="btn ghost sm" id="cbResign">Resign</button></div>
         <div id="cbMoves" class="gscroll"></div>
       </div>
       <div id="cbPromo"><div class="cb-pbox">
@@ -954,20 +955,20 @@
       </div></div>
     </div>
     <div id="game-g2048" class="gpane" style="display:none">
+      <div class="gctrls gctrls-top"><button class="btn sm" id="g2048new">New game</button></div>
       <div class="gtop"><span id="g2048score">Score 0</span><span id="g2048best">Best 0</span></div>
       <div id="g2048grid"></div>
       <div class="gmsg" id="g2048msg"></div>
-      <div class="gctrls"><button class="btn sm" id="g2048new">New game</button></div>
     </div>
     <div id="game-mines" class="gpane" style="display:none">
-      <div class="gtop"><span id="mineCount">&#128681; 10</span><span id="mineTime">&#9201; 0</span></div>
-      <div id="mineGrid"></div>
-      <div class="gmsg" id="mineMsg"></div>
-      <div class="gctrls" style="flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px">
+      <div class="gctrls gctrls-top" style="flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px">
         <select id="mineDiff" class="cb-colbtn"><option value="beg">Beginner 9&times;9</option><option value="int">Intermediate 12&times;12</option></select>
         <button class="btn ghost sm" id="mineFlag">&#128681; Flag: off</button>
         <button class="btn sm" id="mineNew">New game</button>
       </div>
+      <div class="gtop"><span id="mineCount">&#128681; 10</span><span id="mineTime">&#9201; 0</span></div>
+      <div id="mineGrid"></div>
+      <div class="gmsg" id="mineMsg"></div>
     </div>
     <div id="game-sudoku" class="gpane" style="display:none">
       <div class="gtop"><select id="sudDiff" class="cb-colbtn"><option>Easy</option><option>Medium</option><option>Hard</option></select><button class="btn sm" id="sudNew">New game</button></div>
@@ -981,12 +982,12 @@
       </div>
     </div>
     <div id="game-maze" class="gpane" style="display:none">
+      <div class="gctrls gctrls-top">
+        <button class="btn sm" id="mzStart">Start</button>
+      </div>
       <div class="gtop"><span id="mzScore">Score 0</span><span id="mzLives">&#9679;&#9679;&#9679;</span><span id="mzHi">Best 0</span></div>
       <div style="text-align:center"><canvas id="mzCanvas"></canvas></div>
       <div class="gmsg" id="mzMsg"></div>
-      <div class="gctrls">
-        <button class="btn sm" id="mzStart">Start</button>
-      </div>
     </div>
   </div>
 </section>
@@ -1015,7 +1016,6 @@
     <div class="modal-btns"><button class="btn ghost sm" id="photoCancel">Cancel</button><button class="btn sm" id="photoAck">I understand</button></div>
   </div>
 </div>
-<button id="navHandle" aria-label="Open menu" title="Menu">&#9776;</button>
 <div id="navScrim"></div>
 <nav id="navDrawer" aria-label="Sections">
   <div class="nav-brand" id="navBrand" style="cursor:pointer" title="Back to search"><span class="nav-logo" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="1.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="15.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="19.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="6.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="15.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="6.00" y="19.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="10.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="10.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="10.50" y="10.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="10.50" y="15.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="10.50" y="19.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="15.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="15.00" y="6.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="15.00" y="10.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="15.00" y="15.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="15.00" y="19.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="19.50" y="1.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="19.50" y="6.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="19.50" y="10.50" width="3" height="3" rx="0.9" opacity="1"/><rect x="19.50" y="15.00" width="3" height="3" rx="0.9" opacity="1"/><rect x="19.50" y="19.50" width="3" height="3" rx="0.9" opacity="1"/></svg></span>Five by Five</div>
@@ -1199,9 +1199,17 @@ const SYN={
  "report":["salute","sitrep","spot","9-line","nbc-1"],"medevac":["9-line"],"nine line":["9-line"]
 };
 function expand(tokens){ const out=new Map(); tokens.forEach(t=>{ if(t) out.set(t,1); }); tokens.forEach(t=>{ if(SYN[t]) SYN[t].forEach(s=>{ if(!out.has(s)) out.set(s,0.45); }); }); return [...out.entries()].map(([t,w])=>({t,w})); }
-function scoreEntry(entry,tokens){ const title=entry.title.toLowerCase(), tags=(entry.tags||[]).join(' ').toLowerCase(), body=entry.html.toLowerCase().replace(/<[^>]+>/g,' '); let score=0;
+function scoreEntry(entry,tokens,raw){ const title=entry.title.toLowerCase(), tags=(entry.tags||[]).join(' ').toLowerCase(), body=entry.html.toLowerCase().replace(/<[^>]+>/g,' '); let score=0;
  tokens.forEach(({t,w})=>{ if(!t)return; let s=0; if(title.includes(t))s+=12; (entry.tags||[]).forEach(tag=>{ if(tag===t)s+=9; else if(tag.includes(t))s+=4; }); if(tags.includes(t))s+=2;
-  const n=(body.match(new RegExp('\\b'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; s+=Math.min(n,4); score+=s*w; }); return score; }
+  const n=(body.match(new RegExp('\\b'+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'g'))||[]).length; s+=Math.min(n,4); score+=s*w; });
+ // Relevance boosts so an exact acronym/term search surfaces that entry first
+ if(raw){ const r=raw.toLowerCase().trim(); const titleWords=title.split(/[\s\/,()]+/).filter(Boolean);
+   if(title===r) score+=150;                                 // exact term/acronym — surface it first
+   else if(titleWords.includes(r)) score+=55;                // one word of e.g. "TACSAT / SATCOM"
+   else if(title.startsWith(r)) score+=30;                   // prefix
+   if((entry.tags||[]).some(tag=>tag===r)) score+=22;        // exact tag
+   if(entry.cat==='Glossary' && r.length<=7 && (title.includes(r)||titleWords.some(w=>w.startsWith(r)))) score+=10; }
+ return score; }
 function highlight(html,tokens){ if(!tokens||!tokens.length)return html; const words=tokens.map(x=>typeof x==='string'?x:x.t); const uniq=[...new Set(words.filter(t=>t.length>2))].sort((a,b)=>b.length-a.length); if(!uniq.length)return html;
  const rx=new RegExp('('+uniq.map(t=>t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('|')+')','gi');
  // Walk the string: copy tags (<...>) untouched, and in text runs leave HTML entities (&...;) alone
@@ -1216,12 +1224,15 @@ function cardHTML(e,tokens){ const body=highlight(e.html,tokens); const tagchips
  return `<div class="card" id="card-${e.id}">${star}<span class="cat">${e.cat}</span><h3>${highlight(e.title,tokens)}</h3><div class="body">${body}</div><div class="tagline">${tagchips}</div></div>`; }
 function render(){ const raw=q.value.trim(); let tokens=raw?expand(tokenize(raw)).map(o=>({t:o.t,w:o.w*idf(o.t)})):[]; let list=DATA.slice();
  if(activeCat) list=list.filter(d=>d.cat===activeCat);
- if(tokens.length){ list=list.map(e=>({e,s:scoreEntry(e,tokens)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.e); }
+ if(tokens.length){ list=list.map(e=>({e,s:scoreEntry(e,tokens,raw)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s).map(x=>x.e); }
  else { list=list.filter(d=>d.cat!=="Glossary"); list.sort((a,b)=>CAT_ORDER.indexOf(a.cat)-CAT_ORDER.indexOf(b.cat)); }
  if(!list.length){ results.innerHTML=''; noresult.style.display='block'; meta.textContent=`No matches for "${raw}".`; return; }
  noresult.style.display='none';
  meta.innerHTML=raw?`<b>${list.length}</b> result${list.length>1?'s':''} for "<b>${raw.replace(/</g,'&lt;')}</b>"${activeCat?` in ${activeCat}`:''}.`:`Showing all <b>${list.length}</b> entries${activeCat?` in ${activeCat}`:''}. Search to narrow down.`;
- results.innerHTML=list.map(e=>cardHTML(e,tokens)).join(''); wireCards(); }
+ results.innerHTML=list.map(e=>cardHTML(e,tokens)).join(''); wireCards();
+ if(raw){ const r=raw.toLowerCase().trim(); const top=list[0];
+   if(top && (top.title.toLowerCase()===r || (top.tags||[]).includes(r) || top.title.toLowerCase().split(/[\s\/,()]+/).includes(r))){
+     const el=results.querySelector('.card'); if(el){ el.classList.add('flash-top'); el.scrollIntoView({behavior:'smooth',block:'nearest'}); setTimeout(()=>{ if(el)el.classList.remove('flash-top'); },1500); } } } }
 function wireCards(){ results.querySelectorAll('.tag').forEach(t=>t.onclick=()=>{ q.value=t.dataset.t; activeCat=null; chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat==='')); render(); window.scrollTo({top:0,behavior:'smooth'}); });
  results.querySelectorAll('.fav').forEach(b=>b.onclick=ev=>{ ev.stopPropagation(); toggleFav(b.dataset.fav); const on=isFav(b.dataset.fav); b.classList.toggle('on',on); b.innerHTML=on?'&#9733;':'&#9734;'; renderSaved(); }); }
 let deb; q.addEventListener('input',()=>{ clearTimeout(deb); deb=setTimeout(render,120); });
@@ -1238,17 +1249,23 @@ function toggleFav(id){ FAV=isFav(id)?FAV.filter(x=>x!==id):[...FAV,id]; store.s
 const views={ reference:document.getElementById('tab-reference'), tools:document.getElementById('tab-tools'), notes:document.getElementById('tab-notes'), sketch:document.getElementById('tab-sketch'), more:document.getElementById('tab-more'), game:document.getElementById('tab-game'), landnav:document.getElementById('tab-landnav') };
 function switchTab(name){ Object.keys(views).forEach(k=>views[k].classList.toggle('active',k===name)); document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)); document.body.classList.remove('nav-open'); store.set('cf_tab',name); window.scrollTo({top:0}); if(name==='more')renderSaved(); if(name==='notes')renderNotesTab(); if(name==='sketch'&&typeof initSketch==='function')initSketch(); if(name==='game')initGame(); if(name!=='game'&&typeof snakeStop==='function')snakeStop(); if(name!=='game'&&typeof chessStop==='function')chessStop(); if(name!=='game'&&typeof minesStop==='function')minesStop(); if(name!=='game'&&typeof mazeStop==='function')mazeStop(); if(name==='game'&&typeof musicStart==='function')musicStart(); if(name!=='game'&&typeof musicStop==='function')musicStop(); if(name==='landnav'){initLandNav(); if(typeof lnResume==='function')lnResume();} if(name!=='landnav'&&typeof lnStop==='function')lnStop(); }
 document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
-document.getElementById('navHandle').onclick=()=>document.body.classList.toggle('nav-open');
 document.getElementById('navScrim').onclick=()=>document.body.classList.remove('nav-open');
 /* ---- Settings live in the left drawer now; close the drawer when Search is opened ---- */
 (function(){ const search=document.getElementById('cmdOpen'); if(search)search.addEventListener('click',()=>document.body.classList.remove('nav-open')); })();
 /* ---- Fixed game screen: block page scroll while on the games tab (swipes stay in the game) ---- */
 document.addEventListener('touchmove',function(e){ if(!views.game.classList.contains('active'))return; const t=e.target; if(t&&t.closest&&t.closest('.gscroll, #navDrawer, .modal-ov, #cmdPalette'))return; e.preventDefault(); },{passive:false});
-/* ---- Left nav handle: slightly larger + auto-hide after 3s idle ---- */
-(function(){ const h=document.getElementById('navHandle'); if(!h)return; let t=null;
-  function show(){ h.classList.remove('nav-hide'); clearTimeout(t); t=setTimeout(()=>{ if(!document.body.classList.contains('nav-open'))h.classList.add('nav-hide'); },3000); }
-  ['scroll','touchstart','pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,show,{passive:true}));
-  h.addEventListener('pointerenter',show); show(); })();
+/* ---- Full-screen swipe control: a swipe anywhere on the games screen steers the active swipe game ---- */
+(function(){ let sx=0,sy=0,ok=false; const SW={snake:()=>window._snakeDir, maze:()=>window._mazeDir, g2048:()=>window._g2048Dir};
+  document.addEventListener('touchstart',function(e){ ok=false; if(!views.game.classList.contains('active')||document.body.classList.contains('nav-open'))return;
+    const t=e.target; if(t&&t.closest&&t.closest('#navHandle, #navDrawer, .modal-ov, #cmdPalette, select, button'))return;
+    const p=e.changedTouches[0]; sx=p.clientX; sy=p.clientY; ok=true; },{passive:true});
+  document.addEventListener('touchend',function(e){ if(!ok)return; ok=false; const g=document.getElementById('gameSelect'); if(!g||!SW[g.value])return;
+    const p=e.changedTouches[0], dx=p.clientX-sx, dy=p.clientY-sy; if(Math.abs(dx)<24&&Math.abs(dy)<24)return;
+    const d=Math.abs(dx)>Math.abs(dy)?(dx>0?'R':'L'):(dy>0?'D':'U'); const fn=SW[g.value](); if(fn)fn(d); },{passive:true}); })();
+/* ---- Hamburger menu by the clock: opens the dropdown with all sections + settings ---- */
+(function(){ const btn=document.getElementById('hamBtn'); if(!btn)return;
+  btn.addEventListener('click',e=>{ e.stopPropagation(); document.body.classList.toggle('nav-open'); });
+  document.addEventListener('click',e=>{ if(!document.body.classList.contains('nav-open'))return; const d=document.getElementById('navDrawer'); if(d&&!d.contains(e.target)&&e.target!==btn&&!btn.contains(e.target))document.body.classList.remove('nav-open'); }); })();
 function goHome(){ try{q.value='';}catch(e){} activeCat=null; try{chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat===''));}catch(e){} switchTab('reference'); try{render();}catch(e){} }
 var _nb=document.getElementById('navBrand'); if(_nb)_nb.onclick=goHome;
 var _hb=document.getElementById('homeBrand'); if(_hb)_hb.onclick=goHome;
@@ -1652,11 +1669,7 @@ function initGame(){
   snakeStop=function(){ if(loop){clearInterval(loop);loop=null;} alive=false; };
   function turn(d){ if(!alive)return; if(d==='U'&&dir.y!==1)ndir={x:0,y:-1}; else if(d==='D'&&dir.y!==-1)ndir={x:0,y:1}; else if(d==='L'&&dir.x!==1)ndir={x:-1,y:0}; else if(d==='R'&&dir.x!==-1)ndir={x:1,y:0}; }
   document.getElementById('snStart').onclick=start;
-  document.querySelectorAll('.dbtn').forEach(b=>b.onclick=()=>turn(b.dataset.d));
-  // swipe
-  let tsx,tsy;
-  cv.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; tsx=t.clientX; tsy=t.clientY; },{passive:true});
-  cv.addEventListener('touchend',e=>{ const t=e.changedTouches[0],dx=t.clientX-tsx,dy=t.clientY-tsy; if(Math.abs(dx)<14&&Math.abs(dy)<14)return; if(Math.abs(dx)>Math.abs(dy))turn(dx>0?'R':'L'); else turn(dy>0?'D':'U'); },{passive:true});
+  window._snakeDir=turn;   // full-screen swipe routes here
   // keys (only on game tab, snake pane)
   window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; if(document.getElementById('game-snake').style.display==='none')return;
     const k=e.key; let d=null; if(k==='ArrowUp'||k==='w')d='U'; else if(k==='ArrowDown'||k==='s')d='D'; else if(k==='ArrowLeft'||k==='a')d='L'; else if(k==='ArrowRight'||k==='d')d='R'; if(d){ e.preventDefault(); turn(d); } });
@@ -1941,12 +1954,12 @@ function initLandNav(){
   function startGPS(){ if(!navigator.geolocation){ $('lnGpsStat').textContent='unavailable'; return; }
     $('lnGpsStat').textContent='acquiring…';
     try{ if(watchId!=null)navigator.geolocation.clearWatch(watchId);
-      watchId=navigator.geolocation.watchPosition(p=>{ pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude,spd:p.coords.speed}; $('lnGpsStat').textContent='fix ±'+Math.round(pos.acc||0)+' m'; render(); },
-        err=>{ $('lnGpsStat').textContent='denied/err'; }, {enableHighAccuracy:true,maximumAge:1000,timeout:20000}); }catch(e){ $('lnGpsStat').textContent='error'; } }
+      watchId=navigator.geolocation.watchPosition(p=>{ pos={lat:p.coords.latitude,lon:p.coords.longitude,acc:p.coords.accuracy,alt:p.coords.altitude,spd:p.coords.speed}; $('lnGpsStat').textContent='fix ±'+Math.round(pos.acc||0)+' m'; const be=$('lnEnable'); if(be){ be.textContent='✓ GPS & Compass engaged'; be.classList.add('on'); } render(); },
+        err=>{ $('lnGpsStat').textContent='denied/err'; const be=$('lnEnable'); if(be)be.textContent='GPS blocked — tap to retry'; }, {enableHighAccuracy:true,maximumAge:1000,timeout:20000}); }catch(e){ $('lnGpsStat').textContent='error'; } }
   function onOrient(e){ let hd=null; if(e.webkitCompassHeading!=null&&isFinite(e.webkitCompassHeading)) hd=e.webkitCompassHeading; else if(e.absolute===true&&e.alpha!=null) hd=norm(360-e.alpha); if(hd!=null){ heading=hd; haveComp=true; $('lnCompStat').textContent=Math.round(hd)+'°'; render(); } }
   function startCompass(){ const add=()=>{ if(orientOn)return; orientOn=true; window.addEventListener('deviceorientationabsolute',onOrient,true); window.addEventListener('deviceorientation',onOrient,true); $('lnCompStat').textContent='on…'; };
     try{ if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){ DeviceOrientationEvent.requestPermission().then(st=>{ if(st==='granted')add(); else $('lnCompStat').textContent='denied'; }).catch(()=>{ $('lnCompStat').textContent='denied'; }); } else add(); }catch(e){ $('lnCompStat').textContent='n/a'; } }
-  $('lnEnable').onclick=()=>{ enabled=true; startGPS(); startCompass(); };
+  $('lnEnable').onclick=()=>{ enabled=true; $('lnEnable').textContent='Engaging sensors…'; startGPS(); startCompass(); };
   // Stop the live sensors (called when leaving the tab) but remember that the
   // user had them on, so re-entering the tab can bring them back automatically.
   lnStop=function(){ try{ if(watchId!=null){navigator.geolocation.clearWatch(watchId); watchId=null;} }catch(e){} if(orientOn){ window.removeEventListener('deviceorientationabsolute',onOrient,true); window.removeEventListener('deviceorientation',onOrient,true); orientOn=false; } if(enabled){ $('lnGpsStat').textContent='paused'; $('lnCompStat').textContent='paused'; } };
@@ -2589,10 +2602,11 @@ function initExtraTools(){
       h+='<div class="cxmuted" style="margin-top:6px">Times from your phone’s clock &amp; the entered position. Sun times ±~1 min; moon times are approximate.</div>';
       $('smOut').innerHTML=h; }
     $('smCalc').onclick=calc;
-    $('smUseGps').onclick=function(){ $('smOut').innerHTML='<div class="cxmuted">Getting GPS fix…</div>';
+    $('smUseGps').onclick=function(){ const b=$('smUseGps'); $('smOut').innerHTML='<div class="cxmuted">Getting GPS fix…</div>';
       if(!navigator.geolocation){ $('smOut').innerHTML='<div class="cxmuted">No geolocation on this device.</div>'; return; }
-      navigator.geolocation.getCurrentPosition(p=>{ $('smLat').value=p.coords.latitude.toFixed(4); $('smLon').value=p.coords.longitude.toFixed(4); store.set('cf_lastpos',{lat:p.coords.latitude,lon:p.coords.longitude}); calc(); },
-        ()=>{ $('smOut').innerHTML='<div class="cxmuted">Couldn’t get a GPS fix — enter the position manually.</div>'; }, {enableHighAccuracy:true,timeout:15000}); };
+      b.textContent='Locating…'; b.disabled=true;
+      navigator.geolocation.getCurrentPosition(p=>{ $('smLat').value=p.coords.latitude.toFixed(4); $('smLon').value=p.coords.longitude.toFixed(4); store.set('cf_lastpos',{lat:p.coords.latitude,lon:p.coords.longitude}); b.textContent='✓ Location set'; b.disabled=false; calc(); },
+        ()=>{ $('smOut').innerHTML='<div class="cxmuted">Couldn’t get a GPS fix — enter the position manually.</div>'; b.textContent='Use my GPS'; b.disabled=false; }, {enableHighAccuracy:true,timeout:15000}); };
   })();
 
   // ---- Morse ----
@@ -2671,8 +2685,7 @@ function init2048(){ if(_g2048Init)return; _g2048Init=true;
   function save(){ try{ store.set('cf_2048',{board,score,won}); }catch(e){} }
   function load(){ const d=store.get('cf_2048',null); if(d&&d.board&&d.board.length===16){ board=d.board; score=d.score||0; won=!!d.won; dead=!canMove(); return true; } return false; }
   $('g2048new').onclick=neu;
-  let sx,sy; grid.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; sx=t.clientX; sy=t.clientY; },{passive:true});
-  grid.addEventListener('touchend',e=>{ const t=e.changedTouches[0],dx=t.clientX-sx,dy=t.clientY-sy; if(Math.abs(dx)<18&&Math.abs(dy)<18)return; if(Math.abs(dx)>Math.abs(dy))move(dx>0?'R':'L'); else move(dy>0?'D':'U'); },{passive:true});
+  window._g2048Dir=move;   // full-screen swipe routes here
   window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; if($('game-g2048').style.display==='none')return; let d=null; const k=e.key; if(k==='ArrowLeft')d='L'; else if(k==='ArrowRight')d='R'; else if(k==='ArrowUp')d='U'; else if(k==='ArrowDown')d='D'; if(d){ e.preventDefault(); move(d); } });
   if(!load())neu(); else draw();
 }
@@ -2858,7 +2871,17 @@ function initA11y(){ const $=id=>document.getElementById(id);
 /* ---------- Field timers + spoken readouts (TTS) ---------- */
 function _beep(freq,dur){ try{ const ac=new (window.AudioContext||window.webkitAudioContext)(); const o=ac.createOscillator(),g=ac.createGain(); o.frequency.value=freq||660; o.type='sine'; o.connect(g); g.connect(ac.destination); g.gain.setValueAtTime(0.0001,ac.currentTime); g.gain.exponentialRampToValueAtTime(0.3,ac.currentTime+0.01); g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+(dur||0.18)); o.start(); o.stop(ac.currentTime+(dur||0.18)+0.02); setTimeout(()=>{try{ac.close();}catch(e){}},((dur||0.18)+0.1)*1000); }catch(e){} }
 
-function speak(text){ try{ if(!('speechSynthesis' in window)){ return false; } const u=new SpeechSynthesisUtterance(text); u.rate=0.95; speechSynthesis.cancel(); speechSynthesis.speak(u); return true; }catch(e){ return false; } }
+var _ttsPrimed=false;
+function showToast(msg){ try{ let t=document.getElementById('cfToast'); if(!t){ t=document.createElement('div'); t.id='cfToast'; document.body.appendChild(t); } t.textContent=msg; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),3400); }catch(e){} }
+function speak(text,display){ showToast(display||text);   // always give visual feedback, even if audio is unavailable/muted
+  try{ if(!('speechSynthesis' in window)) return false;
+    if(!_ttsPrimed){ try{ const w=new SpeechSynthesisUtterance(''); w.volume=0; speechSynthesis.speak(w); }catch(_){} _ttsPrimed=true; }
+    try{ speechSynthesis.resume(); }catch(_){}
+    if(speechSynthesis.speaking||speechSynthesis.pending){ try{ speechSynthesis.cancel(); }catch(_){} }
+    const u=new SpeechSynthesisUtterance(text); u.rate=0.95; u.lang='en-US';
+    try{ const vs=speechSynthesis.getVoices()||[]; const v=vs.find(x=>/en[-_]us/i.test(x.lang))||vs.find(x=>/^en/i.test(x.lang)); if(v)u.voice=v; }catch(_){}
+    speechSynthesis.speak(u); return true;
+  }catch(e){ return false; } }
 function _spaceDigits(s){ return s.replace(/\d/g,d=>d+' ').replace(/([A-Za-z])/g,'$1 '); }
 
 function initTimers(){ const $=id=>document.getElementById(id); if(!$('tmDisp'))return;
@@ -2904,12 +2927,10 @@ function initTimers(){ const $=id=>document.getElementById(id); if(!$('tmDisp'))
 }
 
 function initSpeak(){ const $=id=>document.getElementById(id);
-  const z=$('zSpeak'); if(z)z.onclick=()=>{ const dtg=(document.getElementById('zuluDtg')||{}).textContent||''; const t=(document.getElementById('zval')||{}).textContent||''; speak('Zulu time '+_spaceDigits(t.replace(/[^0-9]/g,m=>m))+'. '+dtg); };
-  const l=$('lnSpeak'); if(l)l.onclick=()=>{ const grid=(document.getElementById('lnGrid')||{}).textContent||''; const ll=(document.getElementById('lnLL')||{}).textContent||'';
-    if(!grid||grid==='—'){ speak('No position yet. Enable sensors first.'); return; }
-    speak('Grid '+_spaceDigits(grid)+'. Lat long '+ll+'.'); };
-  // If TTS unavailable, hide the buttons
-  if(!('speechSynthesis' in window)){ [z,l].forEach(b=>{ if(b)b.style.display='none'; }); }
+  const z=$('zSpeak'); if(z)z.onclick=()=>{ const dtg=(document.getElementById('zuluDtg')||{}).textContent||''; const t=(document.getElementById('zval')||{}).textContent||''; const digits=(t.match(/\d/g)||[]).join(' '); speak('Zulu time '+digits+'. '+dtg, (t||'--:--:--')+'Z  ·  '+dtg); };
+  const l=$('lnSpeak'); if(l)l.onclick=()=>{ const grid=((document.getElementById('lnGrid')||{}).textContent||'').trim(); const ll=((document.getElementById('lnLL')||{}).textContent||'').trim();
+    if(!grid||grid==='—'||grid==='—'){ speak('No position yet. Enable sensors first.','No position yet — enable sensors first.'); return; }
+    speak('Grid. '+_spaceDigits(grid)+'. Latitude longitude '+ll+'.', grid+(ll&&ll!=='—'?('  ·  '+ll):'')); };
 }
 
 /* ============ DR / NET / OHM / HAPTIC ============ */
@@ -2963,8 +2984,11 @@ function initSpeak(){ const $=id=>document.getElementById(id);
 
 /* ===== browser UI ===== */
 function haptic(p){ try{ if(typeof store!=='undefined'&&store.get('cf_haptic',false)&&navigator.vibrate)navigator.vibrate(p||15); }catch(e){} }
-function initHaptic(){ const t=document.getElementById('hapticTog'); if(!t)return; t.checked=store.get('cf_haptic',false);
-  t.onchange=()=>{ store.set('cf_haptic',t.checked); if(t.checked)haptic(20); }; }
+var HAPTIC_OK=(typeof navigator!=='undefined')&&('vibrate' in navigator)&&typeof navigator.vibrate==='function';
+function initHaptic(){ ['hapticTog','setHaptic'].forEach(id=>{ const t=document.getElementById(id); if(!t)return;
+  if(!HAPTIC_OK){ t.checked=false; t.disabled=true; const lab=t.closest('label'); if(lab&&!lab.querySelector('.hap-note')){ const n=document.createElement('span'); n.className='hap-note'; n.textContent=' — not supported on this device'; lab.appendChild(n); } return; }
+  t.checked=store.get('cf_haptic',false);
+  t.onchange=()=>{ store.set('cf_haptic',t.checked); const o=document.getElementById(id==='hapticTog'?'setHaptic':'hapticTog'); if(o&&!o.disabled)o.checked=t.checked; if(t.checked)haptic(20); }; }); }
 function initExtraTools4(){ const $=id=>document.getElementById(id); const C=(typeof window!=='undefined'&&window.__coorddr)?window.__coorddr.CoordDR:null; if(!C)return;
 
   // ---- Dead-reckoning projector ----
@@ -2983,7 +3007,7 @@ function initExtraTools4(){ const $=id=>document.getElementById(id); const C=(ty
         '<tr><td>True azimuth used</td><td>'+trueAz.toFixed(1)+'°</td></tr></table>'+
         '<div class="cxmuted" style="margin-top:6px">Great-circle projection on WGS84. Pick Magnetic/Grid and fill declination/convergence to convert your azimuth to true.</div>'; }
     ['drGrid','drLat','drLon','drAz','drDist','drUnit','drAzType','drDec','drConv'].forEach(id=>{ const e=$(id); if(e){ e.addEventListener('input',calc); e.addEventListener('change',calc); } });
-    $('drGps').onclick=()=>{ if(!navigator.geolocation)return; navigator.geolocation.getCurrentPosition(p=>{ $('drLat').value=p.coords.latitude.toFixed(5); $('drLon').value=p.coords.longitude.toFixed(5); $('drGrid').value=''; calc(); },()=>{},{enableHighAccuracy:true,timeout:15000}); };
+    $('drGps').onclick=()=>{ const b=$('drGps'); if(!navigator.geolocation){ b.textContent='No GPS on device'; return; } b.textContent='Locating…'; b.disabled=true; navigator.geolocation.getCurrentPosition(p=>{ $('drLat').value=p.coords.latitude.toFixed(5); $('drLon').value=p.coords.longitude.toFixed(5); $('drGrid').value=''; b.textContent='✓ Location set'; b.disabled=false; calc(); },()=>{ b.textContent='GPS blocked — tap to retry'; b.disabled=false; },{enableHighAccuracy:true,timeout:15000}); };
   })();
 
   // ---- Net / frequency plan ----
@@ -3394,11 +3418,9 @@ function initMaze(){
 
   mazeStop=function(){ running=false; if(raf){ cancelAnimationFrame(raf); raf=null; } };
 
+  window._mazeDir=setDir;   // full-screen swipe routes here
   if(!_mazeInit){ _mazeInit=true;
     document.getElementById('mzStart').onclick=start;
-    document.querySelectorAll('#game-maze .dbtn').forEach(b=>b.onclick=()=>setDir(b.dataset.d));
-    let tsx,tsy; cv.addEventListener('touchstart',e=>{ const t=e.changedTouches[0]; tsx=t.clientX; tsy=t.clientY; },{passive:true});
-    cv.addEventListener('touchend',e=>{ const t=e.changedTouches[0],dx=t.clientX-tsx,dy=t.clientY-tsy; if(Math.abs(dx)<14&&Math.abs(dy)<14)return; if(Math.abs(dx)>Math.abs(dy))setDir(dx>0?'R':'L'); else setDir(dy>0?'D':'U'); },{passive:true});
     window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; const mp=document.getElementById('game-maze'); if(!mp||mp.style.display==='none')return;
       const k=e.key; let d=null; if(k==='ArrowUp'||k==='w')d='U'; else if(k==='ArrowDown'||k==='s')d='D'; else if(k==='ArrowLeft'||k==='a')d='L'; else if(k==='ArrowRight'||k==='d')d='R'; if(d){ e.preventDefault(); setDir(d); } });
   }
