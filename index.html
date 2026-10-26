@@ -134,6 +134,24 @@
   #cmdOpen,#toTop{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);font-size:17px;line-height:1;cursor:pointer;padding:0 11px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
   #cmdOpen:active,#toTop:active{transform:translateY(1px)}
   #cmdOpen svg{width:18px;height:18px;display:block}
+  #menuBtn{background:var(--zbar-bg);border:1px solid var(--line);border-radius:10px;color:var(--accent);cursor:pointer;padding:0 10px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+  #menuBtn:active{transform:translateY(1px)}
+  #menuBtn svg{width:21px;height:21px;display:block}
+  #topMenu{position:fixed;top:calc(var(--safe-t) + 58px);right:8px;z-index:200;width:230px;max-width:calc(100vw - 16px);background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 12px 34px rgba(0,0,0,.5);padding:8px;opacity:0;transform:translateY(-6px);transition:opacity .16s,transform .16s}
+  #topMenu.show{opacity:1;transform:none}
+  #topMenu .tm-item{display:flex;align-items:center;gap:10px;width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:14.5px;font-weight:600;padding:11px 12px;cursor:pointer;font-family:inherit;box-shadow:none}
+  #topMenu .tm-item svg{width:17px;height:17px;flex:0 0 auto}
+  #topMenu .tm-item:active{transform:translateY(1px)}
+  #topMenu #cmdOpen{justify-content:flex-start;width:100%;padding:11px 12px;font-size:14.5px;background:var(--panel2);border-radius:10px}
+  #topMenu .tm-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 4px;font-size:14px;color:var(--ink)}
+  #topMenu .tm-row #textSize,#topMenu .tm-row #themeToggle{position:static;min-width:40px;height:34px;font-size:16px}
+  #topMenu .tm-sep{height:1px;background:var(--line);margin:7px 2px}
+  #topMenu .tm-lbl{font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--accent2);font-weight:700;margin:2px 4px 5px}
+  #topMenu .tm-chk{display:flex;align-items:center;gap:9px;padding:8px 4px;font-size:14px;color:var(--ink);cursor:pointer}
+  #topMenu .tm-chk input{width:17px;height:17px}
+  #gameSelect{flex:1;background:var(--panel2);border:1px solid var(--line);color:var(--ink);border-radius:10px;padding:12px 14px;font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%237aa2c4' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:38px}
+  .idot{flex:0 0 auto;width:44px;height:44px;border-radius:50%;background:var(--chip);border:1px solid var(--line);color:var(--accent2);font-size:18px;font-weight:800;font-style:italic;font-family:Georgia,'Times New Roman',serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .idot:active{transform:translateY(1px)}
   .sicon svg{width:18px;height:18px;display:block}
   .btn svg.bi{width:14px;height:14px;vertical-align:-2px;margin-right:3px}
   #toTop{display:none;position:fixed;right:14px;bottom:calc(18px + var(--safe-b));z-index:95;width:46px;height:46px;font-size:22px;font-weight:800;border-radius:50%}
@@ -150,8 +168,10 @@
   .cmdres{display:block;width:100%;text-align:left;background:none;border:none;border-bottom:1px solid var(--line);color:var(--ink);font-size:14.5px;padding:12px 14px;cursor:pointer;font-family:inherit}
   .cmdres:hover,.cmdres:focus-visible{background:var(--panel2)}
   #snCanvas,#g2048grid{overscroll-behavior:contain}
-  #navHandle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:115;width:19px;height:110px;padding:0;display:flex;align-items:center;justify-content:center;font-size:0;background:var(--zbar-bg);border:1px solid var(--line);border-left:none;border-radius:0 11px 11px 0;color:var(--accent);cursor:pointer;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:left .26s cubic-bezier(.4,0,.2,1),opacity .2s}
-  #navHandle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:4px;height:66px;border-radius:3px;background:linear-gradient(var(--logo1),var(--logo2));opacity:.9}
+  #navHandle{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:115;width:27px;height:132px;padding:0;display:flex;align-items:center;justify-content:center;font-size:0;background:var(--zbar-bg);border:1px solid var(--line);border-left:none;border-radius:0 13px 13px 0;color:var(--accent);cursor:pointer;box-shadow:var(--shadow);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);transition:left .26s cubic-bezier(.4,0,.2,1),opacity .35s,transform .35s}
+  #navHandle::after{content:"";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:5px;height:80px;border-radius:3px;background:linear-gradient(var(--logo1),var(--logo2));opacity:.9}
+  #navHandle.nav-hide{opacity:0;pointer-events:none;transform:translateY(-50%) translateX(-60%)}
+  body.nav-open #navHandle.nav-hide{opacity:1;pointer-events:auto;transform:translateY(-50%)}
   #navScrim{position:fixed;inset:0;z-index:105;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;transition:opacity .25s}
   #navDrawer{position:fixed;left:0;top:0;bottom:0;z-index:110;width:min(80vw,272px);background:linear-gradient(180deg,var(--grad1),var(--panel));border-right:1px solid var(--line);box-shadow:6px 0 30px rgba(0,0,0,.45);transform:translateX(-100%);transition:transform .26s cubic-bezier(.4,0,.2,1);display:flex;flex-direction:column;padding-top:var(--safe-t);overflow-y:auto;-webkit-overflow-scrolling:touch}
   body.nav-open #navDrawer{transform:none}
@@ -313,7 +333,7 @@
   .cb-elowrap input[type=range]{flex:1;accent-color:var(--accent)}
   #cbEloLbl{font-family:monospace;font-weight:800;color:var(--accent);min-width:128px;text-align:right;font-size:13px}
   #cbBoard{display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);aspect-ratio:1/1;width:100%;border:2px solid var(--line);border-radius:8px;overflow:hidden;touch-action:manipulation}
-  .cb-sq{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:min(7vw,30px);line-height:1;cursor:pointer;position:relative;user-select:none;overflow:hidden}
+  .cb-sq{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:min(7.4vw,32px);line-height:1;cursor:pointer;position:relative;user-select:none;overflow:hidden;font-family:"Segoe UI Symbol","Noto Sans Symbols2","Arial Unicode MS",sans-serif;-webkit-text-size-adjust:100%}
   .cb-l{background:#e9e2cf}
   .cb-d{background:#7c8ba1}
   .cb-wp{color:#fcfbf7;text-shadow:0 0 1px #000,0 1px 2px rgba(0,0,0,.55)}
@@ -410,11 +430,21 @@
 </head>
 <body>
 
-<div id="topctrls"><button id="cmdOpen" title="Search everything" aria-label="Search everything"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg></button><button id="textSize" title="Text size" aria-label="Text size">A</button><button id="themeToggle" title="Switch to light mode" aria-label="Toggle theme">&#9728;</button><div id="zulubar" title="Zulu / UTC — tap for converter">
+<div id="topctrls"><button id="menuBtn" title="Menu" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button><div id="zulubar" title="Zulu / UTC — tap for converter">
   <div class="zt" id="zuluTime">--:--:--Z</div>
   <div class="zd" id="zuluDate">-- --- ----</div>
   <div class="zg" id="zuluDtg">------Z</div>
 </div></div>
+<div id="topMenu" hidden>
+  <button id="cmdOpen" class="tm-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/></svg><span>Search everything</span></button>
+  <div class="tm-row"><span>Text size</span><button id="textSize" title="Text size" aria-label="Text size">A</button></div>
+  <div class="tm-row"><span>Theme</span><button id="themeToggle" title="Switch theme" aria-label="Toggle theme">&#9728;</button></div>
+  <div class="tm-sep"></div>
+  <div class="tm-lbl">Game audio</div>
+  <label class="tm-chk"><input type="checkbox" id="soundTog"> Sound</label>
+  <label class="tm-chk"><input type="checkbox" id="musicTog"> Music</label>
+  <label class="tm-chk"><input type="checkbox" id="hapticTog"> Haptics</label>
+</div>
 
 <!-- ===================== TAB: REFERENCE ===================== -->
 <section id="tab-reference" class="tabview active">
@@ -899,37 +929,29 @@
   <div class="subhead"><h2>Hurry &amp; Wait</h2><p>Kill some time while you wait on the net. Scores save on this device.</p></div>
   <div class="wrap">
     <div class="gsel">
-      <button class="gbtn active" data-game="snake">Snake</button>
-      <button class="gbtn" data-game="solitaire">Solitaire</button>
-      <button class="gbtn" data-game="chess">Chess</button>
-      <button class="gbtn" data-game="g2048">2048</button>
-      <button class="gbtn" data-game="mines">Mines</button>
-      <button class="gbtn" data-game="sudoku">Sudoku</button>
-      <button class="gbtn" data-game="maze">Maze Muncher</button>
-    </div>
-    <div style="display:flex;flex-wrap:wrap;gap:16px;font-size:13px;color:var(--muted);margin-bottom:12px">
-      <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="soundTog"> Sound</label>
-      <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="musicTog"> Music</label>
-      <label style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="hapticTog"> Haptics</label>
+      <select id="gameSelect" aria-label="Choose game">
+        <option value="snake">Snake</option>
+        <option value="solitaire">Solitaire</option>
+        <option value="chess">Chess</option>
+        <option value="g2048">2048</option>
+        <option value="mines">Mines</option>
+        <option value="sudoku">Sudoku</option>
+        <option value="maze">Maze Muncher</option>
+      </select>
+      <button id="gameInfo" class="idot" aria-label="How to play" title="How to play">i</button>
     </div>
     <div id="game-snake" class="gpane">
       <div class="gtop"><span id="snScore">Score 0</span><span id="snHi">Best 0</span></div>
       <canvas id="snCanvas" width="320" height="320"></canvas>
-      <div class="gmsg" id="snMsg">Tap Start — then swipe the board or use the pad.</div>
+      <div class="gmsg" id="snMsg"></div>
       <div class="gctrls">
         <button class="btn sm" id="snStart">Start</button>
-        <div class="dpad">
-          <button class="dbtn up" data-d="U" aria-label="up">&#9650;</button>
-          <button class="dbtn left" data-d="L" aria-label="left">&#9664;</button>
-          <button class="dbtn right" data-d="R" aria-label="right">&#9654;</button>
-          <button class="dbtn down" data-d="D" aria-label="down">&#9660;</button>
-        </div>
       </div>
     </div>
     <div id="game-solitaire" class="gpane" style="display:none">
       <div class="gtop"><span id="solMoves">Moves 0</span><span style="display:flex;gap:8px"><button class="btn sm" id="solAuto" style="display:none">Auto-finish &#9733;</button><button class="btn sm" id="solNew">New game</button></span></div>
       <div id="solBoard"></div>
-      <div class="gmsg" id="solMsg">Tap a card, then tap where it goes. Tap the deck (top-left) to draw.</div>
+      <div class="gmsg" id="solMsg"></div>
     </div>
     <div id="game-chess" class="gpane" style="display:none">
       <div id="cbWrap">
@@ -977,7 +999,7 @@
     <div id="game-maze" class="gpane" style="display:none">
       <div class="gtop"><span id="mzScore">Score 0</span><span id="mzLives">&#9679;&#9679;&#9679;</span><span id="mzHi">Best 0</span></div>
       <div style="text-align:center"><canvas id="mzCanvas"></canvas></div>
-      <div class="gmsg" id="mzMsg">Tap Start — swipe the board or use the pad.</div>
+      <div class="gmsg" id="mzMsg"></div>
       <div class="gctrls">
         <button class="btn sm" id="mzStart">Start</button>
         <div class="dpad">
@@ -1230,6 +1252,18 @@ function switchTab(name){ Object.keys(views).forEach(k=>views[k].classList.toggl
 document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 document.getElementById('navHandle').onclick=()=>document.body.classList.toggle('nav-open');
 document.getElementById('navScrim').onclick=()=>document.body.classList.remove('nav-open');
+/* ---- Top settings menu (search / text size / theme / game audio) ---- */
+(function(){ const btn=document.getElementById('menuBtn'), menu=document.getElementById('topMenu'); if(!btn||!menu)return;
+  function open(){ menu.hidden=false; requestAnimationFrame(()=>menu.classList.add('show')); }
+  function close(){ menu.classList.remove('show'); setTimeout(()=>{ if(!menu.classList.contains('show'))menu.hidden=true; },180); }
+  btn.onclick=e=>{ e.stopPropagation(); if(menu.hidden)open(); else close(); };
+  document.addEventListener('click',e=>{ if(!menu.hidden && !menu.contains(e.target) && e.target!==btn && !btn.contains(e.target))close(); });
+  const search=document.getElementById('cmdOpen'); if(search)search.addEventListener('click',close); })();
+/* ---- Left nav handle: slightly larger + auto-hide after 3s idle ---- */
+(function(){ const h=document.getElementById('navHandle'); if(!h)return; let t=null;
+  function show(){ h.classList.remove('nav-hide'); clearTimeout(t); t=setTimeout(()=>{ if(!document.body.classList.contains('nav-open'))h.classList.add('nav-hide'); },3000); }
+  ['scroll','touchstart','pointerdown','keydown'].forEach(ev=>window.addEventListener(ev,show,{passive:true}));
+  h.addEventListener('pointerenter',show); show(); })();
 function goHome(){ try{q.value='';}catch(e){} activeCat=null; try{chipsEl.querySelectorAll('.chip').forEach(x=>x.classList.toggle('active',x.dataset.cat===''));}catch(e){} switchTab('reference'); try{render();}catch(e){} }
 var _nb=document.getElementById('navBrand'); if(_nb)_nb.onclick=goHome;
 var _hb=document.getElementById('homeBrand'); if(_hb)_hb.onclick=goHome;
@@ -1468,6 +1502,11 @@ function modalConfirm(msg){ return new Promise(res=>{ const ov=document.createEl
   ov.innerHTML='<div class="modal"><p style="margin:0 0 14px"></p><div class="modal-btns"><button class="btn ghost sm mc">Cancel</button><button class="btn sm mo" style="background:var(--red);color:#fff">Delete</button></div></div>';
   ov.querySelector('p').textContent=msg; document.body.appendChild(ov);
   ov.querySelector('.mc').onclick=()=>{ ov.remove(); res(false); }; ov.querySelector('.mo').onclick=()=>{ ov.remove(); res(true); }; ov.addEventListener('click',e=>{ if(e.target===ov){ ov.remove(); res(false); } }); }); }
+function modalInfo(title,html){ const ov=document.createElement('div'); ov.className='modal-ov';
+  ov.innerHTML='<div class="modal"><h4 style="margin:0 0 8px"></h4><div class="modal-body" style="font-size:14px;line-height:1.5;color:var(--ink)"></div><div class="modal-btns" style="margin-top:14px"><button class="btn sm mo">Got it</button></div></div>';
+  ov.querySelector('h4').textContent=title||''; ov.querySelector('.modal-body').innerHTML=html||'';
+  document.body.appendChild(ov); const close=()=>ov.remove();
+  ov.querySelector('.mo').onclick=close; ov.addEventListener('click',e=>{ if(e.target===ov)close(); }); }
 function renderNotesTab(){ document.getElementById('notesEditView').style.display='none'; document.getElementById('notesListView').style.display='block';
  const chips=document.getElementById('folderChips');
  let html='<span class="fchip'+(noteFilter==='all'?' active':'')+'" data-f="all">All</span>'+'<span class="fchip'+(noteFilter==='unfiled'?' active':'')+'" data-f="unfiled">Unfiled</span>';
@@ -1559,9 +1598,7 @@ let _gameInit=false, snakeStop=function(){};
 function initGame(){
   if(_gameInit) return; _gameInit=true;
   // game selector
-  document.querySelectorAll('.gbtn').forEach(b=>b.onclick=()=>{
-    document.querySelectorAll('.gbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active');
-    const g=b.dataset.game;
+  function showGamePane(g){
     ['snake','solitaire','chess','g2048','mines','sudoku','maze'].forEach(nm=>{ const el=document.getElementById('game-'+nm); if(el)el.style.display=(g===nm)?'block':'none'; });
     if(g!=='snake') snakeStop();
     if(g!=='chess' && typeof chessStop==='function') chessStop();
@@ -1573,7 +1610,21 @@ function initGame(){
     if(g==='mines'){ initMines(); }
     if(g==='sudoku'){ initSudoku(); }
     if(g==='maze'){ initMaze(); }
-  });
+  }
+  window._showGamePane=showGamePane;
+  const gsel=document.getElementById('gameSelect'); if(gsel){ gsel.value='snake'; gsel.onchange=()=>showGamePane(gsel.value); }
+  // How-to-play info popup
+  const GAME_HELP={
+    snake:['Snake','Swipe anywhere on the board to steer (arrow keys work too). Eat the gold squares to grow longer and score. The game ends if you hit a wall or your own tail — it speeds up as you grow.'],
+    solitaire:['Solitaire (Klondike)','Build the four foundations up by suit, Ace to King. On the tableau, stack cards down in alternating colours. Tap a card then tap where it goes; tap the deck (top-left) to draw. Only Kings move to an empty column. An <b>Auto-finish ★</b> button appears when the win is guaranteed.'],
+    chess:['Chess','Pick your side and the engine strength above, then tap a piece and tap its destination. Highlighted dots are legal moves; red rings are captures. Pawns promote when they reach the far rank. Use Undo or Resign anytime.'],
+    g2048:['2048','Swipe to slide all tiles. Two tiles with the same number merge into one that doubles. Keep merging to reach the 2048 tile — the board fills up if you run out of moves.'],
+    mines:['Mines','Tap a cell to reveal it. A number tells how many mines touch that cell. Switch <b>Flag</b> on to mark suspected mines instead of revealing. Clear every safe cell to win; tap a mine and it&rsquo;s over.'],
+    sudoku:['Sudoku','Fill every row, column, and 3×3 box with the digits 1–9, no repeats. Tap a cell then a number. Turn on <b>Notes</b> for small pencil marks, <b>Erase</b> to clear, and <b>Check</b> to find mistakes.'],
+    maze:['Maze Muncher','Swipe or use the pad to move. Chomp every dot to clear the maze. Grab a big corner dot to turn the chasers blue for a few seconds — catch them for bonus points. Touch a chaser while it&rsquo;s not blue and you lose a life.']
+  };
+  function showGameHelp(){ const g=gsel?gsel.value:'snake'; const h=GAME_HELP[g]||['How to play','']; if(typeof modalInfo==='function')modalInfo(h[0],h[1]); }
+  const gi=document.getElementById('gameInfo'); if(gi)gi.onclick=showGameHelp;
 
   /* ---------- SNAKE ---------- */
   const cv=document.getElementById('snCanvas'), ctx=cv.getContext('2d');
@@ -1611,7 +1662,7 @@ function initGame(){
     draw();
   }
   function restartLoop(){ if(loop)clearInterval(loop); loop=setInterval(step,speed); }
-  function start(){ snake=[{x:7,y:8},{x:6,y:8},{x:5,y:8}]; dir={x:1,y:0}; ndir={x:1,y:0}; score=0; speed=130; alive=true; placeFood(); setScore(); setMsg('Swipe the board or use the pad.'); restartLoop(); draw(); document.getElementById('snStart').textContent='Restart'; }
+  function start(){ snake=[{x:7,y:8},{x:6,y:8},{x:5,y:8}]; dir={x:1,y:0}; ndir={x:1,y:0}; score=0; speed=130; alive=true; placeFood(); setScore(); setMsg('Swipe to steer.'); restartLoop(); draw(); document.getElementById('snStart').textContent='Restart'; }
   function gameOver(){ haptic([40,30,80]); sfx('lose'); alive=false; if(loop)clearInterval(loop); loop=null; setMsg('Game over — score '+score+'. Tap Restart.'); document.getElementById('snStart').textContent='Restart'; }
   snakeStop=function(){ if(loop){clearInterval(loop);loop=null;} alive=false; };
   function turn(d){ if(!alive)return; if(d==='U'&&dir.y!==1)ndir={x:0,y:-1}; else if(d==='D'&&dir.y!==-1)ndir={x:0,y:1}; else if(d==='L'&&dir.x!==1)ndir={x:-1,y:0}; else if(d==='R'&&dir.x!==-1)ndir={x:1,y:0}; }
@@ -2260,7 +2311,7 @@ function initChess(){
   if(_chessInit) return; _chessInit=true;
   const $=id=>document.getElementById(id);
   const CE=createChess();
-  const GLYPH={1:'♟',2:'♞',3:'♝',4:'♜',5:'♛',6:'♚'};
+  const GLYPH={1:'♟︎',2:'♞︎',3:'♝︎',4:'♜︎',5:'♛︎',6:'♚︎'};  // ︎ forces text (not emoji) rendering on iOS
   let game=CE.newState();
   let humanColor=1;            // 1 white, -1 black
   let rating=store.get('cf_chess_elo',1200);
@@ -3366,7 +3417,7 @@ function initMaze(){
     window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; const mp=document.getElementById('game-maze'); if(!mp||mp.style.display==='none')return;
       const k=e.key; let d=null; if(k==='ArrowUp'||k==='w')d='U'; else if(k==='ArrowDown'||k==='s')d='D'; else if(k==='ArrowLeft'||k==='a')d='L'; else if(k==='ArrowRight'||k==='d')d='R'; if(d){ e.preventDefault(); setDir(d); } });
   }
-  if(!muncher){ newGame(true); running=false; draw(); msg('Tap Start &mdash; swipe the board or use the pad.'); }
+  if(!muncher){ newGame(true); running=false; draw(); msg('Tap Start to play.'); }
   else { sizeCanvas(); draw(); }
 }
 
