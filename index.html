@@ -548,9 +548,14 @@
   document.addEventListener('click',function(e){ try{ trb().textContent='click: '+tdesc(e.target)+'  fs:'+(document.body.classList.contains('map-fs')?1:0); }catch(_){ } },true);
   /* ---- tapBind: fire an action on touchend AND click (iOS can drop clicks after touching a canvas),
      without double-firing. Use for controls that must work right after map interaction. ---- */
-  window.tapBind=function(el,fn){ if(!el||el.__tb)return; el.__tb=1; var touched=false;
-    el.addEventListener('touchend',function(e){ touched=true; try{e.preventDefault();}catch(_){ } try{ fn.call(el,e); }catch(err){ if(window.__errShow)window.__errShow('tap: '+(err&&(err.stack||err.message)||err)); } setTimeout(function(){touched=false;},700); },{passive:false});
-    el.addEventListener('click',function(e){ if(touched){ touched=false; return; } try{ fn.call(el,e); }catch(err){ if(window.__errShow)window.__errShow('click: '+(err&&(err.stack||err.message)||err)); } }); };
+  window.tapBind=function(el,fn){ if(!el||el.__tb)return; el.__tb=1; var sx=0,sy=0,moved=false,act=false,fired=false;
+    function run(e){ try{ fn.call(el,e); }catch(err){ if(window.__errShow)window.__errShow('tap: '+(err&&(err.stack||err.message)||err)); } }
+    el.addEventListener('touchstart',function(e){ var t=e.touches&&e.touches[0]; if(t){sx=t.clientX;sy=t.clientY;} moved=false; act=true; },{passive:true});
+    el.addEventListener('touchmove',function(e){ var t=e.touches&&e.touches[0]; if(t&&Math.hypot(t.clientX-sx,t.clientY-sy)>14)moved=true; },{passive:true});
+    function end(e){ if(!act)return; act=false; if(moved)return; fired=true; try{ if(e.cancelable)e.preventDefault(); }catch(_){ } run(e); setTimeout(function(){fired=false;},700); }
+    el.addEventListener('touchend',end,{passive:false});
+    el.addEventListener('touchcancel',end,{passive:false});
+    el.addEventListener('click',function(e){ if(fired){ fired=false; return; } run(e); }); };
 })();
 </script>
 
@@ -587,7 +592,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v41</b></div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v42</b></div>
   </div>
 </section>
 
@@ -3912,7 +3917,7 @@ function initMap(){
   function onTStart(e){ const c=e.currentTarget;
     if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=0; tdT=Date.now(); tmoved=false; tpinch=null; t2start=0; t2moved=false; }
     else if(e.touches.length===2){ tpan=null; tpinch=tps(e,c); t2start=Date.now(); t2moved=false; } }
-  function onTMove(e){ if(e.cancelable)e.preventDefault(); const c=e.currentTarget;
+  function onTMove(e){ const c=e.currentTarget; /* no preventDefault: touch-action:none already blocks scroll, and preventDefault here corrupts iOS touch state, killing later taps */
     if(e.touches.length===1&&tpan){ const p=relXY(e.touches[0],c), dx=p.x-tpan.x, dy=p.y-tpan.y; tmaxD=Math.max(tmaxD,Math.hypot(p.x-tdX,p.y-tdY)); if(Math.abs(dx)>2||Math.abs(dy)>2){ tmoved=true; follow=false; } cx-=dx; cy-=dy; tpan=p; scheduleDraw(); }
     else if(e.touches.length>=2&&tpinch){ const ps=tps(e,c), r=ps.d/tpinch.d; if(r>0&&isFinite(r)){ const dz=Math.log2(r); if(Math.abs(dz)>0.015){ zoomTo(z+dz,ps.mx,ps.my); tmoved=true; t2moved=true; follow=false; } } tpinch=ps; } }
   function onTEnd(e){ const c=e.currentTarget;
@@ -3928,7 +3933,7 @@ function initMap(){
   function onMUp(){ if(!mdown)return; mdown=false; if(mmaxD<=5)handleTap(mdX,mdY); else if(moved)saveView(); mpan=null; }
   function onWheel(e){ e.preventDefault(); zoomTo(z - Math.sign(e.deltaY)*0.5, e.offsetX, e.offsetY); }
   function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true;
-    if('ontouchstart' in window){ c.addEventListener('touchstart',onTStart,{passive:true}); c.addEventListener('touchmove',onTMove,{passive:false}); c.addEventListener('touchend',onTEnd); c.addEventListener('touchcancel',onTEnd); }
+    if('ontouchstart' in window){ c.addEventListener('touchstart',onTStart,{passive:true}); c.addEventListener('touchmove',onTMove,{passive:true}); c.addEventListener('touchend',onTEnd); c.addEventListener('touchcancel',onTEnd); }
     else { c.addEventListener('mousedown',onMDown); c.addEventListener('mousemove',onMMove); window.addEventListener('mouseup',onMUp); }
     c.addEventListener('wheel',onWheel,{passive:false}); }
 
