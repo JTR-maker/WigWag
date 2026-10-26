@@ -105,12 +105,14 @@
   .map-pinbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:center;margin-top:10px;font-size:13px;color:var(--muted)}
   .map-pinbar .map-pinsel,.map-pinbar .map-pinmove{display:inline-flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:center}
   .map-pinbar b{color:var(--accent2)}
-  .map-exit{position:absolute;top:calc(var(--safe-t) + 10px);left:10px;z-index:6;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--zbar-bg);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:var(--shadow);display:none;align-items:center;justify-content:center}
-  .map-wrap.fs{position:fixed;inset:0;width:100vw;height:100vh;max-width:none;margin:0;border:none;border-radius:0;z-index:500}
-  .map-wrap.fs .map-exit{display:flex}
-  .map-wrap.fs .map-zoom{top:calc(var(--safe-t) + 10px)}
-  .map-wrap.fs .map-pinbar{position:absolute;left:8px;right:8px;bottom:calc(var(--safe-b) + 54px);z-index:6;margin:0;background:rgba(10,16,26,.78);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:9px;-webkit-backdrop-filter:blur(5px);backdrop-filter:blur(5px)}
+  .map-exit{display:none}
+  #mapFsHost{display:none}
   body.map-fs{overflow:hidden}
+  body.map-fs #mapFsHost{display:block;position:fixed;inset:0;z-index:500;background:#0d1420}
+  body.map-fs .map-wrap{position:fixed;inset:0;width:100%;height:100%;max-width:none;margin:0;border:none;border-radius:0;z-index:500}
+  body.map-fs .map-exit{display:flex;position:fixed;top:calc(var(--safe-t) + 10px);left:10px;z-index:520;transform:translateZ(0);width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:var(--zbar-bg);color:var(--ink);font-size:22px;line-height:1;cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:var(--shadow);align-items:center;justify-content:center}
+  body.map-fs .map-zoom{position:fixed;top:calc(var(--safe-t) + 10px);right:10px;left:auto;z-index:520;transform:translateZ(0)}
+  body.map-fs .map-pinbar{position:fixed;left:62px;right:62px;top:calc(var(--safe-t) + 10px);bottom:auto;z-index:520;margin:0;justify-content:center;transform:translateZ(0);background:rgba(10,16,26,.86);border:1px solid rgba(255,255,255,.14);border-radius:12px;padding:8px;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
   /* ---- Home / landing ---- */
   #tab-home>.home-wrap{max-width:580px;margin:0 auto;padding:calc(10px + var(--safe-t)) 16px calc(30px + var(--safe-b))}
   .home-hero{display:flex;flex-direction:column;align-items:center;text-align:center;padding:26px 0 10px}
@@ -1468,14 +1470,24 @@ function switchTab(name){
 }
 document.querySelectorAll('.navitem').forEach(b=>b.onclick=()=>switchTab(b.dataset.tab));
 document.getElementById('navScrim').onclick=()=>document.body.classList.remove('nav-open');
-/* ---- Map full-screen (Land Nav) ---- */
+/* ---- Map full-screen (Land Nav): move the map + pin controls into a body-level host
+   so iOS positions and delivers touches to the overlay controls reliably ---- */
 (function(){ const wrap=document.querySelector('#tab-landnav .map-wrap'); if(!wrap)return;
-  const btn=document.getElementById('lnMapFs'), exit=document.getElementById('lnMapFsExit'), pinbar=document.querySelector('#tab-landnav .map-pinbar'); let anchor=null;
-  function enter(){ if(wrap.classList.contains('fs'))return; if(pinbar){ anchor=document.createComment('pb'); pinbar.parentNode.insertBefore(anchor,pinbar); wrap.appendChild(pinbar); } wrap.classList.add('fs'); document.body.classList.add('map-fs'); setTimeout(()=>window.dispatchEvent(new Event('resize')),20); }
-  function leave(){ if(!wrap.classList.contains('fs'))return; wrap.classList.remove('fs'); document.body.classList.remove('map-fs'); if(pinbar&&anchor){ anchor.parentNode.insertBefore(pinbar,anchor); anchor.remove(); anchor=null; } setTimeout(()=>window.dispatchEvent(new Event('resize')),20); }
-  if(btn)btn.onclick=()=>wrap.classList.contains('fs')?leave():enter();
-  if(exit)exit.onclick=leave;
-  window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&wrap.classList.contains('fs'))leave(); }); })();
+  let host=document.getElementById('mapFsHost'); if(!host){ host=document.createElement('div'); host.id='mapFsHost'; host.setAttribute('aria-hidden','true'); document.body.appendChild(host); }
+  const btn=document.getElementById('lnMapFs'), exit=document.getElementById('lnMapFsExit'), pinbar=document.querySelector('#tab-landnav .map-pinbar');
+  let wrapAnchor=null, pbAnchor=null;
+  function isFs(){ return document.body.classList.contains('map-fs'); }
+  function enter(){ if(isFs())return;
+    wrapAnchor=document.createComment('mw'); wrap.parentNode.insertBefore(wrapAnchor,wrap); host.appendChild(wrap);
+    if(pinbar){ pbAnchor=document.createComment('pb'); pinbar.parentNode.insertBefore(pbAnchor,pinbar); host.appendChild(pinbar); }
+    document.body.classList.add('map-fs'); setTimeout(()=>window.dispatchEvent(new Event('resize')),30); }
+  function leave(){ if(!isFs())return; document.body.classList.remove('map-fs');
+    if(wrapAnchor&&wrapAnchor.parentNode){ wrapAnchor.parentNode.insertBefore(wrap,wrapAnchor); wrapAnchor.remove(); } wrapAnchor=null;
+    if(pinbar&&pbAnchor&&pbAnchor.parentNode){ pbAnchor.parentNode.insertBefore(pinbar,pbAnchor); pbAnchor.remove(); } pbAnchor=null;
+    setTimeout(()=>window.dispatchEvent(new Event('resize')),30); }
+  if(btn)btn.onclick=()=>isFs()?leave():enter();
+  if(exit){ exit.onclick=leave; exit.addEventListener('touchend',function(e){ e.preventDefault(); leave(); },{passive:false}); }
+  window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&isFs())leave(); }); })();
 /* ---- Home / landing page: tiles navigate, search opens the palette, resume chip jumps to last section ---- */
 function renderHome(){ try{ const host=document.getElementById('homeResume'); if(!host)return;
   const NM={reference:'Reference',tools:'Tools',landnav:'Land Nav',map:'Map',notes:'Notes',sketch:'Sketch Pad',more:'Saved & Setup',game:'Hurry & Wait'};
@@ -3761,8 +3773,8 @@ function initMap(){
   function centerLL(){ return {lat:wy2lat(cy,z), lon:wx2lon(cx,z)}; }
   function llAt(px,py){ return {lat:wy2lat(py,z), lon:wx2lon(px,z)}; }
 
-  function size(){ if(!cv)return; const wrap=cv.parentElement, fs=wrap&&wrap.classList.contains('fs');
-    if(fs){ W=window.innerWidth; H=window.innerHeight; } else { W=Math.max(220,(wrap&&wrap.clientWidth)||320); H=Math.min(560,Math.max(300,Math.round(window.innerHeight*0.52))); }
+  function size(){ if(!cv)return; const wrap=cv.parentElement, fs=document.body.classList.contains('map-fs');
+    if(fs){ W=window.innerWidth; H=(window.visualViewport&&window.visualViewport.height)?Math.round(window.visualViewport.height):window.innerHeight; } else { W=Math.max(220,(wrap&&wrap.clientWidth)||320); H=Math.min(560,Math.max(300,Math.round(window.innerHeight*0.52))); }
     cv.width=W; cv.height=H; cv.style.width=W+'px'; cv.style.height=H+'px'; }
   function scheduleDraw(){ if(drawReq)return; drawReq=true; requestAnimationFrame(()=>{ drawReq=false; try{ draw(); }catch(e){} }); }
   function saveView(){ try{ const c=centerLL(); store.set('cf_mapctr',{lat:c.lat,lon:c.lon}); store.set('cf_mapz',z); }catch(e){} }
@@ -3926,6 +3938,7 @@ function initMap(){
   mapAttach=function(id){ const c=$(id); if(!c)return; cv=c; ctx=c.getContext('2d'); bindCanvas(c); size(); if(!started){ startGPS(); started=true; } else startGPS(); scheduleDraw(); };
   window.addEventListener('online',scheduleDraw); window.addEventListener('offline',scheduleDraw);
   window.addEventListener('resize',()=>{ if(cv){ size(); scheduleDraw(); } });
+  if(window.visualViewport)window.visualViewport.addEventListener('resize',()=>{ if(cv&&document.body.classList.contains('map-fs')){ size(); scheduleDraw(); } });
 
   mapRefresh=function(){ scheduleDraw(); try{ syncPinBar(); }catch(_){} };
   wireCtl('map'); wireCtl('lnMap'); syncSrc(); updateStorage(); syncPinBar(); if(store.get('cf_snaproads',false))fetchSnap();
