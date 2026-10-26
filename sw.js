@@ -3,7 +3,7 @@
    code when you have signal), CACHE-FIRST (stale-while-revalidate) for other
    assets. Falls back to cache when offline, so the app still works with no signal.
    Bump CACHE whenever you update index.html. */
-const CACHE = 'commo-fundamentals-v44';
+const CACHE = 'commo-fundamentals-v45';
 const ASSETS = ['./', './index.html'];
 
 self.addEventListener('install', e => {
