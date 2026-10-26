@@ -60,7 +60,7 @@
   .logo svg{width:23px;height:23px}
   h1.title{font-size:19px;margin:0;letter-spacing:.3px}
   .sub{color:var(--muted);font-size:12.5px;margin-top:2px}
-  .searchwrap{margin-top:12px;position:relative;max-width:780px}
+  .searchwrap{margin-top:32px;position:relative;max-width:780px}
   #q{width:100%;padding:14px 44px 14px 44px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:16px;outline:none}
   #q:focus{border-color:var(--accent)}
   .sicon{position:absolute;left:14px;top:14px;color:var(--muted)}
@@ -180,7 +180,7 @@
   .navitem .ico svg{width:21px;height:21px;display:block;margin:0 auto}
   .navitem:hover{color:var(--ink)}
   .navitem.active{color:var(--accent);background:var(--panel2);border-left-color:var(--accent)}
-  .subhead{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--grad1),var(--grad2));border-bottom:1px solid var(--line);padding:calc(14px + var(--safe-t)) 150px 12px 20px}
+  .subhead{position:sticky;top:0;z-index:40;background:linear-gradient(180deg,var(--grad1),var(--grad2));border-bottom:1px solid var(--line);padding:calc(14px + var(--safe-t)) 188px 12px 20px}
   .subhead h2{margin:0;font-size:18px}
   .subhead p{margin:3px 0 0;color:var(--muted);font-size:12.5px}
   .wrap{max-width:1080px;margin:0 auto;padding:16px 20px 40px}
@@ -281,7 +281,7 @@
     .chips::-webkit-scrollbar{display:none}
     .chip{white-space:nowrap;flex:0 0 auto;padding:7px 13px}
     main,.wrap{padding:12px 12px 40px}
-    .subhead{padding:calc(12px + var(--safe-t)) 150px 10px 14px}
+    .subhead{padding:calc(12px + var(--safe-t)) 188px 10px 14px}
     #zulubar{padding:4px 8px}#zulubar .zt{font-size:15px}
     .card{padding:13px 14px;border-radius:12px;scroll-margin-top:120px}
     table.led{font-size:12.4px;display:block;overflow-x:auto}
@@ -300,6 +300,11 @@
   .gmsg{text-align:center;color:var(--muted);font-size:13px;margin:10px 0;min-height:18px}
   .gctrls{display:flex;flex-direction:column;align-items:center;gap:14px}
   .gctrls-top{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;margin:0 0 12px}
+  .board-wrap{position:relative;max-width:360px;margin:0 auto}
+  .tap-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:rgba(8,12,18,.66);border-radius:12px;cursor:pointer;z-index:6;text-align:center;padding:12px;-webkit-backdrop-filter:blur(1px);backdrop-filter:blur(1px)}
+  .tap-ov .ov-big{font-size:clamp(17px,6vw,23px);font-weight:800;color:var(--accent);letter-spacing:.02em}
+  .tap-ov .ov-sub{font-size:13.5px;font-weight:600;color:var(--ink)}
+  .tap-ov[hidden]{display:none}
   .dpad{display:grid;grid-template-columns:repeat(3,56px);grid-template-rows:repeat(3,56px);gap:7px}
   .dbtn{background:var(--chip);border:1px solid var(--line);color:var(--accent);border-radius:12px;font-size:20px;cursor:pointer;font-family:inherit}
   .dbtn:active{background:var(--panel2);transform:translateY(1px)}
@@ -926,9 +931,6 @@
       <button id="gameInfo" class="idot" aria-label="How to play" title="How to play">i</button>
     </div>
     <div id="game-snake" class="gpane">
-      <div class="gctrls gctrls-top">
-        <button class="btn sm" id="snStart">Start</button>
-      </div>
       <div class="gtop"><span id="snScore">Score 0</span><span id="snHi">Best 0</span></div>
       <canvas id="snCanvas" width="320" height="320"></canvas>
       <div class="gmsg" id="snMsg"></div>
@@ -955,19 +957,17 @@
       </div></div>
     </div>
     <div id="game-g2048" class="gpane" style="display:none">
-      <div class="gctrls gctrls-top"><button class="btn sm" id="g2048new">New game</button></div>
       <div class="gtop"><span id="g2048score">Score 0</span><span id="g2048best">Best 0</span></div>
-      <div id="g2048grid"></div>
+      <div class="board-wrap"><div id="g2048grid"></div><div class="tap-ov" id="g2048ov" hidden><div class="ov-big">Tap to restart</div><div class="ov-sub" id="g2048ovsub">Game over</div></div></div>
       <div class="gmsg" id="g2048msg"></div>
     </div>
     <div id="game-mines" class="gpane" style="display:none">
       <div class="gctrls gctrls-top" style="flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px">
         <select id="mineDiff" class="cb-colbtn"><option value="beg">Beginner 9&times;9</option><option value="int">Intermediate 12&times;12</option></select>
         <button class="btn ghost sm" id="mineFlag">&#128681; Flag: off</button>
-        <button class="btn sm" id="mineNew">New game</button>
       </div>
       <div class="gtop"><span id="mineCount">&#128681; 10</span><span id="mineTime">&#9201; 0</span></div>
-      <div id="mineGrid"></div>
+      <div class="board-wrap"><div id="mineGrid"></div><div class="tap-ov" id="mineOv" hidden><div class="ov-big">Tap to restart</div><div class="ov-sub" id="mineOvsub">Game over</div></div></div>
       <div class="gmsg" id="mineMsg"></div>
     </div>
     <div id="game-sudoku" class="gpane" style="display:none">
@@ -982,9 +982,6 @@
       </div>
     </div>
     <div id="game-maze" class="gpane" style="display:none">
-      <div class="gctrls gctrls-top">
-        <button class="btn sm" id="mzStart">Start</button>
-      </div>
       <div class="gtop"><span id="mzScore">Score 0</span><span id="mzLives">&#9679;&#9679;&#9679;</span><span id="mzHi">Best 0</span></div>
       <div style="text-align:center"><canvas id="mzCanvas"></canvas></div>
       <div class="gmsg" id="mzMsg"></div>
@@ -1596,6 +1593,17 @@ document.getElementById('deleteFolder').onclick=async()=>{ if(noteFilter!=='all'
 if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').then(function(){ console.info('Commo: offline service worker registered.'); }).catch(function(e){ console.warn('Commo: service worker not registered — the app still works, but full offline support needs sw.js hosted next to index.html over HTTPS.', e); }); }); }
 
 /* ===================== HURRY & WAIT (games) ===================== */
+function drawBoardTapOverlay(ctx,w,h,title,sub){ ctx.save(); ctx.fillStyle='rgba(8,12,18,.66)'; ctx.fillRect(0,0,w,h);
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  ctx.fillStyle='#4fd6cb'; ctx.font='800 '+Math.round(w*0.082)+'px system-ui,-apple-system,sans-serif'; ctx.fillText(title,w/2,h/2-(sub?Math.round(w*0.05):0));
+  if(sub){ ctx.fillStyle='#e8e6f0'; ctx.font='600 '+Math.round(w*0.05)+'px system-ui,-apple-system,sans-serif'; ctx.fillText(sub,w/2,h/2+Math.round(w*0.06)); }
+  ctx.restore(); }
+function attachLongPressRestart(el,fn){ if(!el||el._lpr)return; el._lpr=true; let t=null,sx=0,sy=0,fired=false;
+  const clear=()=>{ if(t){clearTimeout(t);t=null;} };
+  el.addEventListener('pointerdown',e=>{ fired=false; sx=e.clientX; sy=e.clientY; clear(); t=setTimeout(()=>{ t=null; fired=true; setTimeout(()=>{ fired=false; },700); try{ if(navigator.vibrate&&store.get('cf_haptic',false))navigator.vibrate(35); }catch(_){} fn(); },600); });
+  el.addEventListener('pointermove',e=>{ if(t&&(Math.abs(e.clientX-sx)>10||Math.abs(e.clientY-sy)>10))clear(); });
+  ['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,clear));
+  el.addEventListener('click',e=>{ if(fired){ e.stopPropagation(); e.preventDefault(); fired=false; } },true); }
 let _gameInit=false, snakeStop=function(){};
 function initGame(){
   if(_gameInit) return; _gameInit=true;
@@ -1631,11 +1639,11 @@ function initGame(){
   /* ---------- SNAKE ---------- */
   const cv=document.getElementById('snCanvas'), ctx=cv.getContext('2d');
   const N=16, CELL=cv.width/N;
-  let snake,dir,ndir,food,score,hi=store.get('cf_snake_hi',0),loop=null,alive=false,speed;
+  let snake,dir,ndir,food,score,hi=store.get('cf_snake_hi',0),loop=null,alive=false,speed,everStarted=false,overLine='';
   const col={ bg:getComputedStyle(document.documentElement).getPropertyValue('--inset')||'#141121' };
   function cssvar(n,f){ const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v||f; }
   function placeFood(){ const free=[]; for(let x=0;x<N;x++)for(let y=0;y<N;y++){ if(!snake.some(s=>s.x===x&&s.y===y))free.push({x,y}); }
-    if(!free.length){ food=null; alive=false; if(loop){clearInterval(loop);loop=null;} setMsg('You filled the board — perfect game!'); document.getElementById('snStart').textContent='Restart'; return; }
+    if(!free.length){ food=null; alive=false; if(loop){clearInterval(loop);loop=null;} overLine='Perfect! Score '+score; setMsg(''); draw(); return; }
     food=free[(Math.random()*free.length)|0]; }
   function draw(){
     ctx.fillStyle=cssvar('--inset','#141121'); ctx.fillRect(0,0,cv.width,cv.height);
@@ -1647,6 +1655,7 @@ function initGame(){
     // snake
     const acc=cssvar('--accent','#4fd6cb'), grn=cssvar('--green','#5fd7a6');
     snake.forEach((s,i)=>{ ctx.fillStyle=(i===0)?acc:grn; ctx.fillRect(s.x*CELL+1,s.y*CELL+1,CELL-2,CELL-2); });
+    if(!alive) drawBoardTapOverlay(ctx,cv.width,cv.height, everStarted?'TAP TO RESTART':'TAP TO START', everStarted?overLine:'Swipe to steer');
   }
   function setMsg(t){ document.getElementById('snMsg').textContent=t; }
   function setScore(){ document.getElementById('snScore').textContent='Score '+score; document.getElementById('snHi').textContent='Best '+hi; }
@@ -1664,11 +1673,12 @@ function initGame(){
     draw();
   }
   function restartLoop(){ if(loop)clearInterval(loop); loop=setInterval(step,speed); }
-  function start(){ snake=[{x:7,y:8},{x:6,y:8},{x:5,y:8}]; dir={x:1,y:0}; ndir={x:1,y:0}; score=0; speed=130; alive=true; placeFood(); setScore(); setMsg('Swipe to steer.'); restartLoop(); draw(); document.getElementById('snStart').textContent='Restart'; }
-  function gameOver(){ haptic([40,30,80]); sfx('lose'); alive=false; if(loop)clearInterval(loop); loop=null; setMsg('Game over — score '+score+'. Tap Restart.'); document.getElementById('snStart').textContent='Restart'; }
+  function start(){ snake=[{x:7,y:8},{x:6,y:8},{x:5,y:8}]; dir={x:1,y:0}; ndir={x:1,y:0}; score=0; speed=130; alive=true; everStarted=true; overLine=''; placeFood(); setScore(); setMsg('Swipe to steer.'); restartLoop(); draw(); }
+  function gameOver(){ haptic([40,30,80]); sfx('lose'); alive=false; if(loop)clearInterval(loop); loop=null; overLine='Score '+score; setMsg(''); draw(); }
   snakeStop=function(){ if(loop){clearInterval(loop);loop=null;} alive=false; };
   function turn(d){ if(!alive)return; if(d==='U'&&dir.y!==1)ndir={x:0,y:-1}; else if(d==='D'&&dir.y!==-1)ndir={x:0,y:1}; else if(d==='L'&&dir.x!==1)ndir={x:-1,y:0}; else if(d==='R'&&dir.x!==-1)ndir={x:1,y:0}; }
-  document.getElementById('snStart').onclick=start;
+  cv.style.cursor='pointer'; cv.onclick=()=>{ if(!alive)start(); };
+  attachLongPressRestart(cv,()=>start());   // hold to restart mid-game
   window._snakeDir=turn;   // full-screen swipe routes here
   // keys (only on game tab, snake pane)
   window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; if(document.getElementById('game-snake').style.display==='none')return;
@@ -2678,13 +2688,15 @@ function init2048(){ if(_g2048Init)return; _g2048Init=true;
   function collapse(v){ const a=v.filter(x=>x); const out=[]; let g=0; for(let i=0;i<a.length;i++){ if(a[i]===a[i+1]){ out.push(a[i]*2); g+=a[i]*2; i++; } else out.push(a[i]); } while(out.length<4)out.push(0); return {out,g}; }
   function canMove(){ if(board.includes(0))return true; for(const dir of ['L','R','U','D'])for(const idx of linesFor(dir)){ const v=idx.map(i=>board[i]); const {out}=collapse(v); for(let k=0;k<4;k++)if(v[k]!==out[k])return true; } return false; }
   function draw(){ for(let i=0;i<16;i++){ const v=board[i]; cells[i].textContent=v||''; cells[i].className='t2048 v'+(v||0); } setScore();
-    $('g2048msg').textContent = dead?'Game over — tap New game.' : (won?'2048! Keep going, or New game.' : 'Swipe the grid or use arrow keys.'); }
+    $('g2048msg').textContent = dead?'' : (won?'2048! Keep going.' : 'Swipe the grid or use arrow keys.');
+    const ov=$('g2048ov'); if(ov){ if(dead){ $('g2048ovsub').textContent='Game over · Score '+score; ov.hidden=false; } else ov.hidden=true; } }
   function move(dir){ if(dead)return; let moved=false,gain=0; for(const idx of linesFor(dir)){ const v=idx.map(i=>board[i]); const {out,g}=collapse(v); gain+=g; for(let k=0;k<4;k++){ if(board[idx[k]]!==out[k])moved=true; board[idx[k]]=out[k]; } }
     if(!moved)return; haptic(14); sfx(gain>0?'pop':'tick'); score+=gain; if(!won&&board.includes(2048)){won=true;sfx('win');} if(score>best){best=score;store.set('cf_2048_hi',best);} spawn(); if(!canMove()){dead=true;haptic([40,30,80]);sfx('lose');} draw(); save(); }
   function neu(){ board=new Array(16).fill(0); score=0; won=false; dead=false; spawn(); spawn(); draw(); save(); }
   function save(){ try{ store.set('cf_2048',{board,score,won}); }catch(e){} }
   function load(){ const d=store.get('cf_2048',null); if(d&&d.board&&d.board.length===16){ board=d.board; score=d.score||0; won=!!d.won; dead=!canMove(); return true; } return false; }
-  $('g2048new').onclick=neu;
+  { const ov=$('g2048ov'); if(ov)ov.onclick=neu; }
+  attachLongPressRestart($('g2048grid'),neu);   // hold to restart mid-game
   window._g2048Dir=move;   // full-screen swipe routes here
   window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; if($('game-g2048').style.display==='none')return; let d=null; const k=e.key; if(k==='ArrowLeft')d='L'; else if(k==='ArrowRight')d='R'; else if(k==='ArrowUp')d='U'; else if(k==='ArrowDown')d='D'; if(d){ e.preventDefault(); move(d); } });
   if(!load())neu(); else draw();
@@ -2702,11 +2714,9 @@ function initMines(){ if(_minesInit)return; _minesInit=true;
   function startTimer(){ stopTimer(); timer=setInterval(()=>{ time++; $('mineTime').textContent='⏱ '+time; },1000); }
   function build(){ grid.style.gridTemplateColumns='repeat('+N+',1fr)'; grid.innerHTML=''; cells=[];
     for(let i=0;i<N*N;i++){ const c=document.createElement('div'); c.className='mcell'; cells.push(c); grid.appendChild(c);
-      (function(i){ let lp=null;
+      (function(i){
         c.addEventListener('click',()=>{ if(flagMode)toggleFlag(i); else reveal(i); });
         c.addEventListener('contextmenu',e=>{ e.preventDefault(); toggleFlag(i); });
-        c.addEventListener('touchstart',()=>{ lp=setTimeout(()=>{ lp=null; toggleFlag(i); },450); },{passive:true});
-        c.addEventListener('touchend',()=>{ if(lp){ clearTimeout(lp); lp=null; } },{passive:true});
       })(i); } }
   function neu(){ const d=diffs[$('mineDiff').value]||diffs.beg; N=d[0]; M=d[1];
     mine=new Array(N*N).fill(false); rev=new Array(N*N).fill(false); flag=new Array(N*N).fill(false);
@@ -2716,16 +2726,18 @@ function initMines(){ if(_minesInit)return; _minesInit=true;
     let placed=0; while(placed<M){ const i=(Math.random()*N*N)|0; if(mine[i]||avoid.has(i))continue; mine[i]=true; placed++; } }
   function near(i){ const r=(i/N)|0,c=i%N; let n=0; for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){ if(!dr&&!dc)continue; const rr=r+dr,cc=c+dc; if(rr>=0&&rr<N&&cc>=0&&cc<N&&mine[rr*N+cc])n++; } return n; }
   function reveal(i){ if(dead||win||rev[i]||flag[i])return; if(first){ place(i); first=false; startTimer(); }
-    if(mine[i]){ haptic([50,40,90]); sfx('explosion'); dead=true; stopTimer(); for(let k=0;k<N*N;k++)if(mine[k])rev[k]=true; rev[i]=true; draw(); $('mineMsg').textContent='Boom 💥 — tap New game.'; return; }
+    if(mine[i]){ haptic([50,40,90]); sfx('explosion'); dead=true; stopTimer(); for(let k=0;k<N*N;k++)if(mine[k])rev[k]=true; rev[i]=true; $('mineMsg').textContent=''; draw(); return; }
     const stack=[i]; while(stack.length){ const j=stack.pop(); if(rev[j]||flag[j])continue; rev[j]=true; if(near(j)===0){ const r=(j/N)|0,c=j%N; for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){ const rr=r+dr,cc=c+dc; if(rr>=0&&rr<N&&cc>=0&&cc<N){ const k=rr*N+cc; if(!rev[k]&&!mine[k])stack.push(k); } } } }
     checkWin(); draw(); }
   function toggleFlag(i){ if(dead||win||rev[i])return; haptic(12); sfx('flag'); flag[i]=!flag[i]; setInfo(); draw(); }
-  function checkWin(){ let r=0; for(let i=0;i<N*N;i++)if(rev[i])r++; if(r===N*N-M){ win=true; sfx('win'); stopTimer(); for(let i=0;i<N*N;i++)if(mine[i])flag[i]=true; setInfo(); $('mineMsg').textContent='Cleared! 🏆 — '+time+'s.'; } }
+  function checkWin(){ let r=0; for(let i=0;i<N*N;i++)if(rev[i])r++; if(r===N*N-M){ win=true; sfx('win'); stopTimer(); for(let i=0;i<N*N;i++)if(mine[i])flag[i]=true; setInfo(); $('mineMsg').textContent=''; } }
   function draw(){ const cols=['','#2f6fd2','#2e9e5b','#d23422','#8a5cd2','#e07b2a','#2aa7a7','#555','#999'];
     for(let i=0;i<N*N;i++){ const c=cells[i]; c.className='mcell'; if(flag[i]&&!rev[i]){ c.textContent='🚩'; }
       else if(rev[i]){ c.classList.add('open'); if(mine[i]){ c.classList.add('mine'); c.textContent='💣'; } else { const n=near(i); c.textContent=n||''; if(n)c.style.color=cols[n]; } }
-      else { c.textContent=''; } } setInfo(); }
-  $('mineNew').onclick=neu; $('mineDiff').onchange=neu;
+      else { c.textContent=''; } } setInfo();
+    const ov=$('mineOv'); if(ov){ if(dead){ $('mineOvsub').textContent='💥 Hit a mine'; ov.hidden=false; } else if(win){ $('mineOvsub').textContent='🏆 Cleared in '+time+'s'; ov.hidden=false; } else ov.hidden=true; } }
+  { const ov=$('mineOv'); if(ov)ov.onclick=neu; } $('mineDiff').onchange=neu;
+  attachLongPressRestart(grid,neu);   // hold to restart mid-game
   $('mineFlag').onclick=()=>{ flagMode=!flagMode; $('mineFlag').classList.toggle('on',flagMode); $('mineFlag').textContent=flagMode?'🚩 Flag: ON':'🚩 Flag: off'; };
   neu();
 }
@@ -2753,9 +2765,12 @@ function initSudoku(){ if(_sudokuInit)return; _sudokuInit=true;
       else if(notes[i]&&notes[i].size){ c.classList.add('notes'); let h=''; for(let d=1;d<=9;d++)h+='<span>'+(notes[i].has(d)?d:'')+'</span>'; c.innerHTML=h; }
       else c.textContent=''; }
     $('sudNotes').classList.toggle('on',notesMode); $('sudNotes').textContent=notesMode?'✏ Notes: ON':'✏ Notes: off'; }
+  function clearPeerNotes(i,d){ const r=(i/9)|0,c=i%9,br=r-r%3,bc=c-c%3;
+    for(let k=0;k<9;k++){ notes[r*9+k].delete(d); notes[k*9+c].delete(d); }
+    for(let rr=0;rr<3;rr++)for(let dc=0;dc<3;dc++){ notes[(br+rr)*9+(bc+dc)].delete(d); } }
   function enter(d){ if(sel<0||given[sel]||done)return;
     if(notesMode){ if(val[sel])return; if(notes[sel].has(d))notes[sel].delete(d); else notes[sel].add(d); }
-    else { haptic(10); sfx('place'); val[sel]=val[sel]===d?0:d; notes[sel].clear(); checkDone(); }
+    else { haptic(10); sfx('place'); const placing=val[sel]!==d; val[sel]=placing?d:0; notes[sel].clear(); if(placing)clearPeerNotes(sel,d); checkDone(); }
     draw(); save(); }
   function erase(){ if(sel<0||given[sel]||done)return; val[sel]=0; notes[sel].clear(); draw(); save(); }
   function checkDone(){ if(val.some(x=>!x))return; for(let i=0;i<81;i++)if(conflict(i))return; done=true; sfx('win'); $('sudMsg').textContent='Solved! 🏆 Tap New game.'; }
@@ -3243,7 +3258,7 @@ function initMaze(){
   let T=18;                          // tile px (recomputed to fit)
   let grid=[], pellets=[], powers=[], tunnelRow=9, pelletTotal=0, pelletLeft=0;
   let muncher=null, chasers=[], score=0, lives=3, level=1, hi=store.get('cf_maze_hi',0);
-  let running=false, raf=null, frightUntil=0, combo=1, respawnAt=0, mouthT=0, won=false;
+  let running=false, raf=null, frightUntil=0, combo=1, respawnAt=0, mouthT=0, won=false, everStarted=false, overLine='';
 
   const COL_WALL='#2347b4', COL_WALL2='#4f74e8', COL_PEL='#ffd98a', COL_POW='#ffd98a',
         COL_MUN='#ffd23f', GHOST=['#ff5a5a','#4fd6cb','#ff86c8','#ffa54f'], COL_FRIGHT='#3b5bff';
@@ -3357,8 +3372,7 @@ function initMaze(){
     for(let i=0;i<powers.length;i++){ if(powers[i].c===cell.c&&powers[i].r===cell.r){ powers.splice(i,1); pelletLeft--; score+=50; frightUntil=Date.now()+7000; combo=1; sfx('pop'); setHud(); break; } } }
 
   function loseLife(){ sfx('explosion'); lives--; setHud();
-    if(lives<=0){ running=false; msg('Game over &mdash; score '+score+'. Tap Restart.'); document.getElementById('mzStart').textContent='Restart';
-      if(score>hi){ hi=score; store.set('cf_maze_hi',hi); setHud(); } return; }
+    if(lives<=0){ running=false; overLine='Score '+score; msg(''); if(score>hi){ hi=score; store.set('cf_maze_hi',hi); setHud(); } draw(); return; }
     respawnAt=Date.now()+1100; const info=genMazeKeep(); muncher.x=tc(info.mun.c,info.mun.r).x; muncher.y=tc(info.mun.c,info.mun.r).y; muncher.dir={x:0,y:0}; muncher.want={x:0,y:0};
     chasers.forEach((e,i)=>{ const h=e.home; e.x=tc(h.c,h.r).x; e.y=tc(h.c,h.r).y; e.dir={x:(i%2?1:-1),y:0}; e.want=e.dir; }); frightUntil=0; }
   function genMazeKeep(){ return {mun:cellToGrid(4,9)}; }  // keep same maze on death; just respawn positions
@@ -3397,6 +3411,7 @@ function initMaze(){
     chasers.forEach(e=>{ const blink=fright&&remain<2000&&(Math.floor(remain/250)%2===0); drawGhost(e.x,e.y,T*0.42,blink?'#cdd6ff':(fright?COL_FRIGHT:e.color),e.dir,fright); });
     // muncher
     drawMuncher(muncher.x,muncher.y,T*0.46,muncher.dir);
+    if(!running) drawBoardTapOverlay(ctx,cv.width,cv.height, everStarted?'TAP TO RESTART':'TAP TO START', everStarted?overLine:'Swipe to move');
   }
   function roundWall(c,r){ const x=c*T,y=r*T; ctx.fillStyle=COL_WALL;
     ctx.fillRect(x+T*0.12,y+T*0.12,T*0.76,T*0.76); ctx.fillStyle=COL_WALL2; ctx.fillRect(x+T*0.12,y+T*0.12,T*0.76,T*0.16); }
@@ -3414,17 +3429,20 @@ function initMaze(){
   function cssvarMZ(n,f){ try{ const v=getComputedStyle(document.documentElement).getPropertyValue(n).trim(); return v||f; }catch(e){ return f; } }
 
   function setDir(d){ if(!running)return; const map={U:{x:0,y:-1},D:{x:0,y:1},L:{x:-1,y:0},R:{x:1,y:0}}; if(map[d])muncher.want=map[d]; }
-  function start(){ newGame(true); running=true; document.getElementById('mzStart').textContent='Restart'; msg('Chomp the dots. Grab a big dot to turn the tables.'); if(raf)cancelAnimationFrame(raf); if(typeof musicStart==='function')musicStart(); tick(); }
+  function start(){ newGame(true); running=true; everStarted=true; overLine=''; msg('Chomp the dots. Grab a big dot to turn the tables.'); if(raf)cancelAnimationFrame(raf); if(typeof musicStart==='function')musicStart(); tick(); }
+  window._mazeTap=function(){ if(!running)start(); };
+  window._mazeRestart=function(){ start(); };
 
   mazeStop=function(){ running=false; if(raf){ cancelAnimationFrame(raf); raf=null; } };
 
   window._mazeDir=setDir;   // full-screen swipe routes here
+  cv.style.cursor='pointer'; cv.onclick=()=>{ if(!running)start(); };
+  attachLongPressRestart(cv,()=>{ if(window._mazeRestart)window._mazeRestart(); });   // hold to restart mid-game
   if(!_mazeInit){ _mazeInit=true;
-    document.getElementById('mzStart').onclick=start;
     window.addEventListener('keydown',e=>{ if(!views.game.classList.contains('active'))return; const mp=document.getElementById('game-maze'); if(!mp||mp.style.display==='none')return;
       const k=e.key; let d=null; if(k==='ArrowUp'||k==='w')d='U'; else if(k==='ArrowDown'||k==='s')d='D'; else if(k==='ArrowLeft'||k==='a')d='L'; else if(k==='ArrowRight'||k==='d')d='R'; if(d){ e.preventDefault(); setDir(d); } });
   }
-  if(!muncher){ newGame(true); running=false; draw(); msg('Tap Start to play.'); }
+  if(!muncher){ newGame(true); running=false; draw(); msg(''); }
   else { sizeCanvas(); draw(); }
 }
 
