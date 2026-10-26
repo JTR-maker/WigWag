@@ -534,6 +534,15 @@
 </style>
 </head>
 <body>
+<script>
+/* ---- On-screen error reporter (diagnostic): surfaces any JS error as a red banner you can read & report ---- */
+(function(){ function bar(){ var b=document.getElementById('__errbar'); if(!b){ b=document.createElement('div'); b.id='__errbar'; b.style.cssText='display:none;position:fixed;top:0;left:0;right:0;z-index:99999;background:#8a1226;color:#fff;font:11px/1.4 monospace;padding:9px 12px;white-space:pre-wrap;max-height:48vh;overflow:auto;box-shadow:0 2px 12px rgba(0,0,0,.55)'; b.onclick=function(){ b.style.display='none'; b.textContent=''; }; (document.body||document.documentElement).appendChild(b); } return b; }
+  function show(m){ try{ var b=bar(); b.style.display='block'; b.textContent=(b.textContent?b.textContent+'\n\n':'')+'tap to dismiss\n'+m; }catch(_){ } }
+  window.__errShow=show;
+  window.addEventListener('error',function(e){ show('ERR: '+(e.message||(e.error&&e.error.stack)||'error')+'\n@ '+((e.filename||'').split('/').pop())+':'+e.lineno+':'+e.colno); });
+  window.addEventListener('unhandledrejection',function(e){ var r=e.reason; show('PROMISE: '+((r&&(r.stack||r.message))||r||'?')); });
+})();
+</script>
 
 <div id="splash" aria-hidden="true" onclick="this.classList.add('sp-skip')">
   <div class="sp-logo"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="1.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="1.50" y="15.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.30s" x="1.50" y="19.50" width="3" height="3" rx="0.9"/><rect x="6.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="6.00" y="10.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.42s" x="6.00" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.42s" x="6.00" y="19.50" width="3" height="3" rx="0.9"/><rect x="10.50" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect x="10.50" y="6.00" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.54s" x="10.50" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.54s" x="10.50" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.54s" x="10.50" y="19.50" width="3" height="3" rx="0.9"/><rect x="15.00" y="1.50" width="3" height="3" rx="0.9" opacity="0.22"/><rect class="spc" style="--d:.66s" x="15.00" y="6.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.66s" x="15.00" y="19.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="1.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="6.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="10.50" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="15.00" width="3" height="3" rx="0.9"/><rect class="spc" style="--d:.78s" x="19.50" y="19.50" width="3" height="3" rx="0.9"/></svg></div>
@@ -568,7 +577,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen</div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v39</b></div>
   </div>
 </section>
 
@@ -1451,7 +1460,7 @@ function toggleFav(id){ FAV=isFav(id)?FAV.filter(x=>x!==id):[...FAV,id]; store.s
 /* ===================== NAV ===================== */
 const views={ home:document.getElementById('tab-home'), reference:document.getElementById('tab-reference'), tools:document.getElementById('tab-tools'), notes:document.getElementById('tab-notes'), sketch:document.getElementById('tab-sketch'), more:document.getElementById('tab-more'), game:document.getElementById('tab-game'), landnav:document.getElementById('tab-landnav') };
 function switchTab(name){
-  const S=fn=>{ try{ fn(); }catch(e){ try{console.warn('[Five by Five] feature error on "'+name+'":',e);}catch(_){ } } };
+  const S=fn=>{ try{ fn(); }catch(e){ try{console.warn('[Five by Five] feature error on "'+name+'":',e);}catch(_){ } try{ if(window.__errShow)window.__errShow('tab "'+name+'": '+(e&&(e.stack||e.message)||e)); }catch(_){ } } };
   S(()=>Object.keys(views).forEach(k=>views[k]&&views[k].classList.toggle('active',k===name)));
   S(()=>document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)));
   try{ if(window.__mapFsLeave)window.__mapFsLeave(); }catch(e){}
@@ -3781,7 +3790,7 @@ function initMap(){
   function size(){ if(!cv)return; const wrap=cv.parentElement, fs=document.body.classList.contains('map-fs');
     if(fs){ W=window.innerWidth; H=(window.visualViewport&&window.visualViewport.height)?Math.round(window.visualViewport.height):window.innerHeight; } else { W=Math.max(220,(wrap&&wrap.clientWidth)||320); H=Math.min(560,Math.max(300,Math.round(window.innerHeight*0.52))); }
     cv.width=W; cv.height=H; cv.style.width=W+'px'; cv.style.height=H+'px'; }
-  function scheduleDraw(){ if(drawReq)return; drawReq=true; requestAnimationFrame(()=>{ drawReq=false; try{ draw(); }catch(e){} }); }
+  function scheduleDraw(){ if(drawReq)return; drawReq=true; requestAnimationFrame(()=>{ drawReq=false; try{ draw(); }catch(e){ try{ if(window.__errShow)window.__errShow('map draw: '+(e&&(e.stack||e.message)||e)); }catch(_){ } } }); }
   function saveView(){ try{ const c=centerLL(); store.set('cf_mapctr',{lat:c.lat,lon:c.lon}); store.set('cf_mapz',z); }catch(e){} }
 
   // ---- tiles ----
