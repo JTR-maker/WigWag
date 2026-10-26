@@ -3,7 +3,7 @@
    no signal), and quietly refreshes the cache from the network when online.
    Bump CACHE (e.g. ...-v2) whenever you update index.html to force everyone
    onto the new version immediately. */
-const CACHE = 'commo-fundamentals-v26';
+const CACHE = 'commo-fundamentals-v28';
 const ASSETS = ['./', './index.html'];
 
 self.addEventListener('install', e => {
@@ -14,7 +14,7 @@ self.addEventListener('install', e => {
 self.addEventListener('activate', e => {
   e.waitUntil(Promise.all([
     self.clients.claim(),
-    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k))))
+    caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE && k.indexOf('fbf-tiles') !== 0).map(k => caches.delete(k))))
   ]));
 });
 
