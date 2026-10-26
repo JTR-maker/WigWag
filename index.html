@@ -1454,6 +1454,7 @@ function switchTab(name){
   const S=fn=>{ try{ fn(); }catch(e){ try{console.warn('[Five by Five] feature error on "'+name+'":',e);}catch(_){ } } };
   S(()=>Object.keys(views).forEach(k=>views[k]&&views[k].classList.toggle('active',k===name)));
   S(()=>document.querySelectorAll('.navitem').forEach(b=>b.classList.toggle('active',b.dataset.tab===name)));
+  try{ if(window.__mapFsLeave)window.__mapFsLeave(); }catch(e){}
   document.body.classList.remove('nav-open'); try{store.set('cf_tab',name); if(name!=='home')store.set('cf_lastsection',name);}catch(e){} try{window.scrollTo({top:0});}catch(e){}
   // stop features we're leaving (each guarded so one failure can't block the switch)
   if(name!=='game')S(()=>{ if(typeof snakeStop==='function')snakeStop(); if(typeof chessStop==='function')chessStop(); if(typeof minesStop==='function')minesStop(); if(typeof mazeStop==='function')mazeStop(); if(typeof musicStop==='function')musicStop(); });
@@ -1487,7 +1488,8 @@ document.getElementById('navScrim').onclick=()=>document.body.classList.remove('
     setTimeout(()=>window.dispatchEvent(new Event('resize')),30); }
   if(btn)btn.onclick=()=>isFs()?leave():enter();
   if(exit){ exit.onclick=leave; exit.addEventListener('touchend',function(e){ e.preventDefault(); leave(); },{passive:false}); }
-  window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&isFs())leave(); }); })();
+  window.addEventListener('keydown',e=>{ if(e.key==='Escape'&&isFs())leave(); });
+  window.__mapFsLeave=leave; })();
 /* ---- Home / landing page: tiles navigate, search opens the palette, resume chip jumps to last section ---- */
 function renderHome(){ try{ const host=document.getElementById('homeResume'); if(!host)return;
   const NM={reference:'Reference',tools:'Tools',landnav:'Land Nav',map:'Map',notes:'Notes',sketch:'Sketch Pad',more:'Saved & Setup',game:'Hurry & Wait'};
@@ -2219,7 +2221,7 @@ function initLandNav(){
   function onOrient(e){ let hd=null; if(e.webkitCompassHeading!=null&&isFinite(e.webkitCompassHeading)) hd=e.webkitCompassHeading; else if(e.absolute===true&&e.alpha!=null) hd=norm(360-e.alpha); if(hd!=null){ heading=hd; haveComp=true; $('lnCompStat').textContent=Math.round(hd)+'°'; render(); } }
   function startCompass(){ const add=()=>{ if(orientOn)return; orientOn=true; window.addEventListener('deviceorientationabsolute',onOrient,true); window.addEventListener('deviceorientation',onOrient,true); $('lnCompStat').textContent='on…'; };
     try{ if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function'){ DeviceOrientationEvent.requestPermission().then(st=>{ if(st==='granted')add(); else $('lnCompStat').textContent='denied'; }).catch(()=>{ $('lnCompStat').textContent='denied'; }); } else add(); }catch(e){ $('lnCompStat').textContent='n/a'; } }
-  $('lnEnable').onclick=()=>{ enabled=true; $('lnEnable').textContent='Engaging sensors…'; startGPS(); startCompass(); };
+  $('lnEnable').onclick=()=>{ enabled=true; try{store.set('cf_ln_enabled',true);}catch(e){} $('lnEnable').textContent='Engaging sensors…'; startGPS(); startCompass(); };
   // Stop the live sensors (called when leaving the tab) but remember that the
   // user had them on, so re-entering the tab can bring them back automatically.
   lnStop=function(){ try{ if(watchId!=null){navigator.geolocation.clearWatch(watchId); watchId=null;} }catch(e){} if(orientOn){ window.removeEventListener('deviceorientationabsolute',onOrient,true); window.removeEventListener('deviceorientation',onOrient,true); orientOn=false; } if(enabled){ $('lnGpsStat').textContent='paused'; $('lnCompStat').textContent='paused'; } };
@@ -2338,6 +2340,9 @@ function initLandNav(){
   function render(){ try{ WPS=store.get('cf_waypoints',[])||[]; active=store.get('cf_wp_active',null); ROUTE=(store.get('cf_route',[])||[]).slice(); }catch(_){} renderPos(); renderWpList(); renderRoute(); renderNav(); drawPlot(); }
   lnRefresh=render;
   render();
+  // Resume sensors automatically if they were engaged before (GPS permission persists for the site;
+  // the motion/compass permission on iOS may still need one tap of the button).
+  try{ if(store.get('cf_ln_enabled',false)){ enabled=true; const be=$('lnEnable'); if(be)be.textContent='Resuming sensors…'; startGPS(); startCompass(); } }catch(e){}
 }
 
 /* ===================== CHESS ENGINE (perft-validated) ===================== */
@@ -3876,23 +3881,37 @@ function initMap(){
 
   // ---- zoom / pan / pinch ----
   function zoomTo(nz,fx,fy){ nz=Math.max(2,Math.min(MAP_SRC[srcKey].max+0.6,nz)); const f=Math.pow(2,nz-z); cx=((cx-W/2)+fx)*f - fx + W/2; cy=((cy-H/2)+fy)*f - fy + H/2; z=nz; saveView(); scheduleDraw(); }
-  const ptrs=new Map(); let panPrev=null, pinchPrev=null, moved=false, lastTap=0, twoStart=0, twoMoved=false, downX=0, downY=0, maxD=0, downT=0;
-  function pinchState(){ const a=[...ptrs.values()]; const dx=a[0].x-a[1].x, dy=a[0].y-a[1].y; return {d:Math.hypot(dx,dy)||1, mx:(a[0].x+a[1].x)/2, my:(a[0].y+a[1].y)/2}; }
-  // NOTE: no setPointerCapture — on iOS it suppresses taps/clicks and can leave later taps (e.g. the menu button) unresponsive.
-  function onDown(e){ ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY}); if(ptrs.size===1){ panPrev={x:e.offsetX,y:e.offsetY}; downX=e.offsetX; downY=e.offsetY; maxD=0; moved=false; downT=Date.now(); } else if(ptrs.size===2){ panPrev=null; pinchPrev=pinchState(); twoStart=Date.now(); twoMoved=false; } }
-  function onMove(e){ if(!ptrs.has(e.pointerId))return; ptrs.set(e.pointerId,{x:e.offsetX,y:e.offsetY});
-    if(ptrs.size===1&&panPrev){ const dx=e.offsetX-panPrev.x, dy=e.offsetY-panPrev.y; maxD=Math.max(maxD,Math.hypot(e.offsetX-downX,e.offsetY-downY)); if(Math.abs(dx)>2||Math.abs(dy)>2){ moved=true; follow=false; } cx-=dx; cy-=dy; panPrev={x:e.offsetX,y:e.offsetY}; scheduleDraw(); }
-    else if(ptrs.size===2&&pinchPrev){ const ps=pinchState(), r=ps.d/pinchPrev.d; if(r>0&&isFinite(r)){ const dz=Math.log2(r); if(Math.abs(dz)>0.015){ zoomTo(z+dz,ps.mx,ps.my); moved=true; twoMoved=true; follow=false; } } pinchPrev=ps; } }
+  let lastTap=0, moved=false;
   function handleTap(px,py){ if(moveId)return; const now=Date.now(), hit=hitWp(px,py);
     if(hit){ setActive(hit); wpChanged(); syncPinBar(); lastTap=now; return; }
     if(now-lastTap<320){ zoomTo(z+1,px,py); lastTap=0; } else lastTap=now; }
-  function onUp(e){ if(!ptrs.has(e.pointerId))return; const was=ptrs.size; ptrs.delete(e.pointerId);
-    if(was>=2){ if(!twoMoved&&Date.now()-twoStart<300)zoomTo(z-1,W/2,H/2); pinchPrev=null; maxD=999; if(ptrs.size===1){ const p=[...ptrs.values()][0]; panPrev={x:p.x,y:p.y}; } return; }
-    if(was===1){ if(maxD<=12&&Date.now()-downT<600)handleTap(downX,downY); else if(moved)saveView(); panPrev=null; } }
+  function relXY(t,c){ const r=c.getBoundingClientRect(); return {x:t.clientX-r.left, y:t.clientY-r.top}; }
+  /* ---- TOUCH: state comes from e.touches (authoritative), so a finger lifting anywhere
+     can never leave the map in a stuck state that blocks later taps / the menu. ---- */
+  let tpan=null, tpinch=null, tdX=0, tdY=0, tmaxD=0, tdT=0, tmoved=false, t2start=0, t2moved=false;
+  function tps(e,c){ const a=relXY(e.touches[0],c), b=relXY(e.touches[1],c), dx=a.x-b.x, dy=a.y-b.y; return {d:Math.hypot(dx,dy)||1, mx:(a.x+b.x)/2, my:(a.y+b.y)/2}; }
+  function onTStart(e){ const c=e.currentTarget;
+    if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=0; tdT=Date.now(); tmoved=false; tpinch=null; t2start=0; t2moved=false; }
+    else if(e.touches.length===2){ tpan=null; tpinch=tps(e,c); t2start=Date.now(); t2moved=false; } }
+  function onTMove(e){ if(e.cancelable)e.preventDefault(); const c=e.currentTarget;
+    if(e.touches.length===1&&tpan){ const p=relXY(e.touches[0],c), dx=p.x-tpan.x, dy=p.y-tpan.y; tmaxD=Math.max(tmaxD,Math.hypot(p.x-tdX,p.y-tdY)); if(Math.abs(dx)>2||Math.abs(dy)>2){ tmoved=true; follow=false; } cx-=dx; cy-=dy; tpan=p; scheduleDraw(); }
+    else if(e.touches.length>=2&&tpinch){ const ps=tps(e,c), r=ps.d/tpinch.d; if(r>0&&isFinite(r)){ const dz=Math.log2(r); if(Math.abs(dz)>0.015){ zoomTo(z+dz,ps.mx,ps.my); tmoved=true; t2moved=true; follow=false; } } tpinch=ps; } }
+  function onTEnd(e){ const c=e.currentTarget;
+    if(e.touches.length===0){
+      if(t2start){ if(!t2moved&&Date.now()-t2start<300)zoomTo(z-1,W/2,H/2); }
+      else if(tpan){ if(tmaxD<=16&&Date.now()-tdT<700)handleTap(tdX,tdY); else if(tmoved)saveView(); }
+      tpan=null; tpinch=null; t2start=0; t2moved=false; tmoved=false;
+    } else if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=999; tpinch=null; } }
+  /* ---- MOUSE (desktop) ---- */
+  let mdown=false, mpan=null, mdX=0, mdY=0, mmaxD=0;
+  function onMDown(e){ mdown=true; mpan={x:e.offsetX,y:e.offsetY}; mdX=e.offsetX; mdY=e.offsetY; mmaxD=0; moved=false; }
+  function onMMove(e){ if(!mdown||!mpan)return; const dx=e.offsetX-mpan.x, dy=e.offsetY-mpan.y; mmaxD=Math.max(mmaxD,Math.hypot(e.offsetX-mdX,e.offsetY-mdY)); if(Math.abs(dx)>1||Math.abs(dy)>1){ moved=true; follow=false; } cx-=dx; cy-=dy; mpan={x:e.offsetX,y:e.offsetY}; scheduleDraw(); }
+  function onMUp(){ if(!mdown)return; mdown=false; if(mmaxD<=5)handleTap(mdX,mdY); else if(moved)saveView(); mpan=null; }
   function onWheel(e){ e.preventDefault(); zoomTo(z - Math.sign(e.deltaY)*0.5, e.offsetX, e.offsetY); }
-  function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true; c.addEventListener('pointerdown',onDown); c.addEventListener('pointermove',onMove); c.addEventListener('wheel',onWheel,{passive:false}); }
-  // Up/cancel on window so a finger lifting ANYWHERE always completes the gesture and clears state.
-  window.addEventListener('pointerup',onUp); window.addEventListener('pointercancel',onUp);
+  function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true;
+    if('ontouchstart' in window){ c.addEventListener('touchstart',onTStart,{passive:true}); c.addEventListener('touchmove',onTMove,{passive:false}); c.addEventListener('touchend',onTEnd); c.addEventListener('touchcancel',onTEnd); }
+    else { c.addEventListener('mousedown',onMDown); c.addEventListener('mousemove',onMMove); window.addEventListener('mouseup',onMUp); }
+    c.addEventListener('wheel',onWheel,{passive:false}); }
 
   // ---- GPS ----
   function startGPS(){ if(!navigator.geolocation||watchId!=null)return;
