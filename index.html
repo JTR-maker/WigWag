@@ -503,9 +503,27 @@
   .wp-row{display:flex;align-items:center;gap:8px;padding:9px 6px;border-bottom:1px solid rgba(120,110,150,.18);cursor:pointer}
   .wp-row:last-child{border-bottom:none}
   .wp-row.active{background:var(--panel2);border-radius:8px}
-  .wp-row .wn{flex:1;font-size:14px;font-weight:600}
+  .wp-row .wp-dot{width:12px;height:12px;flex:none;border-radius:50%;box-shadow:0 0 0 1.5px rgba(0,0,0,.45),0 0 0 2.5px rgba(255,255,255,.14)}
+  .wp-row .wp-main{flex:1;min-width:0}
+  .wp-row .wn{font-size:14px;font-weight:600}
+  .wp-row .wp-tgt{font-size:10.5px;color:var(--accent);font-weight:700;margin-left:5px;white-space:nowrap}
   .wp-row .wg{font-family:monospace;font-size:11.5px;color:var(--muted)}
+  .wp-row .wp-db{font-size:11.5px;color:var(--accent2);font-family:monospace;margin-top:1px}
+  .wp-row .wp-edit{flex:none;border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:8px;font-size:14px;width:32px;height:32px;cursor:pointer;padding:0}
   .wp-row .wx{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;padding:0 6px}
+  .wp-editor{padding:12px;margin:2px 0 8px;background:var(--inset);border:1px solid var(--line);border-radius:10px;display:flex;flex-direction:column;gap:10px}
+  .wpe-l{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--muted)}
+  .wpe-l input{background:var(--panel);border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:9px 10px;font-size:14px}
+  .wpe-types{display:flex;flex-wrap:wrap;gap:7px}
+  .wp-tchip{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:999px;font-size:12px;font-weight:600;padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .wp-tchip::before{content:'';width:9px;height:9px;border-radius:50%;background:var(--c)}
+  .wp-tchip.on{border-color:var(--c);box-shadow:0 0 0 1px var(--c) inset}
+  .wpe-btns{display:flex;flex-wrap:wrap;gap:8px}
+  .wpe-msg{min-height:14px;color:var(--red)}
+  .ln-opt-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:14px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--inset)}
+  .seg button{border:none;background:none;color:var(--muted);font-size:13px;font-weight:700;padding:8px 18px;cursor:pointer}
+  .seg button.on{background:var(--accent);color:var(--on-accent)}
   .wp-row .wp-route{flex:none;border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;font-size:11.5px;font-weight:700;padding:4px 9px;cursor:pointer;white-space:nowrap}
   .wp-row .wp-route.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
   .ln-routetot{font-size:14.5px;font-weight:700;text-align:center;margin:0 0 10px}
@@ -541,11 +559,6 @@
   window.__errShow=show;
   window.addEventListener('error',function(e){ show('ERR: '+(e.message||(e.error&&e.error.stack)||'error')+'\n@ '+((e.filename||'').split('/').pop())+':'+e.lineno+':'+e.colno); });
   window.addEventListener('unhandledrejection',function(e){ var r=e.reason; show('PROMISE: '+((r&&(r.stack||r.message))||r||'?')); });
-  /* ---- Tap inspector (diagnostic): shows what element each tap actually hits ---- */
-  function tdesc(el){ if(!el)return 'null'; var d=el.tagName.toLowerCase(); if(el.id)d+='#'+el.id; else if(el.className&&typeof el.className==='string'&&el.className.trim())d+='.'+el.className.trim().split(/\s+/)[0]; return d; }
-  var tdbg; function trb(){ if(!tdbg){ tdbg=document.createElement('div'); tdbg.id='__tapdbg'; tdbg.style.cssText='position:fixed;left:4px;bottom:4px;z-index:99998;background:rgba(0,0,0,.82);color:#6fe;font:10px/1.3 monospace;padding:3px 7px;border-radius:5px;pointer-events:none;max-width:96vw;white-space:nowrap;overflow:hidden'; (document.body||document.documentElement).appendChild(tdbg); } return tdbg; }
-  document.addEventListener('touchstart',function(e){ try{ var t=e.touches[0], el=t?document.elementFromPoint(t.clientX,t.clientY):null; trb().textContent='hit: '+tdesc(el)+'  fs:'+(document.body.classList.contains('map-fs')?1:0)+' n:'+e.touches.length; }catch(_){ } },true);
-  document.addEventListener('click',function(e){ try{ trb().textContent='click: '+tdesc(e.target)+'  fs:'+(document.body.classList.contains('map-fs')?1:0); }catch(_){ } },true);
   /* ---- tapBind: fire an action on touchend AND click (iOS can drop clicks after touching a canvas),
      without double-firing. Use for controls that must work right after map interaction. ---- */
   window.tapBind=function(el,fn){ if(!el||el.__tb)return; el.__tb=1; var sx=0,sy=0,moved=false,act=false,fired=false;
@@ -592,7 +605,7 @@
       <button class="home-tile" data-tab="game"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="10" rx="5"/><line x1="7" y1="11" x2="7" y2="13"/><line x1="6" y1="12" x2="8" y2="12"/><circle cx="16" cy="11.5" r="1.1"/><circle cx="18.2" cy="13.5" r="1.1"/></svg></span><span class="tn">Hurry &amp; Wait</span><span class="td">Games for the downtime</span></button>
       <button class="home-tile" data-tab="more"><span class="ti"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg></span><span class="tn">Saved &amp; Setup</span><span class="td">Pinned items, backup &amp; settings</span></button>
     </div>
-    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v42</b></div>
+    <div class="home-foot">Unclassified field reference &middot; works offline once added to your home screen &middot; <b id="appVer">v44</b></div>
   </div>
 </section>
 
@@ -1073,7 +1086,7 @@
         <span class="map-pinsel" id="lnMapWpSel" style="display:none">&#9873; <b id="lnMapWpSelName"></b><button class="btn ghost sm" id="lnMapWpMove">Move</button><button class="btn ghost sm" id="lnMapWpDel">Delete</button></span>
         <span class="map-pinmove" id="lnMapWpMoving" style="display:none">Centering <b id="lnMapWpMovingName"></b> &mdash;<button class="btn sm" id="lnMapWpSet">Set here</button><button class="btn ghost sm" id="lnMapWpCancel">Cancel</button></span>
       </div>
-      <div class="cxmuted" style="margin-top:6px;text-align:center">Drag to pan &middot; pinch or +/&minus; to zoom &middot; two-finger-tap to zoom out &middot; tap a pin to select it, then Move or Delete.</div>
+      <div class="cxmuted" style="margin-top:6px;text-align:center">Drag empty map to pan &middot; pinch or +/&minus; to zoom &middot; two-finger-tap to zoom out &middot; tap a pin to select it &middot; <b>drag a pin to move it</b>.</div>
       <div class="map-info" id="lnMapInfo"></div>
       <div class="map-actions">
         <button class="btn sm" id="lnMapDl">&#8681; Download this area</button>
@@ -1091,7 +1104,7 @@
       <div class="proc-tools"><button class="btn sm" id="lnWpAdd">Add waypoint</button><button class="btn ghost sm" id="lnWpHere">Use my position</button></div>
       <div id="lnWpMsg" class="cxmuted" style="margin-top:6px"></div>
       <div id="lnWpList" style="margin-top:8px"></div>
-      <div class="cxmuted" style="margin-top:8px">Tap a waypoint to make it the active target. Use <b>＋ route</b> to build a path through several in order.</div>
+      <div class="cxmuted" style="margin-top:8px">Tap a waypoint to make it the active target &middot; tap <b>&#9998;</b> to rename, edit its grid, or set a type/color &middot; <b>＋</b> adds it to a route.</div>
     </div>
 
     <div class="tool" id="lnRouteCard" style="display:none">
@@ -1122,6 +1135,15 @@
       <h3>Plot (north-up)</h3>
       <canvas id="lnPlot" width="340" height="340"></canvas>
       <div class="cxmuted" id="lnPlotScale" style="text-align:center">Enable GPS and add a waypoint to plot.</div>
+    </div>
+
+    <div class="tool">
+      <h3>Options &amp; waypoint file</h3>
+      <div class="ln-opt-row"><span>Distance units</span><div class="seg" id="lnUnits"><button type="button" data-u="km">km</button><button type="button" data-u="mi">mi</button></div></div>
+      <div class="proc-tools" style="margin-top:12px"><button class="btn sm" id="lnWpExport">&#8682; Share / export waypoints</button><button class="btn ghost sm" id="lnWpImport">&#8681; Import</button></div>
+      <input id="lnWpImportFile" type="file" accept="application/json,.json,.txt" style="display:none">
+      <div id="lnWpIOmsg" class="cxmuted" style="margin-top:8px"></div>
+      <div class="cxmuted" style="margin-top:4px;font-size:12px">Export shares all your waypoints as a file you can save or send; Import adds waypoints from a file onto another device.</div>
     </div>
   </div>
 </section>
@@ -1468,6 +1490,15 @@ q.addEventListener('keydown',e=>{ if(e.key==='Escape'){ q.value=''; render(); } 
 
 /* ===================== STORAGE ===================== */
 const store={ get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} } };
+/* ---- Units (km / mi) — shared by Land Nav and the map engine ---- */
+function cfUnits(){ try{ return store.get('cf_units','km')==='mi'?'mi':'km'; }catch(e){ return 'km'; } }
+function cfDist(m){ if(m==null||!isFinite(m))return '—'; if(cfUnits()==='mi'){ const ft=m*3.28084; return ft<1000?Math.round(ft)+' ft':(m/1609.344).toFixed(2)+' mi'; } return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
+function cfElev(m){ if(m==null||!isFinite(m))return '—'; return cfUnits()==='mi'?Math.round(m*3.28084)+' ft':Math.round(m)+' m'; }
+function cfSpeed(mps){ if(mps==null||!isFinite(mps))return '—'; return cfUnits()==='mi'?(mps*2.23694).toFixed(1)+' mph':(mps*3.6).toFixed(1)+' km/h'; }
+/* ---- Waypoint types / colors ---- */
+const WP_TYPES=[{k:'obj',name:'Objective',color:'#e2574a'},{k:'rally',name:'Rally point',color:'#4fd6cb'},{k:'ckpt',name:'Checkpoint',color:'#ecb457'},{k:'hazard',name:'Hazard',color:'#ff5bb0'},{k:'friendly',name:'Friendly',color:'#5fd7a6'},{k:'other',name:'Other',color:'#b79bff'}];
+function wpColor(w){ if(w&&w.color)return w.color; const t=WP_TYPES.find(x=>x.k===(w&&w.type)); return (t&&t.color)||'#e2574a'; }
+function wpTypeName(w){ const t=WP_TYPES.find(x=>x.k===(w&&w.type)); return t?t.name:'Objective'; }
 let FAV=store.get('cf_fav',[]);
 function isFav(id){ return FAV.includes(id); }
 function toggleFav(id){ FAV=isFav(id)?FAV.filter(x=>x!==id):[...FAV,id]; store.set('cf_fav',FAV); }
@@ -2232,7 +2263,7 @@ function initLandNav(){
   /* --- state --- */
   let pos=null, heading=null, haveComp=false, watchId=null, orientOn=false, enabled=false;
   let WPS=store.get('cf_waypoints',[]); let active=store.get('cf_wp_active',null);
-  let ROUTE=(store.get('cf_route',[])||[]).slice(); let pace=+store.get('cf_pace',4)||4;
+  let ROUTE=(store.get('cf_route',[])||[]).slice(); let pace=+store.get('cf_pace',4)||4; let editId=null;
   function save(){ store.set('cf_waypoints',WPS); store.set('cf_wp_active',active); if(typeof mapRefresh==='function')try{ mapRefresh(); }catch(_){} }
   function routeSave(){ try{ store.set('cf_route',ROUTE); }catch(_){} if(typeof mapRefresh==='function')try{ mapRefresh(); }catch(_){} if(typeof mapRouteSync==='function')try{ mapRouteSync(); }catch(_){} }
 
@@ -2253,18 +2284,55 @@ function initLandNav(){
   lnResume=function(){ if(enabled){ startGPS(); startCompass(); } };
 
   /* --- waypoints --- */
-  function addWp(lat,lon,name){ const id='w'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36); WPS.push({id,name:name||('WP'+(WPS.length+1)),lat,lon}); active=id; save(); render(); }
+  function addWp(lat,lon,name,type){ const id='w'+Date.now().toString(36)+Math.floor(Math.random()*1e4).toString(36); WPS.push({id,name:name||('WP'+(WPS.length+1)),lat,lon,type:type||'obj'}); active=id; save(); render(); }
   $('lnWpAdd').onclick=()=>{ const p=parseWp($('lnWpInput').value); const msg=$('lnWpMsg'); if(!p){ msg.textContent='Could not read that — use a full MGRS grid or "lat, long".'; return; } addWp(p.lat,p.lon,$('lnWpName').value.trim()); $('lnWpInput').value=''; $('lnWpName').value=''; msg.textContent='Added.'; setTimeout(()=>msg.textContent='',1500); };
   $('lnWpHere').onclick=()=>{ const msg=$('lnWpMsg'); if(!pos){ msg.textContent='No GPS fix yet — enable sensors first.'; return; } addWp(pos.lat,pos.lon,$('lnWpName').value.trim()||'My pos'); $('lnWpName').value=''; };
   (function(){ const pc=$('lnPace'); if(pc){ pc.value=pace; const upd=()=>{ let v=parseFloat(pc.value); if(!isFinite(v)||v<=0)v=4; v=Math.min(12,Math.max(1,v)); pace=v; try{store.set('cf_pace',pace);}catch(_){} renderRoute(); }; pc.addEventListener('input',()=>{ const v=parseFloat(pc.value); if(isFinite(v)&&v>0){ pace=Math.min(12,Math.max(1,v)); try{store.set('cf_pace',pace);}catch(_){} renderRoute(); } }); pc.addEventListener('change',upd); }
     const sn=$('lnRouteSnap'); if(sn){ sn.checked=store.get('cf_snaproads',false); sn.onchange=()=>{ try{store.set('cf_snaproads',sn.checked);}catch(_){} if(!sn.checked){ const st=$('lnRouteStat'); if(st)st.textContent=''; } if(typeof mapRouteSync==='function')try{mapRouteSync();}catch(_){} if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; }
     const cl=$('lnRouteClear'); if(cl)cl.onclick=clearRoute; })();
+  /* --- units toggle + waypoint export/import --- */
+  (function(){ const seg=$('lnUnits'); const iomsg=t=>{ const m=$('lnWpIOmsg'); if(m)m.textContent=t||''; };
+    if(seg){ const mark=()=>seg.querySelectorAll('[data-u]').forEach(b=>b.classList.toggle('on',b.dataset.u===cfUnits()));
+      seg.querySelectorAll('[data-u]').forEach(b=>{ const fn=()=>{ try{store.set('cf_units',b.dataset.u==='mi'?'mi':'km');}catch(e){} mark(); render(); if(typeof mapRefresh==='function')try{mapRefresh();}catch(_){} }; if(window.tapBind)window.tapBind(b,fn); else b.onclick=fn; }); mark(); }
+    const ex=$('lnWpExport'); if(ex){ const fn=()=>{ if(!WPS.length){ iomsg('No waypoints to export yet.'); return; } const data=JSON.stringify({app:'five-by-five',kind:'waypoints',ver:1,waypoints:WPS,route:ROUTE}); const fname='waypoints-'+new Date().toISOString().slice(0,10)+'.json'; const blob=new Blob([data],{type:'application/json'});
+      try{ const file=new File([blob],fname,{type:'application/json'}); if(navigator.canShare&&navigator.canShare({files:[file]})){ navigator.share({files:[file],title:'Five by Five waypoints'}).then(()=>iomsg('Shared '+WPS.length+' waypoints.')).catch(()=>{}); return; } }catch(e){}
+      try{ const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=fname; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1500); iomsg('Exported '+fname+' ('+WPS.length+' waypoints).'); }catch(e){ try{ navigator.clipboard.writeText(data); iomsg('Copied waypoints JSON to clipboard.'); }catch(_){ iomsg('Export not supported on this device.'); } } };
+      if(window.tapBind)window.tapBind(ex,fn); else ex.onclick=fn; }
+    const im=$('lnWpImport'), imf=$('lnWpImportFile');
+    function importWpText(text){ try{ const d=JSON.parse(text); const incoming=(d&&Array.isArray(d.waypoints))?d.waypoints:(Array.isArray(d)?d:null); if(!incoming){ iomsg('No waypoints found in that file.'); return; } let added=0;
+      incoming.forEach(w=>{ const lat=+w.lat, lon=+w.lon; if(isFinite(lat)&&isFinite(lon)&&Math.abs(lat)<=90&&Math.abs(lon)<=180){ WPS.push({id:'w'+Date.now().toString(36)+Math.floor(Math.random()*1e6).toString(36), name:w.name||('WP'+(WPS.length+1)), lat, lon, type:w.type||'obj', color:w.color||undefined}); added++; } });
+      if(added){ save(); render(); } iomsg('Imported '+added+' waypoint'+(added!==1?'s':'')+'.'); }catch(e){ iomsg('Could not read that file — expected a waypoints JSON.'); } }
+    if(im&&imf){ const fn=()=>imf.click(); if(window.tapBind)window.tapBind(im,fn); else im.onclick=fn;
+      imf.onchange=()=>{ const f=imf.files&&imf.files[0]; if(!f)return; const r=new FileReader(); r.onload=()=>{ importWpText(String(r.result||'')); imf.value=''; }; r.onerror=()=>iomsg('Could not read that file.'); r.readAsText(f); }; } })();
+  function bearingTo(w){ if(!pos)return null; const g=gc(pos.lat,pos.lon,w.lat,w.lon), dv=decl(pos.lat,pos.lon); return {dist:g.m, mag:norm(g.brg-dv)}; }
+  function wpEditorHTML(w){ const chips=WP_TYPES.map(t=>'<button class="wp-tchip'+((w.type||'obj')===t.k?' on':'')+'" data-type="'+t.k+'" style="--c:'+t.color+'">'+t.name+'</button>').join('');
+    return '<div class="wp-editor" data-for="'+w.id+'">'+
+      '<label class="wpe-l">Name<input class="wpe-name" value="'+esc(w.name||'')+'" placeholder="Name" autocomplete="off"></label>'+
+      '<label class="wpe-l">Grid or lat, long<input class="wpe-coord" value="'+esc(toMGRS(w.lat,w.lon,5))+'" placeholder="MGRS or lat,long" autocomplete="off"></label>'+
+      '<div class="wpe-types">'+chips+'</div>'+
+      '<div class="wpe-btns"><button class="btn sm wpe-save">Save</button><button class="btn ghost sm wpe-here">Use my position</button><button class="btn ghost sm wpe-del">Delete</button><button class="btn ghost sm wpe-cancel">Cancel</button></div>'+
+      '<div class="wpe-msg cxmuted"></div></div>'; }
   function renderWpList(){ const host=$('lnWpList'); if(!WPS.length){ host.innerHTML='<div class="cxmuted">No waypoints yet.</div>'; return; }
-    host.innerHTML=WPS.map(w=>{ const ri=ROUTE.indexOf(w.id); const rl=ri>=0?('#'+(ri+1)):'＋ route';
-      return '<div class="wp-row'+(w.id===active?' active':'')+'" data-id="'+w.id+'"><div><div class="wn">'+esc(w.name||'WP')+'</div><div class="wg">'+toMGRS(w.lat,w.lon,5)+'</div></div><span style="flex:1"></span><button class="wp-route'+(ri>=0?' on':'')+'" data-route="'+w.id+'">'+rl+'</button><button class="wx" data-del="'+w.id+'" title="Delete">&times;</button></div>'; }).join('');
-    host.querySelectorAll('.wp-row').forEach(r=>r.onclick=e=>{ if(e.target.dataset.del||e.target.dataset.route)return; active=r.dataset.id; save(); render(); });
-    host.querySelectorAll('[data-route]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); toggleRoute(b.dataset.route); });
-    host.querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); const id=b.dataset.del; WPS=WPS.filter(w=>w.id!==id); if(active===id)active=null; const ri=ROUTE.indexOf(id); if(ri>=0)ROUTE.splice(ri,1); save(); routeSave(); render(); }); }
+    host.innerHTML=WPS.map(w=>{ const ri=ROUTE.indexOf(w.id), rl=ri>=0?('#'+(ri+1)):'＋', on=w.id===active, b=bearingTo(w);
+      const db=b?'<div class="wp-db">'+cfDist(b.dist)+' · '+Math.round(b.mag)+'°M</div>':'';
+      let row='<div class="wp-row'+(on?' active':'')+'" data-id="'+w.id+'"><span class="wp-dot" style="background:'+wpColor(w)+'"></span><div class="wp-main"><div class="wn">'+esc(w.name||'WP')+(on?' <span class="wp-tgt">◉ target</span>':'')+'</div><div class="wg">'+toMGRS(w.lat,w.lon,5)+'</div>'+db+'</div><button class="wp-route'+(ri>=0?' on':'')+'" data-route="'+w.id+'" title="Add to route">'+rl+'</button><button class="wp-edit" data-edit="'+w.id+'" aria-label="Edit">&#9998;</button></div>';
+      if(editId===w.id)row+=wpEditorHTML(w);
+      return row; }).join('');
+    const B=(el,fn)=>{ if(!el)return; if(window.tapBind)window.tapBind(el,fn); else el.onclick=fn; };
+    host.querySelectorAll('.wp-row').forEach(r=>B(r,function(e){ if(e&&e.target&&e.target.closest&&(e.target.closest('.wp-route')||e.target.closest('.wp-edit')))return; active=r.dataset.id; editId=null; save(); render(); }));
+    host.querySelectorAll('[data-route]').forEach(b=>B(b,function(e){ if(e&&e.stopPropagation)e.stopPropagation(); toggleRoute(b.dataset.route); }));
+    host.querySelectorAll('[data-edit]').forEach(b=>B(b,function(e){ if(e&&e.stopPropagation)e.stopPropagation(); editId=(editId===b.dataset.edit)?null:b.dataset.edit; render(); }));
+    if(editId){ const ed=host.querySelector('.wp-editor[data-for="'+editId+'"]'); if(ed){ const w=WPS.find(x=>x.id===editId); if(w){ let selType=w.type||'obj';
+      ed.addEventListener('click',e=>e.stopPropagation());
+      ed.querySelectorAll('.wp-tchip').forEach(c=>B(c,function(e){ if(e&&e.stopPropagation)e.stopPropagation(); selType=c.dataset.type; ed.querySelectorAll('.wp-tchip').forEach(x=>x.classList.toggle('on',x.dataset.type===selType)); }));
+      const doSave=()=>{ const nm=ed.querySelector('.wpe-name').value.trim(), cv=ed.querySelector('.wpe-coord').value.trim(), msg=ed.querySelector('.wpe-msg'); let lat=w.lat, lon=w.lon;
+        if(cv){ const p=parseWp(cv); if(!p){ msg.textContent='Could not read that coordinate.'; return; } lat=p.lat; lon=p.lon; }
+        w.name=nm||w.name; w.lat=lat; w.lon=lon; w.type=selType; delete w.color; editId=null; save(); render(); };
+      B(ed.querySelector('.wpe-save'),function(e){ if(e&&e.stopPropagation)e.stopPropagation(); doSave(); });
+      B(ed.querySelector('.wpe-here'),function(e){ if(e&&e.stopPropagation)e.stopPropagation(); if(pos)ed.querySelector('.wpe-coord').value=pos.lat.toFixed(6)+', '+pos.lon.toFixed(6); else ed.querySelector('.wpe-msg').textContent='No GPS fix yet.'; });
+      B(ed.querySelector('.wpe-del'),function(e){ if(e&&e.stopPropagation)e.stopPropagation(); WPS=WPS.filter(x=>x.id!==editId); if(active===editId)active=null; const ri=ROUTE.indexOf(editId); if(ri>=0)ROUTE.splice(ri,1); editId=null; save(); routeSave(); render(); });
+      B(ed.querySelector('.wpe-cancel'),function(e){ if(e&&e.stopPropagation)e.stopPropagation(); editId=null; render(); });
+    } } } }
 
   /* --- route --- */
   function toggleRoute(id){ const i=ROUTE.indexOf(id); if(i>=0)ROUTE.splice(i,1); else { ROUTE.push(id); active=id; } save(); routeSave(); render(); }
@@ -2294,13 +2362,13 @@ function initLandNav(){
     host.querySelectorAll('.leg-row').forEach(r=>r.onclick=e=>{ if(e.target.closest('.leg-btns'))return; const lg=legs[+r.dataset.i]; if(lg){ active=lg.to.id; save(); render(); } }); }
 
   /* --- rendering --- */
-  function fmtDist(m){ return m<1000?Math.round(m)+' m':(m/1000).toFixed(2)+' km'; }
+  function fmtDist(m){ return cfDist(m); }
   function renderPos(){ if(!pos){ $('lnGrid').textContent='—'; $('lnLL').textContent='—'; $('lnAcc').textContent='—'; $('lnAlt').textContent='—'; $('lnSpd').textContent='—'; $('lnDecl').textContent='—'; return; }
     $('lnGrid').textContent=toMGRS(pos.lat,pos.lon,5);
     $('lnLL').textContent=pos.lat.toFixed(5)+', '+pos.lon.toFixed(5);
-    $('lnAcc').textContent=pos.acc!=null?'± '+Math.round(pos.acc)+' m':'—';
-    $('lnAlt').textContent=pos.alt!=null?Math.round(pos.alt)+' m':'—';
-    $('lnSpd').textContent=pos.spd!=null?(pos.spd*3.6).toFixed(1)+' km/h':'—';
+    $('lnAcc').textContent=pos.acc!=null?'± '+cfElev(pos.acc):'—';
+    $('lnAlt').textContent=cfElev(pos.alt);
+    $('lnSpd').textContent=cfSpeed(pos.spd);
     const dv=decl(pos.lat,pos.lon); $('lnDecl').textContent=(dv>=0?'+':'')+dv.toFixed(1)+'° '+(dv>=0?'E':'W')+' (auto)'; }
   function activeWp(){ return WPS.find(w=>w.id===active)||null; }
   function renderNav(){ const w=activeWp(), card=$('lnNavCard');
@@ -2345,7 +2413,7 @@ function initLandNav(){
     // range rings
     const niceStep=(x=>{ const p=Math.pow(10,Math.floor(Math.log10(x))); const n=x/p; const s=n<1.5?1:n<3.5?2:n<7.5?5:10; return s*p; })(maxd/2);
     ctx.strokeStyle=line; ctx.fillStyle=mut; ctx.font='10px monospace'; ctx.textAlign='left';
-    for(let rr=niceStep; rr*scale<=R+1; rr+=niceStep){ ctx.beginPath(); ctx.arc(cx,cy,rr*scale,0,7); ctx.stroke(); ctx.fillText((rr<1000?Math.round(rr)+'m':(rr/1000).toFixed(1)+'km'),cx+2,cy-rr*scale-2); }
+    for(let rr=niceStep; rr*scale<=R+1; rr+=niceStep){ ctx.beginPath(); ctx.arc(cx,cy,rr*scale,0,7); ctx.stroke(); ctx.fillText(cfDist(rr).replace(' ',''),cx+2,cy-rr*scale-2); }
     // N marker
     ctx.fillStyle=mut; ctx.textAlign='center'; ctx.font='bold 12px "Segoe UI",Arial'; ctx.fillText('N',cx,14);
     // route polyline (you -> wp -> wp ...)
@@ -2355,12 +2423,12 @@ function initLandNav(){
     // waypoints
     pts.forEach(p=>{ const x=cx+p.dE*scale, y=cy-p.dN*scale; const on=p.w.id===active;
       if(on){ ctx.strokeStyle=acc; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(x,y); ctx.stroke(); }
-      ctx.fillStyle=on?acc:acc2; ctx.beginPath(); ctx.arc(x,y,on?6:4,0,7); ctx.fill();
+      ctx.fillStyle=wpColor(p.w); ctx.beginPath(); ctx.arc(x,y,on?6:4,0,7); ctx.fill(); if(on){ ctx.lineWidth=2; ctx.strokeStyle=acc2; ctx.stroke(); ctx.lineWidth=1; }
       ctx.fillStyle=ink; ctx.font='10px "Segoe UI",Arial'; ctx.textAlign='left'; ctx.fillText(p.w.name||'',x+7,y+3); });
     // you + heading
     if(haveComp&&heading!=null){ const dv=decl(pos.lat,pos.lon), th=(heading+dv)*D; ctx.strokeStyle=ink; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(cx+18*Math.sin(th),cy-18*Math.cos(th)); ctx.stroke(); }
     ctx.fillStyle=acc; ctx.beginPath(); ctx.arc(cx,cy,5,0,7); ctx.fill(); ctx.strokeStyle='#000'; ctx.lineWidth=1; ctx.stroke();
-    $('lnPlotScale').textContent='Rings every '+(niceStep<1000?Math.round(niceStep)+' m':(niceStep/1000).toFixed(1)+' km')+' · you at center · north up'; }
+    $('lnPlotScale').textContent='Rings every '+cfDist(niceStep)+' · you at center · north up'; }
   function render(){ try{ WPS=store.get('cf_waypoints',[])||[]; active=store.get('cf_wp_active',null); ROUTE=(store.get('cf_route',[])||[]).slice(); }catch(_){} renderPos(); renderWpList(); renderRoute(); renderNav(); drawPlot(); }
   lnRefresh=render;
   render();
@@ -3843,8 +3911,9 @@ function initMap(){
   function drawWaypoints(worldLeft,worldTop){ let wps=[]; try{ wps=store.get('cf_waypoints',[])||[]; }catch(_){} const active=store.get('cf_wp_active',null), route=getRoute();
     wps.forEach(w=>{ const sx=lon2wx(w.lon,z)-worldLeft, sy=lat2wy(w.lat,z)-worldTop; if(sx<-50||sy<-60||sx>W+50||sy>H+50)return; const on=w.id===active; const ri=route.indexOf(w.id);
       if(on&&gps&&ri<0){ ctx.beginPath(); ctx.moveTo(lon2wx(gps.lon,z)-worldLeft,lat2wy(gps.lat,z)-worldTop); ctx.lineTo(sx,sy); ctx.strokeStyle='rgba(236,180,87,.85)'; ctx.setLineDash([6,5]); ctx.lineWidth=2; ctx.stroke(); ctx.setLineDash([]); ctx.lineWidth=1; }
-      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx-6,sy-13); ctx.lineTo(sx+6,sy-13); ctx.closePath(); ctx.fillStyle=on?'#ecb457':'#e2574a'; ctx.fill();
-      ctx.beginPath(); ctx.arc(sx,sy-15,7,0,7); ctx.fillStyle=on?'#ecb457':'#e2574a'; ctx.fill(); ctx.lineWidth=1.5; ctx.strokeStyle='#15110a'; ctx.stroke(); ctx.lineWidth=1;
+      const col=(typeof wpColor==='function')?wpColor(w):'#e2574a';
+      ctx.beginPath(); ctx.moveTo(sx,sy); ctx.lineTo(sx-6,sy-13); ctx.lineTo(sx+6,sy-13); ctx.closePath(); ctx.fillStyle=col; ctx.fill();
+      ctx.beginPath(); ctx.arc(sx,sy-15,7,0,7); ctx.fillStyle=col; ctx.fill(); ctx.lineWidth=on?3:1.5; ctx.strokeStyle=on?'#ffcf4a':'#15110a'; ctx.stroke(); ctx.lineWidth=1;
       if(w.name){ ctx.font='600 11px system-ui,sans-serif'; ctx.textAlign='center'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.65)'; ctx.strokeText(w.name,sx,sy-26); ctx.fillStyle='#fff'; ctx.fillText(w.name,sx,sy-26); ctx.lineWidth=1; ctx.textAlign='start'; }
       if(ri>=0){ ctx.beginPath(); ctx.arc(sx+12,sy-21,8,0,7); ctx.fillStyle='#4fd6cb'; ctx.fill(); ctx.lineWidth=1.5; ctx.strokeStyle='#07201d'; ctx.stroke(); ctx.lineWidth=1;
         ctx.fillStyle='#07201d'; ctx.font='700 10px system-ui'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(String(ri+1),sx+12,sy-21); ctx.textAlign='start'; ctx.textBaseline='alphabetic'; }
@@ -3874,9 +3943,14 @@ function initMap(){
     catch(e){ routeGeom=null; setRouteStat('Routing service unreachable — showing straight-line legs.'); scheduleDraw(); } }
   mapRouteSync=function(){ try{ fetchSnap(); }catch(_){} };
   function drawScaleBar(){ const c=centerLL(), mpp=156543.03392*Math.cos(c.lat*Math.PI/180)/Math.pow(2,z);
-    const targets=[10,20,50,100,200,500,1000,2000,5000,10000,20000,50000]; let m=targets[0]; for(const t of targets){ if(t/mpp<110)m=t; } const px=m/mpp, x=12, y=H-16;
+    const mi=(typeof cfUnits==='function'&&cfUnits()==='mi'); const maxM=110*mpp; let m, lbl;
+    if(mi){ const ftT=[50,100,250,500,1000,2000], miT=[0.5,1,2,5,10,20,50]; m=ftT[0]/3.28084; lbl='50 ft';
+      for(const ft of ftT){ const mm=ft/3.28084; if(mm<maxM){ m=mm; lbl=ft+' ft'; } }
+      for(const v of miT){ const mm=v*1609.344; if(mm<maxM){ m=mm; lbl=v+' mi'; } } }
+    else { const targets=[10,20,50,100,200,500,1000,2000,5000,10000,20000,50000]; m=targets[0]; lbl=m+' m'; for(const t of targets){ if(t/mpp<110){ m=t; lbl=t>=1000?(t/1000)+' km':t+' m'; } } }
+    const px=m/mpp, x=12, y=H-16;
     ctx.strokeStyle='#fff'; ctx.lineWidth=3; ctx.beginPath(); ctx.moveTo(x,y); ctx.lineTo(x+px,y); ctx.stroke(); ctx.strokeStyle='#0d1420'; ctx.lineWidth=1; ctx.stroke();
-    ctx.font='600 11px system-ui'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; const lbl=m>=1000?(m/1000)+' km':m+' m'; ctx.strokeText(lbl,x,y-5); ctx.fillStyle='#fff'; ctx.fillText(lbl,x,y-5); ctx.lineWidth=1; }
+    ctx.font='600 11px system-ui'; ctx.lineWidth=3; ctx.strokeStyle='rgba(0,0,0,.6)'; ctx.strokeText(lbl,x,y-5); ctx.fillStyle='#fff'; ctx.fillText(lbl,x,y-5); ctx.lineWidth=1; }
   function updateBadge(){ const off=!navigator.onLine, bt=(off?'<b>OFFLINE</b> · ':'')+MAP_SRC[srcKey].attr, c=centerLL(), it='Center '+c.lat.toFixed(4)+', '+c.lon.toFixed(4)+'  ·  zoom '+z.toFixed(1)+'  ·  '+(gps?('GPS ±'+Math.round(gps.acc||0)+' m'):'GPS: off');
     ['mapBadge','lnMapBadge'].forEach(id=>{ const b=$(id); if(b){ b.innerHTML=bt; b.classList.toggle('off',off); } });
     ['mapInfo','lnMapInfo'].forEach(id=>{ const e=$(id); if(e)e.textContent=it; }); }
@@ -3912,25 +3986,31 @@ function initMap(){
   function relXY(t,c){ const r=c.getBoundingClientRect(); return {x:t.clientX-r.left, y:t.clientY-r.top}; }
   /* ---- TOUCH: state comes from e.touches (authoritative), so a finger lifting anywhere
      can never leave the map in a stuck state that blocks later taps / the menu. ---- */
-  let tpan=null, tpinch=null, tdX=0, tdY=0, tmaxD=0, tdT=0, tmoved=false, t2start=0, t2moved=false;
+  let tpan=null, tpinch=null, tdX=0, tdY=0, tmaxD=0, tdT=0, tmoved=false, t2start=0, t2moved=false, dragId=null;
+  function setWpPos(id,lat,lon){ const w=getWps(), t=w.find(x=>x.id===id); if(t){ t.lat=lat; t.lon=lon; setWps(w); } }
   function tps(e,c){ const a=relXY(e.touches[0],c), b=relXY(e.touches[1],c), dx=a.x-b.x, dy=a.y-b.y; return {d:Math.hypot(dx,dy)||1, mx:(a.x+b.x)/2, my:(a.y+b.y)/2}; }
   function onTStart(e){ const c=e.currentTarget;
-    if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=0; tdT=Date.now(); tmoved=false; tpinch=null; t2start=0; t2moved=false; }
-    else if(e.touches.length===2){ tpan=null; tpinch=tps(e,c); t2start=Date.now(); t2moved=false; } }
+    if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=0; tdT=Date.now(); tmoved=false; tpinch=null; t2start=0; t2moved=false; dragId=(moveId?null:hitWp(p.x,p.y)); }
+    else if(e.touches.length===2){ tpan=null; tpinch=tps(e,c); t2start=Date.now(); t2moved=false; dragId=null; } }
   function onTMove(e){ const c=e.currentTarget; /* no preventDefault: touch-action:none already blocks scroll, and preventDefault here corrupts iOS touch state, killing later taps */
-    if(e.touches.length===1&&tpan){ const p=relXY(e.touches[0],c), dx=p.x-tpan.x, dy=p.y-tpan.y; tmaxD=Math.max(tmaxD,Math.hypot(p.x-tdX,p.y-tdY)); if(Math.abs(dx)>2||Math.abs(dy)>2){ tmoved=true; follow=false; } cx-=dx; cy-=dy; tpan=p; scheduleDraw(); }
+    if(e.touches.length===1&&tpan){ const p=relXY(e.touches[0],c), dx=p.x-tpan.x, dy=p.y-tpan.y; tmaxD=Math.max(tmaxD,Math.hypot(p.x-tdX,p.y-tdY));
+      if(dragId){ if(tmaxD>6){ tmoved=true; follow=false; const ll=llAt((cx-W/2)+p.x,(cy-H/2)+p.y); setWpPos(dragId,ll.lat,ll.lon); scheduleDraw(); } tpan=p; }
+      else { if(Math.abs(dx)>2||Math.abs(dy)>2){ tmoved=true; follow=false; } cx-=dx; cy-=dy; tpan=p; scheduleDraw(); } }
     else if(e.touches.length>=2&&tpinch){ const ps=tps(e,c), r=ps.d/tpinch.d; if(r>0&&isFinite(r)){ const dz=Math.log2(r); if(Math.abs(dz)>0.015){ zoomTo(z+dz,ps.mx,ps.my); tmoved=true; t2moved=true; follow=false; } } tpinch=ps; } }
   function onTEnd(e){ const c=e.currentTarget;
     if(e.touches.length===0){
       if(t2start){ if(!t2moved&&Date.now()-t2start<300)zoomTo(z-1,W/2,H/2); }
+      else if(dragId){ if(tmoved){ setActive(dragId); wpChanged(); syncPinBar(); } else { setActive(dragId); wpChanged(); syncPinBar(); } }
       else if(tpan){ if(tmaxD<=16&&Date.now()-tdT<700)handleTap(tdX,tdY); else if(tmoved)saveView(); }
-      tpan=null; tpinch=null; t2start=0; t2moved=false; tmoved=false;
-    } else if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=999; tpinch=null; } }
+      tpan=null; tpinch=null; t2start=0; t2moved=false; tmoved=false; dragId=null;
+    } else if(e.touches.length===1){ const p=relXY(e.touches[0],c); tpan=p; tdX=p.x; tdY=p.y; tmaxD=999; tpinch=null; dragId=null; } }
   /* ---- MOUSE (desktop) ---- */
-  let mdown=false, mpan=null, mdX=0, mdY=0, mmaxD=0;
-  function onMDown(e){ mdown=true; mpan={x:e.offsetX,y:e.offsetY}; mdX=e.offsetX; mdY=e.offsetY; mmaxD=0; moved=false; }
-  function onMMove(e){ if(!mdown||!mpan)return; const dx=e.offsetX-mpan.x, dy=e.offsetY-mpan.y; mmaxD=Math.max(mmaxD,Math.hypot(e.offsetX-mdX,e.offsetY-mdY)); if(Math.abs(dx)>1||Math.abs(dy)>1){ moved=true; follow=false; } cx-=dx; cy-=dy; mpan={x:e.offsetX,y:e.offsetY}; scheduleDraw(); }
-  function onMUp(){ if(!mdown)return; mdown=false; if(mmaxD<=5)handleTap(mdX,mdY); else if(moved)saveView(); mpan=null; }
+  let mdown=false, mpan=null, mdX=0, mdY=0, mmaxD=0, mdragId=null;
+  function onMDown(e){ mdown=true; mpan={x:e.offsetX,y:e.offsetY}; mdX=e.offsetX; mdY=e.offsetY; mmaxD=0; moved=false; mdragId=(moveId?null:hitWp(e.offsetX,e.offsetY)); }
+  function onMMove(e){ if(!mdown||!mpan)return; mmaxD=Math.max(mmaxD,Math.hypot(e.offsetX-mdX,e.offsetY-mdY));
+    if(mdragId){ if(mmaxD>4){ moved=true; follow=false; const ll=llAt((cx-W/2)+e.offsetX,(cy-H/2)+e.offsetY); setWpPos(mdragId,ll.lat,ll.lon); scheduleDraw(); } mpan={x:e.offsetX,y:e.offsetY}; }
+    else { const dx=e.offsetX-mpan.x, dy=e.offsetY-mpan.y; if(Math.abs(dx)>1||Math.abs(dy)>1){ moved=true; follow=false; } cx-=dx; cy-=dy; mpan={x:e.offsetX,y:e.offsetY}; scheduleDraw(); } }
+  function onMUp(){ if(!mdown)return; mdown=false; if(mdragId){ setActive(mdragId); wpChanged(); syncPinBar(); } else if(mmaxD<=5)handleTap(mdX,mdY); else if(moved)saveView(); mpan=null; mdragId=null; }
   function onWheel(e){ e.preventDefault(); zoomTo(z - Math.sign(e.deltaY)*0.5, e.offsetX, e.offsetY); }
   function bindCanvas(c){ if(c._mapBound)return; c._mapBound=true;
     if('ontouchstart' in window){ c.addEventListener('touchstart',onTStart,{passive:true}); c.addEventListener('touchmove',onTMove,{passive:true}); c.addEventListener('touchend',onTEnd); c.addEventListener('touchcancel',onTEnd); }
